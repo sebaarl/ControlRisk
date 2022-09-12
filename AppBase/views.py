@@ -21,6 +21,7 @@ def HomeView(request):
     return render(request, 'home.html')
 
 
+@login_required
 def CreateClient(request):
     data = {
         'cliente': CreateClienteForm()
@@ -61,7 +62,7 @@ def CreateClient(request):
     return render(request, 'create_cliente.html', data)
 
 
-
+@login_required
 def CreateEmpleado(request):
     data = {
         'emp': CreateEmpleadoForm()
@@ -99,6 +100,7 @@ def CreateEmpleado(request):
     return render(request, 'create_empleado.html', data)
 
 
+@login_required
 def ListClienteView(request):
     cursor = connection.cursor()
     cursor.execute('EXEC [dbo].[SP_LISTAR_CLIENTES]')
@@ -122,9 +124,11 @@ def ListClienteView(request):
 def CreateAccidentView(request):
     return render(request, 'create_accident.html')
 
+
+@login_required
 def CreateContractView(request):
     data = {
-        'contract': CreateClienteForm()
+        'contract': CreateContratoForm()
     }
     if request.method == "POST":
         if request.POST.get('asesoria') and request.POST.get('capa') and request.POST.get('termino') and request.POST.get(
@@ -137,7 +141,7 @@ def CreateContractView(request):
             contratosave.cuotascontrato = request.POST.get('cuota')
             contratosave.valorcontrato = request.POST.get('valor')
             contratosave.rutcliente = request.POST.get('cliente')
-            contratosave.rut = request.POST.get('emp')
+            contratosave.rut = request.POST.get('empleado')
 
             from django.db import connection
             with connection.cursor() as cursor:
@@ -150,9 +154,10 @@ def CreateContractView(request):
 
             return render(request, 'create_contract.html', data)
 
-    return render(request, 'create_contract.html')
+    return render(request, 'create_contract.html', data)
 
 
+@login_required
 def ListContractView(request):
     cursor = connection.cursor()
     cursor.execute('EXEC [dbo].[SP_LISTAR_CONTRATO]')

@@ -46,16 +46,30 @@
             </div>
             <div class="input-content">
                 <label for="">Seleccione el empelado encargado</label>
-                {{ contractForm.emp }}
+                {{ contractForm.empleado }}
             </div>
-    
+
             <div class="form-butto">
                 <button class="button">
                     Guardar
                 </button>
             </div>
-    
         </form>
+
+        {% if messages %}
+        {% for m in messages %}
+        <script>
+            Swal.fire({
+                'tittle': 'Exito',
+                'text': '{{ m }}',
+                'icon': 'success',
+                'confirmButtonColor': '#ff131d',
+                'confirmButtonText': 'Aceptar',
+            })
+        </script>
+        {% endfor %}
+        {% endif %}
+
     </div>
 </div>
 {% block javascript %}

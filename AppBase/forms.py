@@ -1,3 +1,4 @@
+from multiprocessing.connection import Client
 from django import forms
 from AppBase.models import Cliente, Empleado, RubroEmpresa
 from django.forms import ValidationError
@@ -195,29 +196,15 @@ class CreateContratoForm(forms.Form):
             }
         )
     )
-    cliente = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                'id': 'contratCliente',
-                'type': 'text',
-                'class': '',
-                'placeholder': '',
-                'name': 'cliente',
-            }
-        )
+    cliente = forms.ModelChoiceField(
+            queryset=Cliente.objects.all(),
+            initial=0 
     )
-    emp = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                'id': 'contratEmp',
-                'type': 'text',
-                'class': '',
-                'placeholder': '',
-                'name': 'empleado',
-            }
-        )
+    empleado = forms.ModelChoiceField(
+        queryset=Empleado.objects.all(),
+        initial=0 
     )
-
+    
 
 class CreateAccidenteForm(forms.Form):
     fecha = forms.DateTimeField(

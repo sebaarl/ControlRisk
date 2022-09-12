@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio de sesión - ControlRisk</title>
+  <link rel="stylesheet" href='{% static "css/estilos.css" %}'>
+  <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="icon" href="{% static 'images/prevencion.png'%}">
+</head>
+
+<body>
+  <section class="container forms">
+    <div class="form login">
+      <div class="form-content">
+        <div class="header-logo">
+          <img src='{% static "images/ControlRisk_Logo.png" %}' alt="">
+        </div>
+        <header>Inicio de sesión</header>
+        <form action='' method="POST">
+          {% csrf_token %}
+          <div class="field input-field">
+            <!-- <input type="email" placeholder="Nombre de usuario" class="input"> -->
+            {{ loginForm.username }}
+          </div>
+
+          <div class="field input-field">
+            <!-- <input id="pass" type="password" placeholder="Contraseña" class="password"> -->
+            {{ loginForm.password }}
+          </div>
+
+          <div class="field button-field">
+            <button type="submit">Iniciar sesión</button>
+          </div>
+        </form>
+
+        {% if messages %}
+        {% for m in messages %}
+            <script>
+                Swal.fire({
+                    'tittle': 'Exito',
+                    'text': '{{ m }}',
+                    'icon': 'success',
+                    'confirmButtonColor': '#ff131d',
+                    'confirmButtonText': 'Aceptar',
+                })
+            </script>
+        {% endfor %}
+    {% endif %}
+
+
+      </div>
+  </section>
+  <script src='{% static "js/main.js" %}'></script>
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Registro Cliente - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-user-plus"></i>
+    <span class="text">Nuevo Cliente?, Ingresalo aquí!</span>
+</div>
+
+<div class="container-dash">
+
+    <div class="form-container">
+        <form action="#" method="POST" class="form">
+            {% csrf_token %}
+            <div class="input-content">
+                <label for="">Rut del cliente</label>
+                {{ clienteForm.rut }}
+            </div>
+            <div class="input-content">
+                <label for="">Razon social del cliente</label>
+                {{ clienteForm.razon }}
+            </div>
+            <div class="input-content">
+                <label for="">Dirección del cliente</label>
+                {{ clienteForm.direccion }}
+            </div>
+            <div class="input-content">
+                <label for="">Telefono del cliente</label>
+                {{ clienteForm.telefono }}
+            </div>
+            <div class="input-content">
+                <label for="">Representante</label>
+                {{ clienteForm.representante }}
+            </div>
+            <div class="input-content">
+                <label for="">Rubro del cliente</label>
+                {{ clienteForm.rubro }}
+            </div>
+
+            <div class="form-butto">
+                <button class="button">
+                    Guardar
+                </button>
+            </div>
+
+        </form>
+
+        {% if messages %}
+            {% for m in messages %}
+                <script>
+                    Swal.fire({
+                        'tittle': 'Exito',
+                        'text': '{{ m }}',
+                        'icon': 'success',
+                        'confirmButtonColor': '#ff131d',
+                        'confirmButtonText': 'Aceptar',
+                    })
+                </script>
+            {% endfor %}
+        {% endif %}
+
+    </div>
+    {% block javascript %}
+    {% endblock %}
+</div>
+{% endblock %}

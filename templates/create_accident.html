@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Registro Contrato - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-file-contract-dollar"></i>
+    <span class="text">Nuevo contrato?, Ingresalo aquí!</span>
+</div>
+
+<div class="container-dash">
+
+    <div class="form-container">
+        <form action="#" method="POST">
+            {% csrf_token %}
+            <div class="input-content">
+                <label for="">Fecha del accidente</label>
+                {{ accidentForm.fecha }}
+            </div>
+            <div class="input-content">
+                <label for="">Ingrese descripcion del accidente</label>
+                {{ accidentForm.descripcion }}
+            </div>
+            <div class="input-content">
+                <label for="">Ingrese medidas tomadas en el accidente</label>
+                {{ accidentForm.medidas }}
+            </div>
+    
+            <div class="form-butto">
+                <button class="button">
+                    Guardar
+                </button>
+            </div>
+    
+        </form>
+    </div>
+</div>
+{% block javascript %}
+{% endblock %}
+{% endblock %}

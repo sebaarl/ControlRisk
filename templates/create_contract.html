@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Registro Contrato - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-file-contract-dollar"></i>
+    <span class="text">Nuevo contrato?, Ingresalo aquí!</span>
+</div>
+
+<div class="container-dash">
+
+    <div class="form-container">
+        <form action="#" method="POST">
+            {% csrf_token %}
+            <div class="input-content">
+                <label for="">Ingrese cantidad de asesorias</label>
+                {{ contractForm.asesoria }}
+            </div>
+            <div class="input-content">
+                <label for="">Ingrese cantidad de capacitaciones</label>
+                {{ contractForm.capa }}
+            </div>
+            <div class="input-content">
+                <label for="">Ingrese la fecha termino del contrato</label>
+                {{ contractForm.termino }}
+            </div>
+            <div class="input-content">
+                <label for="">Ingrese la primera fecha de pago</label>
+                {{ contractForm.pago }}
+            </div>
+            <div class="input-content">
+                <label for="">Ingrese la cantidad de cuotas</label>
+                {{ contractForm.cuota }}
+            </div>
+            <div class="input-content">
+                <label for="">Ingrese el valor del contrato</label>
+                {{ contractForm.valor }}
+            </div>
+            <div class="input-content">
+                <label for="">Seleccione el cliente</label>
+                {{ contractForm.cliente }}
+            </div>
+            <div class="input-content">
+                <label for="">Seleccione el empelado encargado</label>
+                {{ contractForm.emp }}
+            </div>
+    
+            <div class="form-butto">
+                <button class="button">
+                    Guardar
+                </button>
+            </div>
+    
+        </form>
+    </div>
+</div>
+{% block javascript %}
+{% endblock %}
+{% endblock %}

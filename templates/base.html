@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {% block name %}
+    <title></title>
+    {% endblock %}
+    <link rel="stylesheet" href='{% static "css/styles.css" %}' />
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <link rel="icon" href="{% static 'images/prevencion.png'%}">
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {% block link %}
+
+    {% endblock %}
+</head>     
+
+<body>
+    <nav>
+        <div class="logo-name">
+            <div class="logo-image">
+                <img src='{% static "images/prevencion.png" %}' alt="">
+            </div>
+
+            <span class="logo_name">ControlRisk</span>
+        </div>
+
+        <div class="menu-items">
+            {% if user.is_profesional == 0 %}
+            <ul class="nav-links">
+                <li><a href='{% url "base:home" %}'>
+                        <i class="uil uil-estate"></i>
+                        <span class="link-name">Inicio</span>
+                    </a></li>
+                <li><a href="#">
+                        <i class="uil uil-car"></i>
+                        <span class="link-name">Visitas</span>
+                    </a></li>
+                <li><a href="#">
+                        <i class="uil uil-podium"></i>
+                        <span class="link-name">Capacitaciones</span>
+                    </a></li>
+                <li><a href="#">
+                        <i class="uil uil-thumbs-up"></i>
+                        <span class="link-name">Asesorias</span>
+                    </a></li>
+                <li><a href='{% url "base:create-accident" %}'>
+                        <i class="uil uil-band-aid"></i>
+                        <span class="link-name">Accidente</span>
+                    </a></li>
+            </ul>
+            {% endif %}
+            {% if user.is_profesional == 1 %}
+            <ul class="nav-links">
+                <li><a href='{% url "base:home" %}'>
+                        <i class="uil uil-estate"></i>
+                        <span class="link-name">Inicio</span>
+                    </a></li>
+                <li><a href="#">
+                        <i class="uil uil-podium"></i>
+                        <span class="link-name">Capacitaciones</span>
+                    </a></li>
+                <li><a href="#">
+                        <i class="uil uil-thumbs-up"></i>
+                        <span class="link-name">Asesorias</span>
+                    </a></li>
+                <li><a href='{% url "base:create-accident" %}'>
+                        <i class="uil uil-band-aid"></i>
+                        <span class="link-name">Accidentes</span>
+                    </a></li>
+                <li><a href='{% url "base:list-client" %}'>
+                        <i class="uil uil-hard-hat"></i>
+                        <span class="link-name">Clientes</span>
+                    </a></li>
+                <li><a href='{% url "base:list-contract" %}'>
+                        <i class="uil uil-file-contract-dollar"></i>
+                        <span class="link-name">Contratos</span>
+                    </a></li> 
+            </ul>
+            {% endif %}
+            <ul class="logout-mode">
+                <li class="mode">
+                    <a href="#">
+                        <i class="uil uil-moon"></i>
+                        <span class="link-name">Modo oscuro</span>
+                    </a>
+
+                    <div class="mode-toggle">
+                        <span class="switch"></span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="dashboard">
+        <div class="top">
+            <i class="uil uil-draggabledots sidebar-toggle"></i>
+
+            <div class="noti-menu">
+                <div class="noti-btn">
+                    <i class="uil uil-bell sBtn-text-noti"></i>
+                </div>
+
+                <ul class="noti-options">
+                    <div class="noti-ver">
+                        <p href="">Notificaciones</>
+                    </div>
+                    <li class="noti-option"><a href="#">
+                            <span class="option-text-noti">Tu boleta Nro #12342 está por vencer, realiza tu pago lo
+                                antes posible!</span>
+                        </a></li>
+                    <li class="noti-option"><a href="#">
+                            <span class="option-text-noti">Tu boleta Nro #12342 está por vencer, realiza tu pago lo
+                                antes posible!</span>
+                        </a></li>
+                    <li class="noti-option"><a href="#">
+                            <span class="option-text-noti">Tu boleta Nro #12342 está por vencer, realiza tu pago lo
+                                antes posible!</span>
+                        </a></li>
+                    <li class="noti-option"><a href="#">
+                            <span class="option-text-noti">Tu boleta Nro #12342 está por vencer, realiza tu pago lo
+                                antes posible!</span>
+                        </a></li>
+                    <div class="noti-ver">
+                        <a href="">Ver más</a>
+                    </div>
+                </ul>
+            </div>
+            <div class="select-menu">
+                <div class="select-btn">
+                    <span class="sBtn-text">Cuenta</span>
+                    <i class="uil uil-angle-down"></i>
+                </div>
+
+                <ul class="options">
+                    <li class="option"><a href="#">
+                            <i class="uil uil-user"></i>
+                            <span class="option-text">Perfil</span>
+                        </a></li>
+                    <li class="option"><a href="{% url 'logout' %}">
+                            <i class="uil uil-signout"></i>
+                            <span class="option-text">Cerrar sesión</span>
+                        </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="dash-content">
+            {% block contenido %}
+
+            {% endblock %}
+        </div>
+
+    </section>
+
+    <footer>
+        <p>&#169 Copyright - ControlRisk 2022</p>
+    </footer>
+
+    <script src='{% static "js/main.js" %}'></script>
+
+    {% block javascript %}
+    {% endblock %}
+</body>
+
+</html>

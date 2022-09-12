@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Inicio - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+
+{% if user.is_authenticated %}
+    {% if user.is_profesional == 1 %}
+    <div class="home-title">
+        <h2>Bienvenido a Intranet Control Risk</h2>
+        <p>Panel: Profesional</p>
+        <p></p>
+    </div>
+    {% endif %}
+    {% if user.is_profesional == 0 %}
+    <div class="home-title">
+        <h2>Bienvenido a Intranet Control Risk</h2>
+        <p>Panel: Cliente</p>
+        <p></p>
+    </div>
+    {% endif %}
+{% endif %}
+
+{% endblock %}

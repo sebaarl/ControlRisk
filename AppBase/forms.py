@@ -11,7 +11,7 @@ class CreateClienteForm(forms.Form):
                 'id': 'clienteRut',
                 'type': 'text',
                 'class': '',
-                'placeholder': '',
+                'placeholder': 'Ingrese RUT',
                 'name': 'rut',
             }
         )
@@ -22,7 +22,7 @@ class CreateClienteForm(forms.Form):
                 'id': 'clienteRazon',
                 'type': 'text',
                 'class': '',
-                'placeholder': '',
+                'placeholder': 'Ingrese Razón Social',
                 'name': 'razon',
             }
         )
@@ -33,7 +33,7 @@ class CreateClienteForm(forms.Form):
                 'id': 'clienteDireccion',
                 'type': 'text',
                 'class': '',
-                'placeholder': '',
+                'placeholder': 'Ingrese dirección',
                 'name': 'direccion',
             }
         )
@@ -44,7 +44,7 @@ class CreateClienteForm(forms.Form):
                 'id': 'clienteTelefono',
                 'type': 'number',
                 'class': '',
-                'placeholder': '',
+                'placeholder': 'Ingrese telefono',
                 'name': 'telefono',
             }
         )
@@ -55,7 +55,7 @@ class CreateClienteForm(forms.Form):
                 'id': 'clienteRepresentante',
                 'type': 'text',
                 'class': '',
-                'placeholder': '',
+                'placeholder': 'Ingrese representante legal',
                 'name': 'representante',
             }
         )
@@ -66,7 +66,7 @@ class CreateClienteForm(forms.Form):
                 'id': 'clienteRubro',
                 'type': 'number',
                 'class': '',
-                'placeholder': '',
+                'placeholder': 'Ingrese rubro de la empresa',
                 'name': 'rubro',
             }
         )
@@ -78,7 +78,7 @@ class CreateClienteForm(forms.Form):
 
         if existe:
             raise ValidationError("Rut ya registrado!")
-            
+
         return rut
 
 
@@ -136,7 +136,7 @@ class CreateContratoForm(forms.Form):
                 'id': 'contratoAsesoria',
                 'type': 'number',
                 'class': '',
-                'placeholder': '',
+                'placeholder': 'Ingrese n° de asesorias',
                 'name': 'asesoria',
             }
         )
@@ -147,7 +147,7 @@ class CreateContratoForm(forms.Form):
                 'id': 'contratoCapa',
                 'type': 'number',
                 'class': '',
-                'placeholder': '',
+                'placeholder': 'Ingrese n° de capacitaciones',
                 'name': 'capa',
             }
         )
@@ -180,7 +180,7 @@ class CreateContratoForm(forms.Form):
                 'id': 'contratoCuota',
                 'type': 'number',
                 'class': '',
-                'placeholder': '',
+                'placeholder': 'Ingrese n° de cuotas del contrato',
                 'name': 'cuota',
             }
         )
@@ -191,20 +191,34 @@ class CreateContratoForm(forms.Form):
                 'id': 'contratoValor',
                 'type': 'number',
                 'class': '',
-                'placeholder': '',
+                'placeholder': 'Ingrese el valor total',
                 'name': 'valor',
             }
         )
     )
-    cliente = forms.ModelChoiceField(
-            queryset=Cliente.objects.all(),
-            initial=0 
+    cliente = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'id': 'clienteRut',
+                'type': 'text',
+                'class': '',
+                'placeholder': 'Ingrese RUT',
+                'name': 'cliente',
+            }
+        )
     )
-    empleado = forms.ModelChoiceField(
-        queryset=Empleado.objects.all(),
-        initial=0 
+    empleado = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'id': 'clienteRut',
+                'type': 'text',
+                'class': '',
+                'placeholder': 'Ingrese RUT',
+                'name': 'empleado',
+            }
+        )
     )
-    
+
 
 class CreateAccidenteForm(forms.Form):
     fecha = forms.DateTimeField(

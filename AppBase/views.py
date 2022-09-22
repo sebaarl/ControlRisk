@@ -15,10 +15,36 @@ from AppBase.forms import CreateClienteForm, CreateEmpleadoForm, CreateContratoF
 from AppBase.models import Cliente, Empleado, Contrato
 from AppUser.models import User
 
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+from dateutil.relativedelta import *
+from dateutil.easter import *
+from dateutil.rrule import *
+from dateutil.parser import *
+
+
+def rut(rut):
+    puntos = rut.replace('.', '')
+    guion = puntos.replace('-', '')
+    rut_final = guion
+
+    return rut_final
+
+
+def formatRut(rut):
+    if len(rut) == 8:
+        formato = rut[0:1] + '.' + rut[1:4] + '.' + rut[4:7] + '-' + rut[-1]
+    else:
+        formato = rut[0:2] + '.' + rut[2:5] + '.' + rut[5:8] + '-' + rut[-1]
+
+    return formato
+
 
 @login_required
 def HomeView(request):
     return render(request, 'home.html')
+
 
 
 @login_required
@@ -37,27 +63,36 @@ def CreateClient(request):
             clientesave.representante = request.POST.get('representante')
             clientesave.rubro = request.POST.get('rubro')
 
+            rut_cli = rut(clientesave.rutcliente)
+
             if request.method == "POST":
-                username = request.POST.get('rut')
-                password = request.POST.get('rut')[4:]
+                existe =  Cliente.objects.filter(rutcliente=rut_cli).exists()
+                user_exist = User.objects.filter(username=rut_cli).exists()
 
-                user = get_user_model().objects.create(
-                    username=username,
-                    password=make_password(password),
-                    is_active=True,
-                    is_profesional=False
-                )
+                if existe and user_exist:
+                    messages.error(request, "El rut " +
+                                formatRut(rut_cli) +" ya está registrado en el sistema!")
+                else:
+                    username = rut_cli
+                    password = rut_cli[4:]
 
-            from django.db import connection
-            with connection.cursor() as cursor:
+                    user = get_user_model().objects.create(
+                        username=username,
+                        password=make_password(password),
+                        is_active=True,
+                        is_profesional=False
+                    )  
 
-                cursor.execute('EXEC [dbo].[SP_CREATE_CLIENTE] %s, %s, %s, %s, %s, %s', (clientesave.rutcliente,
+                    from django.db import connection
+                    with connection.cursor() as cursor:
+
+                        cursor.execute('EXEC [dbo].[SP_CREATE_CLIENTE] %s, %s, %s, %s, %s, %s', (rut_cli,
                                clientesave.razonsocial, clientesave.rubro,  clientesave.direccion, clientesave.telefono, clientesave.representante))
 
-                messages.success(request, "Cliente " +
-                                 clientesave.rutcliente+" registrado correctamente ")
+                        messages.success(request, "Cliente " +
+                                    formatRut(rut_cli) +" registrado correctamente ")
 
-            return render(request, 'create_cliente.html', data)
+                    return render(request, 'create_cliente.html', data)
 
     return render(request, 'create_cliente.html', data)
 
@@ -130,24 +165,26 @@ def CreateContractView(request):
     data = {
         'contract': CreateContratoForm()
     }
+
     if request.method == "POST":
-        if request.POST.get('asesoria') and request.POST.get('capa') and request.POST.get('termino') and request.POST.get(
-            'pago') and request.POST.get('cuota') and request.POST.get('valor') and request.POST.get('cliente') and request.POST.get('emp'):
+        if request.POST.get('asesoria') and request.POST.get('capa') and request.POST.get('cuota') and request.POST.get('valor') and request.POST.get('cliente') and request.POST.get('empleado'):
             contratosave = Contrato()
             contratosave.cantidadasesorias = request.POST.get('asesoria')
             contratosave.cantidadcapacitaciones = request.POST.get('capa')
-            contratosave.fechatermino = request.POST.get('termino')
-            contratosave.fechapago = request.POST.get('pago')
             contratosave.cuotascontrato = request.POST.get('cuota')
             contratosave.valorcontrato = request.POST.get('valor')
             contratosave.rutcliente = request.POST.get('cliente')
-            contratosave.rut = request.POST.get('empleado')
+            contratosave.rutempleado = request.POST.get('empleado')
+
+            now = datetime.now()
+            termino = now + relativedelta(months=12) 
+            pago = now + relativedelta(months=1)
 
             from django.db import connection
             with connection.cursor() as cursor:
 
-                cursor.execute('EXEC [dbo].[SP_CREATE_CONTRATO] %s, %s, %s, %s, %s, %s, %s, %s', (contratosave.cantidadasesorias,
-                                contratosave.cantidadcapacitaciones,contratosave.fechatermino,contratosave.fechapago,contratosave.cuotascontrato,contratosave.valorcontrato, contratosave.rutcliente, contratosave.rut))
+                cursor.execute('EXEC [dbo].[[SP_CREATE_CONTRAT] %s, %s, %s, %s, %s, %s, %s, %s', (contratosave.cantidadasesorias,
+                                contratosave.cantidadcapacitaciones, termino, pago, contratosave.cuotascontrato,contratosave.valorcontrato, contratosave.rutcliente, contratosave.rutempleado))
 
                 messages.success(request, "Contrato " +
                                  "registrado correctamente ")

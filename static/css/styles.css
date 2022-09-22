@@ -60,11 +60,11 @@ body.dark .activity-data::-webkit-scrollbar-thumb:hover {
     background: #3a3b3c;
 }
 
-.home-title h2{
+.home-title h2 {
     color: var(--text-color);
 }
 
-.home-title p{
+.home-title p {
     color: var(--text-color);
 }
 
@@ -312,7 +312,7 @@ nav.close~.dashboard .top {
 
 .top .title {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     margin: 10px 0 30px 0;
 }
 
@@ -355,13 +355,167 @@ nav.close~.dashboard .top {
     margin-left: 10px;
 }
 
-.container-dash {
+.container {
+    height: 100%;
     width: 100%;
-
+    border-radius: 6px;
+    padding: 30px;
+    margin: 0;
 }
 
-.form-container {
+.container form {
+    height: 100%;
+    overflow: hidden;
+}
+
+.dashboard .top .search-box {
+    position: relative;
+    height: 45px;
+    max-width: 600px;
     width: 100%;
+    margin: 0 30px;
+}
+
+.options {
+    width: 100%;
+    height: auto;
+    display: flex;
+}
+
+.search-box {
+    margin-left: 20px;
+}
+
+.search-box input {
+    border: 1px solid var(--border-color);
+    background-color: var(--panel-color);
+    padding: 5px 10px 5px 15px;
+    border-radius: 5px;
+    color: var(--text-color);
+    font-size: 15px;
+    font-weight: 400;
+    outline: none;
+}
+
+.container form .title {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 6px 0;
+    color: #333;
+}
+
+.container form .fields {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+form .fields .input-field {
+    display: flex;
+    width: calc(100% / 3 - 10px);
+    flex-direction: column;
+}
+
+.direc {
+    width: 100% !important;
+}
+
+.repre {
+    width: 60% !important;
+}
+
+.input-field label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #2e2e2e;
+}
+
+.input-field input,
+select {
+    outline: none;
+    font-size: 14px;
+    font-weight: 400;
+    color: #333;
+    border-radius: 5px;
+    border: 1px solid #aaa;
+    padding: 0 15px;
+    height: 42px;
+    margin: 8px 0;
+}
+
+.input-field input :focus,
+.input-field select:focus {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.13);
+}
+
+.input-field select,
+.input-field input[type="date"] {
+    color: #707070;
+}
+
+.input-field input[type="date"]:valid {
+    color: #333;
+}
+
+.container form button,
+.backBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 45px;
+    max-width: 200px;
+    width: 100%;
+    border: none;
+    outline: none;
+    color: #fff;
+    border-radius: 5px;
+    margin: 25px 0;
+    background-color: #ff131d;
+    transition: all 0.3s linear;
+    cursor: pointer;
+}
+
+.container form .btnText {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+form button i,
+form .backBtn i {
+    margin: 0 6px;
+}
+
+form .backBtn i {
+    transform: rotate(180deg);
+}
+
+form .buttons {
+    display: flex;
+    align-items: center;
+}
+
+form .buttons button,
+.backBtn {
+    margin-right: 14px;
+}
+
+@media (max-width: 750px) {
+    .container form {
+        overflow-y: scroll;
+    }
+
+    .container form::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@media (max-width: 550px) {
+    form .fields .input-field {
+        width: 100%;
+    }
 }
 
 .input-content {
@@ -675,8 +829,7 @@ footer p {
     color: #707070;
 }
 
-.button-c {
-}
+.button-c {}
 
 .button-c .btn {
     height: 100%;
@@ -714,7 +867,7 @@ th {
     color: #fff;
 }
 
-table thead tr{
+table thead tr {
     font-size: 10px;
 }
 
@@ -771,9 +924,11 @@ tbody {
     td:nth-child(5)::before {
         content: "Direccion";
     }
+
     td:nth-child(6)::before {
         content: "Telefono";
     }
+
     td:nth-child(7)::before {
         content: "Representante";
     }
@@ -839,7 +994,7 @@ tbody {
     }
 
     .activity .activity-data {
-        overflow-X: scroll;
+        overflow-x: scroll;
     }
 }
 

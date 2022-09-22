@@ -11,60 +11,64 @@
     <span class="text">Nuevo Cliente?, Ingresalo aquí!</span>
 </div>
 
-<div class="container-dash">
-
-    <div class="form-container">
-        <form action="#" method="POST" class="form">
-            {% csrf_token %}
-            <div class="input-content">
-                <label for="">Rut del cliente</label>
-                {{ clienteForm.rut }}
-            </div>
-            <div class="input-content">
-                <label for="">Razon social del cliente</label>
-                {{ clienteForm.razon }}
-            </div>
-            <div class="input-content">
-                <label for="">Dirección del cliente</label>
-                {{ clienteForm.direccion }}
-            </div>
-            <div class="input-content">
-                <label for="">Telefono del cliente</label>
-                {{ clienteForm.telefono }}
-            </div>
-            <div class="input-content">
-                <label for="">Representante</label>
-                {{ clienteForm.representante }}
-            </div>
-            <div class="input-content">
-                <label for="">Rubro del cliente</label>
-                {{ clienteForm.rubro }}
+<div class="container">
+    <form action="#" method="POST">
+        {% csrf_token %}
+        <div class="form first">
+            <div class="details personal">
+                <div class="fields">
+                    <div class="input-field">
+                        <label>Rut del Cliente</label>
+                        {{ clienteForm.rut }}
+                    </div>
+                    <div class="input-field">
+                        <label>Razón Social del Cliente</label>
+                        {{ clienteForm.razon }}
+                    </div>
+                    <div class="input-field">
+                        <label>Telefono de Contacto del Cliente</label>
+                        {{ clienteForm.telefono }}
+                    </div>
+                    <div class="input-field direc">
+                        <label>Dirección del Cliente</label>
+                        {{ clienteForm.direccion }}
+                    </div>
+                </div>
             </div>
 
-            <div class="form-butto">
-                <button class="button">
-                    Guardar
+            <div class="details ID">
+                <div class="fields">
+
+                    <div class="input-field repre">
+                        <label>Representante Legal</label>
+                        {{ clienteForm.representante }}
+                    </div>
+
+                    <div class="input-field">
+                        <label>Rubro de Empresa del Cliente</label>
+                        {{ clienteForm.rubro }}
+                    </div>
+                </div>
+
+                <button class="nextBtn">
+                    <span class="btnText">Guardar</span>
+                    <i class="uil uil-navigator"></i>
                 </button>
-            </div>
+            </div> 
+        </div>
+    </form>
 
-        </form>
-
-        {% if messages %}
-            {% for m in messages %}
-                <script>
-                    Swal.fire({
-                        'tittle': 'Exito',
-                        'text': '{{ m }}',
-                        'icon': 'success',
-                        'confirmButtonColor': '#ff131d',
-                        'confirmButtonText': 'Aceptar',
-                    })
-                </script>
-            {% endfor %}
-        {% endif %}
-
-    </div>
-    {% block javascript %}
-    {% endblock %}
+    {% if messages %}
+    {% for m in messages %}
+    <script>
+        Swal.fire({
+            'tittle': 'Exito',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}

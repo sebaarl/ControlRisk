@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'core',
     'AppUser',
     'AppBase',
+    'crispy_forms',
     # 'tailwind',
     # 'theme',
 ]

@@ -1,77 +1,68 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block name %}
+{% extends 'base.html' %} {% load static %} {% block name %}
 <title>Registro Contrato - ControlRisk</title>
-{% endblock %}
-
-{% block contenido %}
+{% endblock %} {% block contenido %}
 <div class="title">
     <i class="uil uil-file-contract-dollar"></i>
     <span class="text">Nuevo contrato?, Ingresalo aquí!</span>
 </div>
 
-<div class="container-dash">
+<div class="container">
+    <form action="#" method="POST">
+        {% csrf_token %}
+        <div class="form first">
+            <div class="details personal">
+                <div class="fields">
+                    <div class="input-field">
+                        <label>Cantidad de Asesorias</label>
+                        {{ contractForm.asesoria }}
+                    </div>
+                    <div class="input-field">
+                        <label>Cantidad de capacitaciones</label>
+                        {{ contractForm.capa }}
+                    </div>
+                    <div class="input-field">
+                        <label>Valor Total del Contrato</label>
+                        {{ contractForm.valor }}
+                    </div>
+                    <div class="input-field">
+                        <label>Número de cuotas</label>
+                        {{ contractForm.cuota }}
+                    </div>
+                    <div class="input-field">
+                        <label>Cliente</label>
+                        {{ contractForm.cliente }}
+                    </div>
 
-    <div class="form-container">
-        <form action="#" method="POST">
-            {% csrf_token %}
-            <div class="input-content">
-                <label for="">Ingrese cantidad de asesorias</label>
-                {{ contractForm.asesoria }}
-            </div>
-            <div class="input-content">
-                <label for="">Ingrese cantidad de capacitaciones</label>
-                {{ contractForm.capa }}
-            </div>
-            <div class="input-content">
-                <label for="">Ingrese la fecha termino del contrato</label>
-                {{ contractForm.termino }}
-            </div>
-            <div class="input-content">
-                <label for="">Ingrese la primera fecha de pago</label>
-                {{ contractForm.pago }}
-            </div>
-            <div class="input-content">
-                <label for="">Ingrese la cantidad de cuotas</label>
-                {{ contractForm.cuota }}
-            </div>
-            <div class="input-content">
-                <label for="">Ingrese el valor del contrato</label>
-                {{ contractForm.valor }}
-            </div>
-            <div class="input-content">
-                <label for="">Seleccione el cliente</label>
-                {{ contractForm.cliente }}
-            </div>
-            <div class="input-content">
-                <label for="">Seleccione el empelado encargado</label>
-                {{ contractForm.empleado }}
+                    <div class="input-field">
+                        <label>Rubro de Empresa del Cliente</label>
+                        {{ contractForm.empleado }}
+                    </div>
+                </div>
             </div>
 
-            <div class="form-butto">
-                <button class="button">
-                    Guardar
+            <div class="details ID">
+                <div class="fields">
+                </div>
+
+                <button class="nextBtn">
+                    <span class="btnText">Guardar</span>
+                    <i class="uil uil-navigator"></i>
                 </button>
-            </div>
-        </form>
+            </div> 
+        </div>
+    </form>
 
-        {% if messages %}
-        {% for m in messages %}
-        <script>
-            Swal.fire({
-                'tittle': 'Exito',
-                'text': '{{ m }}',
-                'icon': 'success',
-                'confirmButtonColor': '#ff131d',
-                'confirmButtonText': 'Aceptar',
-            })
-        </script>
-        {% endfor %}
-        {% endif %}
-
-    </div>
+    {% if messages %}
+    {% for m in messages %}
+    <script>
+        Swal.fire({
+            'tittle': 'Exito',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endfor %}
+    {% endif %}
 </div>
-{% block javascript %}
-{% endblock %}
-{% endblock %}
+{% block javascript %} {% endblock %} {% endblock %}

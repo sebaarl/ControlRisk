@@ -11,10 +11,15 @@
     <span class="text">Clientes registrados</span>
 </div>
 
-<div class="button-c">
-    <a class="btn" href="{% url 'base:create-client' %}">Agregar Cliente</a>
+<div class="options">
+    <div class="button-c">
+        <a class="btn" href="{% url 'base:create-client' %}">Agregar Cliente</a>
+    </div>
+    
+    <div class="search-box">
+        <input type="text" placeholder="Busca aquí...">
+    </div>    
 </div>
-
 
 <div class="dash-content">
     <table>

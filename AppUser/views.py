@@ -31,7 +31,7 @@ def LoginView(request):
             return redirect('base:home')
     
     messages.error(request, 'Formulario invalido')
-    return render(request, 'login.html')
+    return render(request, 'registration/login.html')
 
 user=get_user_model()
 

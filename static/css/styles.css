@@ -413,6 +413,12 @@ nav.close~.dashboard .top {
     flex-wrap: wrap;
 }
 
+.container form .acci {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
 form .fields .input-field {
     display: flex;
     width: calc(100% / 3 - 10px);
@@ -443,6 +449,18 @@ select {
     border: 1px solid #aaa;
     padding: 0 15px;
     height: 42px;
+    margin: 8px 0;
+}
+
+.input-field textarea {
+    outline: none;
+    font-size: 14px;
+    font-weight: 400;
+    color: #333;
+    border-radius: 5px;
+    border: 1px solid #aaa;
+    padding: 0 15px;
+    height: 100px;
     margin: 8px 0;
 }
 

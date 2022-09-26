@@ -60,11 +60,13 @@ class CreateClienteForm(forms.Form):
             }
         )
     )
-    rubro = forms.IntegerField(
-        widget=forms.NumberInput(
+    rubro = forms.ModelChoiceField(
+        queryset=RubroEmpresa.objects.all(),
+        initial=0,
+        widget=forms.Select(
             attrs={
                 'id': 'clienteRubro',
-                'type': 'number',
+                'type': 'select',
                 'class': '',
                 'placeholder': 'Ingrese rubro de la empresa',
                 'name': 'rubro',
@@ -196,22 +198,26 @@ class CreateContratoForm(forms.Form):
             }
         )
     )
-    cliente = forms.CharField(
-        widget=forms.TextInput(
+    cliente = forms.ModelChoiceField(
+        queryset=Cliente.objects.all(),
+        initial=0,
+        widget=forms.Select(
             attrs={
-                'id': 'clienteRut',
-                'type': 'text',
+                'id': 'clienteCli',
+                'type': 'select',
                 'class': '',
                 'placeholder': 'Ingrese RUT',
-                'name': 'cliente',
+                'name': 'empleado',
             }
         )
     )
-    empleado = forms.CharField(
-        widget=forms.TextInput(
+    empleado = forms.ModelChoiceField(
+        queryset=Empleado.objects.all(),
+        initial=0,
+        widget=forms.Select(
             attrs={
                 'id': 'clienteRut',
-                'type': 'text',
+                'type': 'select',
                 'class': '',
                 'placeholder': 'Ingrese RUT',
                 'name': 'empleado',

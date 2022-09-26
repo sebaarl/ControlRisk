@@ -7,36 +7,52 @@
 
 {% block contenido %}
 <div class="title">
-    <i class="uil uil-file-contract-dollar"></i>
-    <span class="text">Nuevo contrato?, Ingresalo aquí!</span>
+    <i class="uil uil-band-aid"></i>
+    <span class="text">Ingreso de accidente</span>
 </div>
 
-<div class="container-dash">
+<div class="container">
+    <form action="#" method="POST">
+        {% csrf_token %}
+        <div class="form first">
+            <div class="details personal">
+                <div class="fields acci">
+                    <div class="input-field">
+                        <label>Fecha del accidente</label>
+                        {{ accidentForm.fecha }}
+                    </div>
+                    <div class="input-field">
+                        <label>Descripción del accidente</label>
+                        {{ accidentForm.descripcion }}
+                    </div>
+                    <div class="input-field">
+                        <label>Medidas tomadas en el accidente</label>
+                        {{ accidentForm.medidas }}
+                    </div>
+                </div>
+            </div>
 
-    <div class="form-container">
-        <form action="#" method="POST">
-            {% csrf_token %}
-            <div class="input-content">
-                <label for="">Fecha del accidente</label>
-                {{ accidentForm.fecha }}
-            </div>
-            <div class="input-content">
-                <label for="">Ingrese descripcion del accidente</label>
-                {{ accidentForm.descripcion }}
-            </div>
-            <div class="input-content">
-                <label for="">Ingrese medidas tomadas en el accidente</label>
-                {{ accidentForm.medidas }}
-            </div>
-    
-            <div class="form-butto">
-                <button class="button">
-                    Guardar
+            <div class="details ID">
+                <button class="nextBtn">
+                    <span class="btnText">Guardar</span>
+                    <i class="uil uil-navigator"></i>
                 </button>
-            </div>
-    
-        </form>
-    </div>
+            </div> 
+        </div>
+    </form>
+
+    {% if messages %}
+    {% for m in messages %}
+    <script>
+        Swal.fire({
+            'tittle': 'Exito',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endfor %}
+    {% endif %}
 </div>
 {% block javascript %}
 {% endblock %}

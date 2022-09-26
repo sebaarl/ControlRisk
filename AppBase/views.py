@@ -105,32 +105,42 @@ def CreateEmpleado(request):
     if request.method == "POST":
         if request.POST.get('rut') and request.POST.get('nombre') and request.POST.get('apellido') and request.POST.get('cargo'):
             empsave = Empleado()
-            empsave.rut = request.POST.get('rut')
+            empsave.rutempleado = request.POST.get('rut')
             empsave.nombre = request.POST.get('nombre')
             empsave.apellido = request.POST.get('apellido')
             empsave.cargo = request.POST.get('cargo')
 
+            rut_emp = rut(empsave.rutempleado)
+
             if request.method == "POST":
-                username = request.POST.get('rut')
-                password = request.POST.get('rut')[4:]
+                existe =  Empleado.objects.filter(rutempleado=rut_emp).exists()
+                user_exist = User.objects.filter(username=rut_emp).exists()
 
-                user = get_user_model().objects.create(
-                    username=username,
-                    password=make_password(password),
-                    is_active=True,
-                    is_profesional=True
-                )
+                if existe and user_exist:
+                    messages.error(request, "El rut " +
+                                formatRut(rut_emp) +" ya está registrado en el sistema!")
+                else:
+                    if request.method == "POST":
+                        username = rut_emp
+                        password = rut_emp[4:]
 
-            from django.db import connection
-            with connection.cursor() as cursor:
+                        user = get_user_model().objects.create(
+                            username=username,
+                            password=make_password(password),
+                            is_active=True,
+                            is_profesional=True
+                        )
 
-                cursor.execute('EXEC [dbo].[SP_CREATE_EMPLEADO] %s, %s, %s, %s', (
-                    empsave.rut, empsave.nombre, empsave.apellido, empsave.cargo))
+                        from django.db import connection
+                        with connection.cursor() as cursor:
 
-                messages.success(request, "Empleado " +
-                                 empsave.rut+" registrado correctamente ")
+                            cursor.execute('EXEC [dbo].[SP_CREATE_EMPLEADO] %s, %s, %s, %s', (
+                                empsave.rut, empsave.nombre, empsave.apellido, empsave.cargo))
 
-            return render(request, 'create_empleado.html', data)
+                            messages.success(request, "Empleado " +
+                                        empsave.rut+" registrado correctamente ")
+
+                        return render(request, 'create_empleado.html', data)
 
     return render(request, 'create_empleado.html', data)
 
@@ -173,8 +183,12 @@ def CreateContractView(request):
             contratosave.cantidadcapacitaciones = request.POST.get('capa')
             contratosave.cuotascontrato = request.POST.get('cuota')
             contratosave.valorcontrato = request.POST.get('valor')
-            contratosave.rutcliente = request.POST.get('cliente')
-            contratosave.rutempleado = request.POST.get('empleado')
+
+            cliente = Cliente.objects.get(rutcliente=request.POST.get('cliente'))
+            empleado = Empleado.objects.get(rutempleado=request.POST.get('empleado'))
+
+            contratosave.rutcliente = cliente
+            contratosave.rutempleado = empleado
 
             now = datetime.now()
             termino = now + relativedelta(months=12) 
@@ -183,8 +197,8 @@ def CreateContractView(request):
             from django.db import connection
             with connection.cursor() as cursor:
 
-                cursor.execute('EXEC [dbo].[[SP_CREATE_CONTRAT] %s, %s, %s, %s, %s, %s, %s, %s', (contratosave.cantidadasesorias,
-                                contratosave.cantidadcapacitaciones, termino, pago, contratosave.cuotascontrato,contratosave.valorcontrato, contratosave.rutcliente, contratosave.rutempleado))
+                cursor.execute('EXEC [dbo].[SP_CREATE_CONTRATO] %s, %s, %s, %s, %s, %s, %s, %s', (contratosave.cantidadasesorias,
+                                contratosave.cantidadcapacitaciones, termino, pago, contratosave.cuotascontrato,contratosave.valorcontrato, str(contratosave.rutcliente), str(contratosave.rutempleado)))
 
                 messages.success(request, "Contrato " +
                                  "registrado correctamente ")

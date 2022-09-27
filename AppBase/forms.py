@@ -1,7 +1,12 @@
+from enum import unique
 from multiprocessing.connection import Client
 from django import forms
-from AppBase.models import Cliente, Empleado, RubroEmpresa
+from .models import Cliente, Empleado, RubroEmpresa
 from django.forms import ValidationError
+from datetime import date
+from datetime import datetime
+
+from AppBase import models
 
 
 class CreateClienteForm(forms.Form):
@@ -15,7 +20,7 @@ class CreateClienteForm(forms.Form):
                 'name': 'rut',
             }
         )
-    )
+    )      
     razon = forms.CharField(
         widget=forms.TextInput(
             attrs={
@@ -70,16 +75,33 @@ class CreateClienteForm(forms.Form):
                 'name': 'rubro',
             }
         )
-    )
+    )    
+        
+    rut=forms.CharField(min_length=8, max_length=12)
+    razon=forms.CharField(min_length=3, max_length=50, required=True,
+    widget=forms.TextInput(attrs={'class':'form-control' , 'autocomplete': 'off',
+    'pattern':'[A-Za-z]+', 'title':'No puede contener numeros ni cracteres especiales '}))
+    direccion=forms.CharField(min_length=3, max_length=100)
+    telefono=forms.IntegerField()
+    representante=forms.CharField(min_length=3, max_length=50, required=True,
+    widget=forms.TextInput(attrs={'class':'form-control' , 'autocomplete': 'off',
+    'pattern':'[A-Za-z]+', 'title':'No puede contener numeros ni cracteres especiales '}))
+    rubro=forms.IntegerField(max_value=4)
 
     def clean_rut(self):
         rut = self.cleaned_data["rut"]
-        existe = Cliente.objects.filter(rutcliente=rut).exists()
+        existe = Cliente.objects.filter(RutCliente=rut).exists()
 
         if existe:
             raise ValidationError("Rut ya registrado!")
             
         return rut
+    
+    def validarRazon(self):
+        razon = self.cleaned_data["razon"]
+        if razon.isalpha():
+            raise ValidationError("Solo ingresar texto")
+        return razon
 
 
 class CreateEmpleadoForm(forms.Form):
@@ -204,7 +226,15 @@ class CreateContratoForm(forms.Form):
         queryset=Empleado.objects.all(),
         initial=0 
     )
-    
+
+    def clean_fecha(self):
+        fecha = self.cleaned_data["termino"]
+        now = datetime.now()
+        
+        if fecha < now:
+            raise ValidationError("Ingrese una fecha valida")
+            
+        return fecha    
 
 class CreateAccidenteForm(forms.Form):
     fecha = forms.DateTimeField(
@@ -226,3 +256,6 @@ class CreateAccidenteForm(forms.Form):
         widget=forms.Textarea(
         )
     )
+
+    
+    

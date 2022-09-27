@@ -38,26 +38,32 @@ def CreateClient(request):
             clientesave.rubro = request.POST.get('rubro')
 
             if request.method == "POST":
-                username = request.POST.get('rut')
-                password = request.POST.get('rut')[4:]
+                existe = Cliente.objects.filter(rutcliente=clientesave.rutcliente).exists()
 
-                user = get_user_model().objects.create(
-                    username=username,
-                    password=make_password(password),
-                    is_active=True,
-                    is_profesional=False
-                )
+                if existe:
+                    messages.error(request, "Cliente " + clientesave.rutcliente + " ya registrado")
 
-            from django.db import connection
-            with connection.cursor() as cursor:
+                else:
+                    username = request.POST.get('rut')
+                    password = request.POST.get('rut')[4:]
 
-                cursor.execute('EXEC [dbo].[SP_CREATE_CLIENTE] %s, %s, %s, %s, %s, %s', (clientesave.rutcliente,
+                    user = get_user_model().objects.create(
+                        username=username,
+                        password=make_password(password),
+                        is_active=True,
+                        is_profesional=False
+                    )
+
+                    from django.db import connection
+                    with connection.cursor() as cursor:
+
+                        cursor.execute('EXEC [dbo].[SP_CREATE_CLIENTE] %s, %s, %s, %s, %s, %s', (clientesave.rutcliente,
                                clientesave.razonsocial, clientesave.rubro,  clientesave.direccion, clientesave.telefono, clientesave.representante))
 
-                messages.success(request, "Cliente " +
+                        messages.success(request, "Cliente " +
                                  clientesave.rutcliente+" registrado correctamente ")
 
-            return render(request, 'create_cliente.html', data)
+                return render(request, 'create_cliente.html', data)
 
     return render(request, 'create_cliente.html', data)
 

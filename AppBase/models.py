@@ -2,6 +2,7 @@ from pyexpat import model
 from django.db import models
 from AppUser.models import User
 from django.conf import settings
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class RubroEmpresa(models.Model):
@@ -114,17 +115,18 @@ class Checklist(models.Model):
 
 class Cliente(models.Model):
     rutcliente = models.CharField(db_column='RutCliente', max_length=12,
-                                  db_collation='Modern_Spanish_CI_AS', primary_key=True)
+                                  db_collation='Modern_Spanish_CI_AS', primary_key=True, blank=False, null=False)
     razonsocial = models.CharField(
-        db_column='RazonSocial', max_length=50, db_collation='Modern_Spanish_CI_AS')
+        db_column='RazonSocial', max_length=50, db_collation='Modern_Spanish_CI_AS', blank=False, null=False)
     direccion = models.CharField(
-        db_column='Direccion', max_length=100, db_collation='Modern_Spanish_CI_AS')
+        db_column='Direccion', max_length=100, db_collation='Modern_Spanish_CI_AS', blank=False, null=False)
     telefono = models.IntegerField(db_column='Telefono')
+    #telefono = PhoneNumberField(unique = True, null = False, blank = False)
     representante = models.CharField(
-        db_column='Representante', max_length=50, db_collation='Modern_Spanish_CI_AS')
+        db_column='Representante', max_length=50, db_collation='Modern_Spanish_CI_AS', blank=False, null=False)
     usuarioid = models.ForeignKey(
         settings.AUTH_USER_MODEL, models.DO_NOTHING, db_column='UsuarioID', null=True, blank=True)
-    rubroid = models.ForeignKey('RubroEmpresa', models.DO_NOTHING, db_column='RubroID')
+    rubroid = models.ForeignKey('RubroEmpresa', models.DO_NOTHING, db_column='RubroID', blank=False, null=False)
 
     class Meta:
         managed = False

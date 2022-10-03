@@ -76,6 +76,21 @@ class CreateClienteForm(forms.Form):
             }
         )
     )
+    rutrepre = forms.CharField(
+        max_length=12, 
+        min_length=8,
+        widget=forms.TextInput(
+            attrs={
+                'id': 'clienteRutRepre',
+                'type': 'text',
+                'class': '',
+                'placeholder': 'Ingrese RUT',
+                'name': 'rut',
+                'pattern': '^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$',
+                'title': 'Ingrese RUT en formato correcto XX.XXX.XXX-X',
+            }
+        )
+    )
     rubro = forms.ModelChoiceField(
         queryset=RubroEmpresa.objects.all(),
         initial=0,

@@ -9,14 +9,14 @@ from AppBase.validators import validate_length
 
 class RubroEmpresa(models.Model):
     rubroid = models.AutoField(db_column='RubroID', primary_key=True)
-    rubro = models.CharField(db_column='RubroEmpresa', max_length=50, db_collation='Modern_Spanish_CI_AS')
+    nombre = models.CharField(db_column='Nombre', max_length=50, db_collation='Modern_Spanish_CI_AS')
 
     class Meta:
         managed = False
         db_table = 'RubroEmpresa'
     
     def __str__(self):
-        return self.rubro
+        return self.nombre
 
 
 class Accidente(models.Model):
@@ -43,8 +43,8 @@ class Actividad(models.Model):
     actividadextra = models.SmallIntegerField(db_column='ActividadExtra')
     contratoid = models.ForeignKey('Contrato', models.DO_NOTHING,
                                    db_column='ContratoID', blank=True, null=True, related_name='contrato_contrato_actividad')
-    rut = models.ForeignKey(
-        'Empleado', models.DO_NOTHING, db_column='Rut', related_name="empleado_empleado")
+    rutempleado = models.ForeignKey(
+        'Empleado', models.DO_NOTHING, db_column='RutEmpleado', related_name="empleado_empleado")
     asesoriaid = models.ForeignKey(
         'Asesoria', models.DO_NOTHING, db_column='AsesoriaID', blank=True, null=True, related_name="asesoria_asesoria")
     capacitacionid = models.ForeignKey(
@@ -55,7 +55,7 @@ class Actividad(models.Model):
     class Meta:
         managed = False
         db_table = 'Actividad'
-        unique_together = (('actividadid', 'rut', 'contratoid'),)
+        unique_together = (('actividadid', 'rutempleado', 'contratoid'),)
 
 
 class Asesoria(models.Model):
@@ -159,6 +159,7 @@ class Contrato(models.Model):
     cuotascontrato = models.IntegerField(db_column='CuotasContrato')
     valorcontrato = models.IntegerField(
         db_column='ValorContrato')
+    estado = models.BooleanField(db_column='Estado')
     pagado = models.BooleanField(db_column='Pagado', default=False)
     rutcliente = models.OneToOneField(Cliente, models.DO_NOTHING, db_column='RutCliente', blank=True, null=True)
     rutempleado = models.OneToOneField('Empleado', models.DO_NOTHING, db_column='RutEmpleado')
@@ -188,6 +189,7 @@ class Empleado(models.Model):
         db_column='Cargo', max_length=50, db_collation='Modern_Spanish_CI_AS')
     usuarioid = models.ForeignKey(
         settings.AUTH_USER_MODEL, models.DO_NOTHING, db_column='UsuarioID', null=True, blank=True)
+    estado = models.BooleanField(db_column='Estado')  # Field name made lowercase.
 
     class Meta:
         managed = False

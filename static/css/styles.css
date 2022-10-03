@@ -916,7 +916,7 @@ tbody {
     color: var(--text-color);
 }
 
-.status {    
+.status {
     background-color: green;
     display: flex;
     justify-content: center;
@@ -931,7 +931,7 @@ tbody {
     padding: 2px;
 }
 
-.status-no {    
+.status-no {
     background-color: #ff131d;
     display: flex;
     justify-content: center;
@@ -950,6 +950,7 @@ tbody {
     display: flex;
     justify-content: space-around;
 }
+
 
 .action i {
     background-color: #ff131d;
@@ -1020,7 +1021,7 @@ tbody {
     padding: 10px;
 }
 
-.title-pdf .text{
+.title-pdf .text {
     text-align: center;
     font-size: 3.5rem;
 }
@@ -1147,7 +1148,7 @@ tbody {
         margin-top: -15px;
     }
 
-    .title span{
+    .title span {
         font-size: 2.0rem !important;
     }
 }

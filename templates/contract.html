@@ -5,94 +5,192 @@
 <title>Contrato: {{ entity.1 }} - ControlRisk</title>
 {% endblock %}
 
+{% block styles %}
+<style>
+    html {
+        font-size: 62.5%;
+    }
+
+    .img-invoice {
+        width: 80px;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .head {
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    #invoice thead tr th {
+        width: 100%;
+        text-align: left;
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+        padding-top: 4px;
+    }
+
+    #invoice thead tr {
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    #invoice tbody tr {
+        padding: 0;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .td-table {
+        padding: 8px;
+        margin-bottom: 20px;
+    }
+
+    .container p,
+    b,
+    th {
+        font-size: 1.5rem;
+        color: var(--text-color);
+    }
+
+    td {
+        font-size: 1.4rem;
+    }
+
+    .aviso {
+        margin-top: 10px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    div>h1 {
+        text-align: center;
+        margin: 30px;
+    }
+
+    img {
+        width: 150px;
+    }
+
+    .info {
+        font-size: 1.5rem !important;
+    }
+
+    .firmas {
+        width: 100px;
+        margin-top: 50px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .firmass {
+        width: 100px;
+        margin-top: 50px;
+        position: absolute;
+    }
+
+    .container-firmas {
+        margin: 0 auto !important;
+        text-align: center;
+        margin-top: 100px !important;
+    }
+
+    .invoice span {
+        color: var(--text-color);
+    }
+
+    .aviso span {
+        color: var(--text-color);
+    }
+
+    .titulo h1 {
+        color: var(--text-color);
+    }
+</style>
+{% endblock %}
+
 {% block contenido %}
 <div class="title">
     <i class="uil uil-file-contract-dollar"></i>
-    <span class="text">Contrato</span>
-</div>
-<div class="title">
-    <span class="text">Cliente : {{ entity.1 }}</span>
+    <span class="text">Detalle contrato</span>
 </div>
 <div class="dash-content">
-    <div class="contract-detail">
-        <div class="detail-title">
-            <h2> DETALLES GENERALES</h2>
-            <div class="detail">
-                <h3>NRO CONTRATO :</h3>
-                <p>{{ entity.0 }}</p>
-            </div>
-            <div class="detail">
-                <h3>RUT CLIENTE :</h3>
-                <p>{{ entity.1 }}</p>
-            </div>
-            <div class="detail">
-                <h3>RAZÓN SOCIAL CLIENTE :</h3>
-                <p>{{ entity.17 }}</p>
-            </div>
-            <div class="detail">
-                <h3>RUBRO DE LA EMPRESA CLIENTE :</h3>
-                <p>{{ entity.15 }}</p>
-            </div>
-            <div class="detail">
-                <h3>REPRESENTANTE LEGAL EMPRESA CLIENTE :</h3>
-                <p>{{ entity.13 }}</p>
-            </div>
-            <div class="detail">
-                <h3>TELEFONO DE CONTACTO EMPRESA CLIENTE :</h3>
-                <p>{{ entity.14 }}</p>
-            </div>
-            <div class="detail">
-                <h3>DIRECCIÓN EMPRESA CLIENTE :</h3>
-                <p>{{ entity.12 }}</p>
-            </div>
+    <p class="head">
+        {{ comp.name|upper }}<br>
+        {{ comp.rut}}<br>
+        {{ comp.direccion|upper }}
+    </p>
+    <div style="margin-top: -100px" class="titulo">
+        <h1>****CONTRATO DE SERVICIOS - CONTROLRISK****</h1>
+    </div>
+    <div class="container" style="margin-top: -30px">
+        <p style="margin-bottom: 15px">
+            <b>NRO CONTRATO:</b> {{ contrato.0 }}<br>
+        </p>
+        <table id="invoice">
+            <b>RUT EMPRESA CLIENTE : <span class="info"> {{ contrato.1 }}</span></b><br><br>
+            <b>RAZÓN SOCIAL EMPRESA CLIENTE : <span class="info"> {{ contrato.11 }}</span></b><br><br>
+            <b>REPRESENTANTE LEGAL EMPRESA CLIENTE : <span class="info"> {{ contrato.13 }}</span></b><br><br>
+            <b>RUBRO EMPRESA CLIENTE : <span class="info"> {{ contrato.15 }}</span></b><br><br>
+            <b>DIRECCIÓN EMPRESA CLIENTE : <span class="info"> {{ contrato.12 }}</span></b> <br><br>
+            <b>TELÉFONO EMPRESA CLIENTE : <span class="info"> {{ contrato.14 }}</span></b> <br><br><br>
+            <b>RUT EMPLEADO ENCARGADO : <span class="info"> {{ contrato.2 }}</span></b> <br><br>
+            <b>NOMBRE EMPELADO ENCARGADO : <span class="info"> {{ contrato.16 }}</span></b> <br><br><br>
+            <thead style="margin-top: 20px">
+                <tr>
+                    <th style="width: 33%;" style="text-align: center;">VALOR MENSUAL CONTRATO</th>
+                    <th style="width: 34%;" style="text-align: center;">NRO DE CUOTAS</th>
+                    <th style="width: 33%;" style="text-align: center;">VALOR TOTAL CONTRATO</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr {% if forloop.first %}style="padding-top: 3px;" {% endif %} class="table" style="width: 100%">
+                    <td class="td-table">{{ contrato.17 }}</td>
+                    <td class="td-table">{{ contrato.7 }} CUOTAS</td>
+                    <td class="td-table">{{ contrato.5 }}</td>
+                </tr>
+            </tbody>
+        </table><br><br>
+        <div>
+            <b>CANTIDAD DE ASESORIAS MENSUALES INCLUIDAS EN EL CONTRATO: <span class="info"> {{ contrato.3 }}
+                    ASESORIAS</span></b><br><br>
+            <b>CANTIDAD DE CAPACITACIONES MENSUALES INCLUIDAS EN EL CONTRATO : <span class="info"> {{ contrato.4 }}
+                    CAPACITACIONES</span></b><br><br>
+            <b>CANTIDAD DE VISITAS A TERRENO MENSUALES INCLUIDAS EN EL CONTRATO : <span class="info"> 2
+                    VISITAS</span></b><br><br>
         </div>
-        <div class="detail-title">
-            <h2> DETALLES EMPLEADO ENCARGADO</h2>
-            <div class="detail">
-                <h3>RUT EMPELADO ENCARGADO :</h3>
-                <p>{{ entity.2 }}</p>
-            </div>
-            <div class="detail">
-                <h3>NOMBRE EMPELADO ENCARGADO :</h3>
-                <p>{{ entity.16 }}</p>
-            </div>
+        <div class="aviso">
+            <span style="margin-top: 5px">**TODA ACTIVDAD (ASESORIAS, CAPACITACIONES O VISITAS) QUE HAYA SUPERADO EL
+                LIMITE MENSUAL ASIGNADO EN EL CONTRATO SERÁ CARGADO EN SU BOLETA MENSUAL COMO COBROS EXTRAS**</span>
         </div>
-        <div class="detail-title">
-            <h2> DETALLES CONTRATO</h2>
-            <div class="detail">
-                <h3>CANTIDAD DE ASESORIAS MENSUALES :</h3>
-                <p>{{ entity.3 }}</p>
-            </div>
-            <div class="detail">
-                <h3>CANTIDAD DE CAPACITACIONES MENSUALES :</h3>
-                <p>{{ entity.4 }}</p>
-            </div>
-            <div class="detail">
-                <h3>VALOR TOTAL DEL CONTRATO :</h3>
-                <p>{{ entity.5 }}</p>
-            </div>
-            <div class="detail">
-                <h3>CANTIDAD DE CUOTAS DEL CONTRATO :</h3>
-                <p>{{ entity.7 }} CUOTAS</p>
-            </div>
-            <div class="detail">
-                <h3>FECHA CONTRATO :</h3>
-                <p>{{ entity.8 }}</p>
-            </div>
-            <div class="detail">
-                <h3>FECHA PRIMER PAGO :</h3>
-                <p>{{ entity.9 }}</p>
-            </div>
-            <div class="detail">
-                <h3>CONTRATO VALIDO HASTA  :</h3>
-                <p>{{ entity.10 }}</p>
-            </div>
+        <div>
+            <b>CONTRATO VALIDO DESDE : <span class="info"> {{ contrato.8 }}</span></b><br><br>
+            <b>CONTRATO VALIDO HASTA : <span class="info"> {{ contrato.10 }}</span></b> <br><br>
+            <b>FECHA PAGO DE PRIMERA CUOTA : <span class="info"> {{ contrato.9 }}</span></b> <br><br><br><br>
+        </div>
+        <div>
+            {% if contrato.18 == '0' %}
+                <b>ESTADO DEL CONTRATO : <span class="info"> FINALIZADO</span></b><br><br>
+            {% else %}
+                <b>ESTADO DEL CONTRATO : <span class="info"> CONTRATO VIGENTE</span></b><br><br>
+            {% endif %}
+        </div>
+        <div>
+            {% if contrato.6 == '1' %}
+                <b>ESTADO DE PAGO DEL CONTRATO : <span class="info"> CONTRATO PAGADO</span></b><br><br>
+            {% else %}
+                <b>ESTADO DE PAGO DEL CONTRATO : <span class="info"> PAGANDO</span></b><br><br>
+            {% endif %}
         </div>
     </div>
-    <div class="boton">
-        <div class="button-c pdf">
-            <a class="btn" href="{% url 'base:contract-pdf' entity.0 %}" target="_blank">Generar pdf de contrato</a>
-        </div>
+</div>
+<div class="boton">
+    <div class="button-c pdf">
+        <a class="btn" href="{% url 'base:contract-pdf' contrato.0 %}" target="_blank">Generar pdf de contrato</a>
     </div>
+</div>
 </div>
 {% endblock %}

@@ -63,16 +63,18 @@ def CreateClient(request):
     }
 
     if request.method == "POST":
-        if request.POST.get('rut') and request.POST.get('razon') and request.POST.get('rubro') and request.POST.get('direccion') and request.POST.get('telefono') and request.POST.get('representante'):
+        if request.POST.get('rut') and request.POST.get('razon') and request.POST.get('rubro') and request.POST.get('direccion') and request.POST.get('telefono') and request.POST.get('representante') and request.POST.get('rutrepre'):
             clientesave = Cliente()
             clientesave.rutcliente = request.POST.get('rut')
             clientesave.razonsocial = request.POST.get('razon')
             clientesave.direccion = request.POST.get('direccion')
             clientesave.telefono = request.POST.get('telefono')
             clientesave.representante = request.POST.get('representante')
+            clientesave.rutrepresentante = request.POST.get('rutrepre')
             clientesave.rubro = request.POST.get('rubro')
 
             rut_cli = rut(clientesave.rutcliente)
+            rut_repre = rut(clientesave.rutrepresentante)
 
             if request.method == "POST":
                 existe =  Cliente.objects.filter(rutcliente=rut_cli).exists()
@@ -95,8 +97,9 @@ def CreateClient(request):
                     from django.db import connection
                     with connection.cursor() as cursor:
 
-                        cursor.execute('EXEC [dbo].[SP_CREATE_CLIENTE] %s, %s, %s, %s, %s, %s', (rut_cli,
-                               clientesave.razonsocial, clientesave.rubro,  clientesave.direccion, clientesave.telefono, clientesave.representante))
+                        cursor.execute('EXEC [dbo].[SP_CREATE_CLIENTE] %s, %s, %s, %s, %s, %s, %s', (rut_cli,
+                               clientesave.razonsocial, clientesave.rubro,  clientesave.direccion, clientesave.telefono, clientesave.representante,
+                               rut_repre))
 
                         messages.success(request, "Cliente " +
                                     formatRut(rut_cli) +" registrado correctamente ")
@@ -156,21 +159,20 @@ def CreateEmpleado(request):
 
 @login_required
 def ListClienteView(request):
-    # cursor = connection.cursor()
-    # cursor.execute('EXEC [dbo].[SP_LISTAR_CLIENTES]')
-    # results = cursor.fetchall()
-    # page = request.GET.get('page', 1)
+    cursor = connection.cursor()
+    cursor.execute('EXEC [dbo].[SP_LISTAR_CLIENTES]')
+    results = cursor.fetchall()
+    page = request.GET.get('page', 1)
 
-    # try:
-    #     paginator = Paginator(results, 8)
-    #     results = paginator.page(page)
-    # except:
-    #     raise Http404
+    try:
+        paginator = Paginator(results, 10)
+        results = paginator.page(page)
+    except:
+        raise Http404
 
     data = {
-        # "entity": results,
-        # "paginator": paginator,
-        'cliente': Cliente.objects.all()
+        "entity": results,
+        "paginator": paginator,
     }
 
     return render(request, 'listar_clientes.html', data)
@@ -211,7 +213,7 @@ def CreateContractView(request):
                 #     'SELECT COUNT(Pagado) FROM Contrato WHERE RutCliente = {} AND Pagado = 0'.format(str(contratosave.rutcliente)))
 
                 filterRut = Contrato.objects.filter(rutcliente=contratosave.rutcliente)
-                estado = filterRut.filter(pagado=0)
+                estado = filterRut.filter(estado=1)
                 cantidad = estado.count()
 
                 if cantidad >= 1:
@@ -265,7 +267,7 @@ def ContractDetailView(request, id):
         raise Http404
 
     data = {
-        "entity": results,
+        "contrato": results,
     }
 
     return render(request, 'contract.html', data)

@@ -26,24 +26,24 @@
     <table>
         <thead>
             <tr>
-                <th>Rut</th>
-                <th>Razon social</th>
-                <th>Dirección</th>
-                <th>Telefono</th>
-                <th>Representante</th>
-                <th>Rubro</th>
-                <th>Acción</th>
+                <th style="text-transform: uppercase">Rut</th>
+                <th style="text-transform: uppercase">Razon social</th>
+                <th style="text-transform: uppercase">Telefono</th>
+                <th style="text-transform: uppercase">Representante</th>
+                <th style="text-transform: uppercase">Rut Representante</th>
+                <th style="text-transform: uppercase">Rubro</th>
+                <th style="text-transform: uppercase">Acción</th>
             </tr>
         </thead>
         <tbody>
-            {% for item in cliente %}
+            {% for item in entity %}
             <tr>
-                <td>{{ item.formatRut }}</td>
-                <td>{{ item.razonsocial }}</td>
-                <td>{{ item.direccion }}</td>
-                <td>{{ item.telefono }}</td>
-                <td>{{ item.representante }}</td>
-                <td>{{ item.rubroid }}</td>
+                <td>{{ item.0 }}</td>
+                <td>{{ item.1 }}</td>
+                <td>+56 22 {{ item.3 }}</td>
+                <td>{{ item.4 }}</td>
+                <td>{{ item.6 }}</td>
+                <td>{{ item.5 }}</td>
                 <td class="action-container">
                     <div class="action">
                         <a href=""><i class="uil uil-refresh"></i></a>
@@ -56,5 +56,8 @@
             {% endfor %}
         </tbody>
     </table>
+    <div>
+        {% include 'paginator.html' %}
+    </div>
 </div>
 {% endblock %}

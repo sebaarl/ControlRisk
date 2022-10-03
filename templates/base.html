@@ -16,6 +16,9 @@
     {% block link %}
     
     {% endblock %}
+    {% block styles %}
+
+    {% endblock %}
 </head>     
 
 <body>
@@ -29,7 +32,7 @@
         </div>
 
         <div class="menu-items">
-            {% if user.is_profesional == 0 %}
+            <!-- {% if user.is_profesional == 0 %}
             <ul class="nav-links">
                 <li><a href='{% url "base:home" %}'>
                         <i class="uil uil-estate"></i>
@@ -52,8 +55,36 @@
                         <span class="link-name">Accidente</span>
                     </a></li>
             </ul>
-            {% endif %}
+            {% endif %} -->
             {% if user.is_profesional == 1 %}
+            <ul class="nav-links">
+                <li><a href='{% url "base:home" %}'>
+                        <i class="uil uil-estate"></i>
+                        <span class="link-name">Inicio</span>
+                    </a></li>
+                <li><a href="#">
+                        <i class="uil uil-podium"></i>
+                        <span class="link-name">Capacitaciones</span>
+                    </a></li>
+                <li><a href="#">
+                        <i class="uil uil-thumbs-up"></i>
+                        <span class="link-name">Asesorias</span>
+                    </a></li>
+                <li><a href='{% url "base:create-accident" %}'>
+                        <i class="uil uil-band-aid"></i>
+                        <span class="link-name">Accidentes</span>
+                    </a></li>
+                <li><a href='{% url "base:list-client" %}'>
+                        <i class="uil uil-hard-hat"></i>
+                        <span class="link-name">Clientes</span>
+                    </a></li>
+                <li><a href='{% url "base:list-contract" %}'>
+                        <i class="uil uil-file-contract-dollar"></i>
+                        <span class="link-name">Contratos</span>
+                    </a></li> 
+            </ul>
+            {% endif %}
+            {% if user.is_staff == 1 %}
             <ul class="nav-links">
                 <li><a href='{% url "base:home" %}'>
                         <i class="uil uil-estate"></i>

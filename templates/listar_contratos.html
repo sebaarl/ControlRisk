@@ -24,14 +24,14 @@
     <table>
         <thead>
             <tr>
-                <th>Nro. Contrato</th>
-                <th>Cliente</th>
-                <th>Razón Social</th>
-                <th>Rut Empleado</th>
-                <th>Nombre Empelado</th>
-                <th>Fecha Creación</th>
-                <th>Estado</th>
-                <th>Acción</th>
+                <th style="text-transform: uppercase">Nro. Contrato</th>
+                <th style="text-transform: uppercase">Cliente</th>
+                <th style="text-transform: uppercase">Razón Social</th>
+                <th style="text-transform: uppercase">Rut Empleado</th>
+                <th style="text-transform: uppercase">Nombre Empelado</th>
+                <th style="text-transform: uppercase">Fecha Creación</th>
+                <th style="text-transform: uppercase">Estado</th>
+                <th style="text-transform: uppercase">Acción</th>
             </tr>
         </thead>
         <tbody>
@@ -43,7 +43,7 @@
                 <td>{{ item.2 }}</td>
                 <td>{{ item.16 }}</td>
                 <td>{{ item.8 }}</td>
-                {% if item.6 == 0 %}
+                {% if item.18 == 1 %}
                 <td>
                     <div class="status">
                         <p>ACTIVO</p>

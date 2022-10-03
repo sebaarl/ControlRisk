@@ -102,7 +102,7 @@
     </div>
     <div class="container">
         <p>
-            <b>NRO CONTRATO:</b> {{ contrato.0 }}<br>
+            <b>NRO CONTRATO:</b> {{ contrato.0 }}<br><br>
         </p>
         <table id="invoice">
             <b>RUT EMPRESA CLIENTE :</b><span class="info">  {{ contrato.1 }}</span><br><br>
@@ -110,7 +110,9 @@
             <b>REPRESENTANTE LEGAL EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.13 }}</span><br><br>
             <b>RUBRO EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.15 }}</span><br><br>
             <b>DIRECCIÓN EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.12 }}</span><br><br>
-            <b>TELÉFONO EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.14 }}</span><br>
+            <b>TELÉFONO EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.14 }}</span><br><br><br>
+            <b>RUT EMPLEADO ENCARGADO : <span class="info">  {{ contrato.2 }}</span></b> <br><br>
+            <b>NOMBRE EMPELADO ENCARGADO : <span class="info">  {{ contrato.16 }}</span></b> <br><br><br>
             <thead>
                 <tr>
                     <th style="width: 33%;">VALOR MENSUAL CONTRATO</th>
@@ -125,7 +127,7 @@
                     <td class="td-table">{{ contrato.5 }}</td>
                 </tr>
             </tbody>
-        </table>
+        </table><br><br><br>
         <div>
             <b>CANTIDAD DE ASESORIAS MENSUALES INCLUIDAS EN EL CONTRATO:</b><span class="info">  {{ contrato.3 }} ASESORIAS</span><br><br>
             <b>CANTIDAD DE CAPACITACIONES MENSUALES INCLUIDAS EN EL CONTRATO :</b> <span class="info">  {{ contrato.4 }} CAPACITACIONES</span><br><br>
@@ -138,6 +140,40 @@
             <b>CONTRATO VALIDO DESDE :</b><span class="info">  {{ contrato.8 }}</span><br><br>
             <b>CONTRATO VALIDO HASTA :</b> <span class="info">  {{ contrato.10 }}</span><br><br>
             <b>FECHA PAGO DE PRIMERA CUOTA :</b> <span class="info">  {{ contrato.9 }}</span><br><br>
+        </div>
+    </div><br><br><br><br><br><br><br><br><br><br><br><br>
+    <div>
+        {% if contrato.18 == '0' %}
+            <b>ESTADO DEL CONTRATO : <span class="info"> FINALIZADO</span></b><br><br>
+        {% else %}
+            <b>ESTADO DEL CONTRATO : <span class="info"> CONTRATO VIGENTE</span></b><br><br>
+        {% endif %}
+    </div>
+    <div>
+        {% if contrato.6 == '1' %}
+            <b>ESTADO DE PAGO DEL CONTRATO : <span class="info"> CONTRATO PAGADO</span></b><br><br>
+        {% else %}
+            <b>ESTADO DE PAGO DEL CONTRATO : <span class="info"> PAGANDO</span></b><br><br>
+        {% endif %}
+    </div>
+    <div class="container-firmas" style="margin-top: 100px">     
+        <div class="firmas">
+            <div class="firma-container">
+                <img src="../static/images/firma2.png" alt="">
+                <div>
+                    <p >FIRMA VICEPRESIDENTE JUNIOR</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-firmas" style="margin-top: 100px">     
+        <div class="firmas">
+            <div class="firma-container">
+                <img src="../static/images/firma2.png" alt="">
+                <div>
+                    <p >FIRMA VICEPRESIDENTE JUNIOR</p>
+                </div>
+            </div>
         </div>
     </div>
     <div class="container-firmas" style="margin-top: 100px">     

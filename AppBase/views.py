@@ -5,11 +5,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.db import connection
 from django.contrib.auth import authenticate, login
 from django.core.paginator import Paginator
 from django.contrib import messages
+from django.urls import reverse_lazy
 
 from AppBase.forms import CreateClienteForm, CreateEmpleadoForm, CreateContratoForm
 from AppBase.models import Cliente, Empleado, Contrato
@@ -22,6 +23,14 @@ from dateutil.relativedelta import *
 from dateutil.easter import *
 from dateutil.rrule import *
 from dateutil.parser import *
+from django.views import View
+
+import os
+from django.conf import settings
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from django.contrib.staticfiles import finders
 
 
 def rut(rut):
@@ -69,7 +78,7 @@ def CreateClient(request):
                 existe =  Cliente.objects.filter(rutcliente=rut_cli).exists()
                 user_exist = User.objects.filter(username=rut_cli).exists()
 
-                if existe and user_exist:
+                if existe or user_exist:
                     messages.error(request, "El rut " +
                                 formatRut(rut_cli) +" ya está registrado en el sistema!")
                 else:
@@ -147,20 +156,21 @@ def CreateEmpleado(request):
 
 @login_required
 def ListClienteView(request):
-    cursor = connection.cursor()
-    cursor.execute('EXEC [dbo].[SP_LISTAR_CLIENTES]')
-    results = cursor.fetchall()
-    page = request.GET.get('page', 1)
+    # cursor = connection.cursor()
+    # cursor.execute('EXEC [dbo].[SP_LISTAR_CLIENTES]')
+    # results = cursor.fetchall()
+    # page = request.GET.get('page', 1)
 
-    try:
-        paginator = Paginator(results, 8)
-        results = paginator.page(page)
-    except:
-        raise Http404
+    # try:
+    #     paginator = Paginator(results, 8)
+    #     results = paginator.page(page)
+    # except:
+    #     raise Http404
 
     data = {
-        "entity": results,
-        "paginator": paginator
+        # "entity": results,
+        # "paginator": paginator,
+        'cliente': Cliente.objects.all()
     }
 
     return render(request, 'listar_clientes.html', data)
@@ -197,11 +207,25 @@ def CreateContractView(request):
             from django.db import connection
             with connection.cursor() as cursor:
 
-                cursor.execute('EXEC [dbo].[SP_CREATE_CONTRATO] %s, %s, %s, %s, %s, %s, %s, %s', (contratosave.cantidadasesorias,
-                                contratosave.cantidadcapacitaciones, termino, pago, contratosave.cuotascontrato,contratosave.valorcontrato, str(contratosave.rutcliente), str(contratosave.rutempleado)))
+                # cantidad = cursor.execute(
+                #     'SELECT COUNT(Pagado) FROM Contrato WHERE RutCliente = {} AND Pagado = 0'.format(str(contratosave.rutcliente)))
 
-                messages.success(request, "Contrato " +
-                                 "registrado correctamente ")
+                filterRut = Contrato.objects.filter(rutcliente=contratosave.rutcliente)
+                estado = filterRut.filter(pagado=0)
+                cantidad = estado.count()
+
+                if cantidad >= 1:
+                    messages.error(request, 'La empresa {0} presenta un contracto activo'.format(formatRut(str(contratosave.rutcliente))))
+                else:
+                    # cursor.execute('EXEC [dbo].[SP_CREATE_CONTRATO]  [{0}], [{1}], [{2}], [{3}], [{4}], [{5}], [{6}], [{7}], [{8}]'.format(
+                    #     int(contratosave.cantidadasesorias),int(contratosave.cantidadcapacitaciones),termino,pago,int(contratosave.cuotascontrato),
+                    #     int(contratosave.valorcontrato), str(contratosave.rutcliente),str(contratosave.rutempleado), now))
+                    cursor.execute('EXEC [dbo].[SP_CREATE_CONTRATO]  %s, %s, %s, %s, %s, %s, %s, %s, %s', (
+                        int(contratosave.cantidadasesorias), int(contratosave.cantidadcapacitaciones),termino,pago,
+                        int(contratosave.cuotascontrato), int(contratosave.valorcontrato), 
+                        str(contratosave.rutcliente),str(contratosave.rutempleado), now))
+
+                    messages.success(request, "Contrato registrado correctamente")
 
             return render(request, 'create_contract.html', data)
 
@@ -211,12 +235,12 @@ def CreateContractView(request):
 @login_required
 def ListContractView(request):
     cursor = connection.cursor()
-    cursor.execute('EXEC [dbo].[SP_LISTAR_CONTRATO]')
+    cursor.execute('EXEC [dbo].[SP_CONTRATO_CLIENTE]')
     results = cursor.fetchall()
     page = request.GET.get('page', 1)
 
     try:
-        paginator = Paginator(results, 8)
+        paginator = Paginator(results, 10)
         results = paginator.page(page)
     except:
         raise Http404
@@ -227,3 +251,41 @@ def ListContractView(request):
     }
 
     return render(request, 'listar_contratos.html', data)
+
+
+@login_required
+def ContractDetailView(request, id):
+    cursor = connection.cursor()
+    cursor.execute('EXEC [dbo].[SP_CONTRACT_DETAIL] {}'.format(str(id)))
+    results = cursor.fetchone()
+
+    try:
+        results
+    except:
+        raise Http404
+
+    data = {
+        "entity": results,
+    }
+
+    return render(request, 'contract.html', data)
+
+#PDF Contrato
+class ContractDetailPdf(View):
+    def get(self, request, *args, **kwargs):
+        pk = self.kwargs['pk']
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_CONTRACT_DETAIL] {}'.format(str(pk)))
+        results = cursor.fetchone()
+
+        template = get_template('pdf.html')
+        response = HttpResponse(content_type='application/pdf')
+        # response['Content-Disposition'] = 'attachment; filename="detalle_contrato.pdf"'
+        context = {
+            'comp': {'name': 'ControlRisk', 'rut': '99.999.999-k', 'direccion': 'Avenida Siempreviva 742'},
+            'contrato': results
+        }
+        html = template.render(context)
+        pisa_status = pisa.CreatePDF(html, dest=response)
+
+        return response

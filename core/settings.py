@@ -33,10 +33,15 @@ INSTALLED_APPS = [
     'core',
     'AppUser',
     'AppBase',
-    'crispy_forms',
+    "crispy_forms",
+    "crispy_bootstrap5",
     # 'tailwind',
     # 'theme',
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 TAILWIND_APP_NAME = 'theme'
 

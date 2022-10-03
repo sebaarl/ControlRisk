@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Contrato: {{ entity.1 }} - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-file-contract-dollar"></i>
+    <span class="text">Contrato</span>
+</div>
+<div class="title">
+    <span class="text">Cliente : {{ entity.1 }}</span>
+</div>
+<div class="dash-content">
+    <div class="contract-detail">
+        <div class="detail-title">
+            <h2> DETALLES GENERALES</h2>
+            <div class="detail">
+                <h3>NRO CONTRATO :</h3>
+                <p>{{ entity.0 }}</p>
+            </div>
+            <div class="detail">
+                <h3>RUT CLIENTE :</h3>
+                <p>{{ entity.1 }}</p>
+            </div>
+            <div class="detail">
+                <h3>RAZÓN SOCIAL CLIENTE :</h3>
+                <p>{{ entity.17 }}</p>
+            </div>
+            <div class="detail">
+                <h3>RUBRO DE LA EMPRESA CLIENTE :</h3>
+                <p>{{ entity.15 }}</p>
+            </div>
+            <div class="detail">
+                <h3>REPRESENTANTE LEGAL EMPRESA CLIENTE :</h3>
+                <p>{{ entity.13 }}</p>
+            </div>
+            <div class="detail">
+                <h3>TELEFONO DE CONTACTO EMPRESA CLIENTE :</h3>
+                <p>{{ entity.14 }}</p>
+            </div>
+            <div class="detail">
+                <h3>DIRECCIÓN EMPRESA CLIENTE :</h3>
+                <p>{{ entity.12 }}</p>
+            </div>
+        </div>
+        <div class="detail-title">
+            <h2> DETALLES EMPLEADO ENCARGADO</h2>
+            <div class="detail">
+                <h3>RUT EMPELADO ENCARGADO :</h3>
+                <p>{{ entity.2 }}</p>
+            </div>
+            <div class="detail">
+                <h3>NOMBRE EMPELADO ENCARGADO :</h3>
+                <p>{{ entity.16 }}</p>
+            </div>
+        </div>
+        <div class="detail-title">
+            <h2> DETALLES CONTRATO</h2>
+            <div class="detail">
+                <h3>CANTIDAD DE ASESORIAS MENSUALES :</h3>
+                <p>{{ entity.3 }}</p>
+            </div>
+            <div class="detail">
+                <h3>CANTIDAD DE CAPACITACIONES MENSUALES :</h3>
+                <p>{{ entity.4 }}</p>
+            </div>
+            <div class="detail">
+                <h3>VALOR TOTAL DEL CONTRATO :</h3>
+                <p>{{ entity.5 }}</p>
+            </div>
+            <div class="detail">
+                <h3>CANTIDAD DE CUOTAS DEL CONTRATO :</h3>
+                <p>{{ entity.7 }} CUOTAS</p>
+            </div>
+            <div class="detail">
+                <h3>FECHA CONTRATO :</h3>
+                <p>{{ entity.8 }}</p>
+            </div>
+            <div class="detail">
+                <h3>FECHA PRIMER PAGO :</h3>
+                <p>{{ entity.9 }}</p>
+            </div>
+            <div class="detail">
+                <h3>CONTRATO VALIDO HASTA  :</h3>
+                <p>{{ entity.10 }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="boton">
+        <div class="button-c pdf">
+            <a class="btn" href="{% url 'base:contract-pdf' entity.0 %}" target="_blank">Generar pdf de contrato</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

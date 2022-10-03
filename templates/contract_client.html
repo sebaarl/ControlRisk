@@ -15,11 +15,10 @@
     <div class="button-c">
         <a class="btn" href="{% url 'base:create-client' %}">Agregar Cliente</a>
     </div>
-</div>
-<div class=" w">
+    
     <div class="search-box">
         <input type="text" placeholder="Busca aquí...">
-    </div>  
+    </div>    
 </div>
 
 <div class="dash-content">
@@ -27,23 +26,12 @@
         <thead>
             <tr>
                 <th>Rut</th>
-                <th>Razon social</th>
-                <th>Dirección</th>
-                <th>Telefono</th>
-                <th>Representante</th>
-                <th>Rubro</th>
-                <th>Acción</th>
             </tr>
         </thead>
         <tbody>
-            {% for item in cliente %}
+            {% for item in entity %}
             <tr>
-                <td>{{ item.formatRut }}</td>
-                <td>{{ item.razonsocial }}</td>
-                <td>{{ item.direccion }}</td>
-                <td>{{ item.telefono }}</td>
-                <td>{{ item.representante }}</td>
-                <td>{{ item.rubroid }}</td>
+                <td>{{ item }}</td>
                 <td class="action-container">
                     <div class="action">
                         <a href=""><i class="uil uil-refresh"></i></a>

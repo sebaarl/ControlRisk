@@ -32,6 +32,10 @@
     --box-shadow: 15px 10px 39px 0px rgba(130, 130, 130, 1);
 }
 
+html {
+    font-size: 62.5%;
+}
+
 body {
     min-height: 100vh;
     background-color: var(--primary-color);
@@ -55,9 +59,15 @@ body.dark {
     --box-shadow: 15px 10px 39px 0px rgb(33, 33, 33);
 }
 
-body.dark::-webkit-scrollbar-thumb:hover,
-body.dark .activity-data::-webkit-scrollbar-thumb:hover {
-    background: #3a3b3c;
+
+body::-webkit-scrollbar {
+    width: 7px;
+    background-color: #e7d1fc;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: #ff131d;
+    border-radius: 20px;
 }
 
 .home-title h2 {
@@ -68,13 +78,19 @@ body.dark .activity-data::-webkit-scrollbar-thumb:hover {
     color: var(--text-color);
 }
 
+.home-title img {
+    border-radius: 50%;
+    max-width: 150px;
+    margin-top: -50px;
+}
+
 nav {
     position: fixed;
     top: 0;
     left: 0;
     height: 100%;
     width: 250px;
-    padding: 10px 14px;
+    padding: 10px 8px;
     background-color: var(--panel-color);
     /* border-right: 1px solid var(--border-color); */
     transition: var(--tran-05);
@@ -102,7 +118,7 @@ nav .logo-image img {
 }
 
 nav .logo-name .logo_name {
-    font-size: 22px;
+    font-size: 2.2rem;
     font-weight: 600;
     color: var(--text-color);
     margin-left: 14px;
@@ -149,7 +165,7 @@ body.dark li a:hover:before {
 }
 
 .menu-items li a i {
-    font-size: 24px;
+    font-size: 2.4rem;
     min-width: 45px;
     height: 100%;
     display: flex;
@@ -159,7 +175,7 @@ body.dark li a:hover:before {
 }
 
 .menu-items li a .link-name {
-    font-size: 18px;
+    font-size: 1.8rem;
     font-weight: 400;
     color: var(--black-light-color);
     transition: var(--tran-05);
@@ -263,7 +279,7 @@ nav.close~.dashboard .top {
 }
 
 .dashboard .top .sidebar-toggle {
-    font-size: 26px;
+    font-size: 2.6rem;
     color: var(--text-color);
     cursor: pointer;
 }
@@ -285,7 +301,7 @@ nav.close~.dashboard .top {
     height: 100%;
     width: 100%;
     color: var(--text-color);
-    font-size: 15px;
+    font-size: 1.5rem;
     font-weight: 400;
     outline: none;
 }
@@ -293,7 +309,7 @@ nav.close~.dashboard .top {
 .top .search-box i {
     position: absolute;
     left: 15px;
-    font-size: 22px;
+    font-size: 2.2rem;
     z-index: 10;
     top: 50%;
     transform: translateY(-50%);
@@ -317,13 +333,13 @@ nav.close~.dashboard .top {
 }
 
 .top .title i {
-    font-size: 20px;
+    font-size: 2.0rem;
     margin-left: 5px;
     color: var(--text-color);
 }
 
 .top .title .text {
-    font-size: 20px;
+    font-size: 2.0rem;
     font-weight: 500;
     color: var(--text-color);
     margin-left: 20px;
@@ -345,11 +361,11 @@ nav.close~.dashboard .top {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 2.4rem;
 }
 
 .dash-content .title .text {
-    font-size: 24px;
+    font-size: 2.4rem;
     font-weight: 500;
     color: var(--text-color);
     margin-left: 10px;
@@ -373,7 +389,6 @@ nav.close~.dashboard .top {
     height: 45px;
     max-width: 600px;
     width: 100%;
-    margin: 0 30px;
 }
 
 .options {
@@ -382,17 +397,13 @@ nav.close~.dashboard .top {
     display: flex;
 }
 
-.search-box {
-    margin-left: 20px;
-}
-
 .search-box input {
     border: 1px solid var(--border-color);
     background-color: var(--panel-color);
     padding: 5px 10px 5px 15px;
     border-radius: 5px;
     color: var(--text-color);
-    font-size: 15px;
+    font-size: 1.5rem;
     font-weight: 400;
     outline: none;
 }
@@ -400,7 +411,7 @@ nav.close~.dashboard .top {
 .container form .title {
     display: block;
     margin-bottom: 8px;
-    font-size: 16px;
+    font-size: 1.6rem;
     font-weight: 500;
     margin: 6px 0;
     color: #333;
@@ -434,15 +445,15 @@ form .fields .input-field {
 }
 
 .input-field label {
-    font-size: 12px;
+    font-size: 1.2rem;
     font-weight: 500;
-    color: #2e2e2e;
+    color: var(--text-color);
 }
 
 .input-field input,
 select {
     outline: none;
-    font-size: 14px;
+    font-size: 1.4rem;
     font-weight: 400;
     color: #333;
     border-radius: 5px;
@@ -454,7 +465,7 @@ select {
 
 .input-field textarea {
     outline: none;
-    font-size: 14px;
+    font-size: 1.4rem;
     font-weight: 400;
     color: #333;
     border-radius: 5px;
@@ -497,7 +508,7 @@ select {
 }
 
 .container form .btnText {
-    font-size: 14px;
+    font-size: 1.4rem;
     font-weight: 400;
 }
 
@@ -543,7 +554,7 @@ form .buttons button,
 
 .input-content label {
     color: var(--black-light-color);
-    font-size: 15px;
+    font-size: 1.5rem;
     font-weight: 500;
 }
 
@@ -551,7 +562,7 @@ form .buttons button,
     max-width: 400px;
     height: 30px;
     outline: none;
-    font-size: 14px;
+    font-size: 1.4rem;
     font-weight: 400;
     color: #333;
     border-radius: 5px;
@@ -564,7 +575,7 @@ form .buttons button,
     max-width: 400px;
     height: 30px;
     outline: none;
-    font-size: 14px;
+    font-size: 1.4rem;
     font-weight: 400;
     color: #333;
     border-radius: 5px;
@@ -577,7 +588,7 @@ form .buttons button,
     max-width: 400px;
     height: 30px;
     outline: none;
-    font-size: 14px;
+    font-size: 1.4rem;
     font-weight: 400;
     color: #333;
     border-radius: 5px;
@@ -591,7 +602,7 @@ form .buttons button,
     max-width: 400px;
     height: 100px;
     outline: none;
-    font-size: 14px;
+    font-size: 1.4rem;
     font-weight: 400;
     color: #333;
     border-radius: 5px;
@@ -642,7 +653,7 @@ form .buttons button,
     display: flex;
     background: var(--panel-color);
     padding: 10px;
-    font-size: 15px;
+    font-size: 1.5rem;
     font-weight: bold;
     border-radius: 8px;
     align-items: center;
@@ -670,11 +681,11 @@ form .buttons button,
 }
 
 .home-title p {
-    font-size: 20px;
+    font-size: 2.0rem;
 }
 
 .select-btn i {
-    font-size: 20px;
+    font-size: 2.0rem;
     transition: 0.3s;
     color: var(--text-color);
 }
@@ -690,7 +701,8 @@ form .buttons button,
 
 .select-menu .options {
     position: absolute;
-    padding: 15px;
+    width: 185px;
+    padding: 10px;
     margin-top: 10px;
     border-radius: 8px;
     background: var(--panel-color);
@@ -707,7 +719,7 @@ form .buttons button,
     display: flex;
     height: 55px;
     cursor: pointer;
-    padding: 0 10px;
+    padding: 0 5px;
     border-radius: 8px;
     align-items: center;
     background: var(--panel-color);
@@ -719,13 +731,13 @@ form .buttons button,
 }
 
 .option i {
-    font-size: 20px;
+    font-size: 2.0rem;
     margin-right: 12px;
     color: var(--text-color);
 }
 
 .option .option-text {
-    font-size: 15px;
+    font-size: 1.5rem;
     color: var(--text-color);
 }
 
@@ -743,7 +755,7 @@ body.dark .nav-links li a:hover .option-text {
     display: flex;
     background: var(--panel-color);
     padding: 10px;
-    font-size: 15px;
+    font-size: 1.5rem;
     font-weight: bold;
     border-radius: 8px;
     align-items: center;
@@ -753,7 +765,7 @@ body.dark .nav-links li a:hover .option-text {
 }
 
 .noti-btn i {
-    font-size: 20px;
+    font-size: 2.0rem;
     transition: 0.3s;
     color: var(--text-color);
 }
@@ -797,13 +809,13 @@ body.dark .nav-links li a:hover .option-text {
 }
 
 .noti-option i {
-    font-size: 20px;
+    font-size: 2.0rem;
     margin-right: 12px;
     color: var(--text-color);
 }
 
 .noti-option .option-text-noti {
-    font-size: 15px;
+    font-size: 1.5rem;
     color: var(--text-color);
 }
 
@@ -843,17 +855,20 @@ footer {
 }
 
 footer p {
-    font-size: 15px;
+    font-size: 1.5rem;
     color: #707070;
 }
 
-.button-c {}
+.w {
+    margin-top: 20px;
+    margin-left: 0;
+}
 
 .button-c .btn {
     height: 100%;
     width: 100%;
     border: none;
-    font-size: 16px;
+    font-size: 1.6rem;
     font-weight: 400;
     border-radius: 6px;
     background-color: #ff131d;
@@ -876,8 +891,9 @@ footer p {
 
 table {
     width: 100%;
-    font-family: sans-serif;
+    font-family: 'Poppins';
     border-collapse: collapse;
+    text-align: center;
 }
 
 th {
@@ -886,18 +902,48 @@ th {
 }
 
 table thead tr {
-    font-size: 10px;
+    font-size: 1.0rem;
 }
 
 th,
 td {
     padding: 10px;
-    font-size: 13px;
+    font-size: 1.3rem;
 }
 
 tbody {
     background-color: var(--panel-color);
     color: var(--text-color);
+}
+
+.status {    
+    background-color: green;
+    display: flex;
+    justify-content: center;
+    border-radius: 50px;
+    align-items: center;
+}
+
+.status p {
+    color: white;
+    font-weight: bold;
+    letter-spacing: 1px;
+    padding: 2px;
+}
+
+.status-no {    
+    background-color: #ff131d;
+    display: flex;
+    justify-content: center;
+    border-radius: 50px;
+    align-items: center;
+}
+
+.status-no p {
+    color: white;
+    font-weight: bold;
+    letter-spacing: 1px;
+    padding: 2px;
 }
 
 .action-container {
@@ -910,6 +956,85 @@ tbody {
     color: white;
     padding: 5px;
     border-radius: 5px;
+}
+
+.container-paginator {
+    display: flex;
+    justify-content: center;
+    margin: 100px;
+    font-family: 'Poppins';
+    font-size: 1.4rem;
+}
+
+.pagination {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination li a {
+    text-decoration: none;
+    padding: 7px;
+    margin: 7px;
+    color: var(--text-color);
+}
+
+.pagination li a:hover {
+    color: var(--primary-color);
+}
+
+.pagination li i {
+    background-color: #ff131d;
+    color: white;
+    padding: 2px;
+    font-size: 2rem;
+    border-radius: 10px;
+}
+
+.contract-detail {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin-top: -50px;
+    color: var(--text-color);
+}
+
+.detail-title {
+    margin-bottom: 30px;
+    font-size: 1.2rem;
+}
+
+.detail {
+    display: flex;
+}
+
+.contract-detail h3 {
+    font-size: 1.5rem;
+    padding: 10px;
+    margin-left: 30px;
+}
+
+.contract-detail p {
+    font-size: 1.5rem;
+    padding: 10px;
+}
+
+.title-pdf .text{
+    text-align: center;
+    font-size: 3.5rem;
+}
+
+.boton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin: 50px;
+}
+
+.logo-pdf-img img {
+    width: 200px !important;
 }
 
 @media screen and (max-width: 600px) {
@@ -927,32 +1052,9 @@ tbody {
         text-align: center;
     }
 
-    td:nth-child(2)::before {
-        content: "Rut";
-    }
-
-    td:nth-child(3)::before {
-        content: "Razon social";
-    }
-
-    td:nth-child(4)::before {
-        content: "Rubro";
-    }
-
-    td:nth-child(5)::before {
-        content: "Direccion";
-    }
-
-    td:nth-child(6)::before {
-        content: "Telefono";
-    }
-
-    td:nth-child(7)::before {
-        content: "Representante";
-    }
 
     td {
-        text-align: right;
+        text-align: center;
     }
 
     td::before {
@@ -1026,6 +1128,27 @@ tbody {
 @media (max-width: 560px) {
     .dash-content .boxes .box {
         width: 100%;
+    }
+}
+
+@media screen and (max-width:594px) {
+    .detail {
+        flex-direction: column;
+    }
+
+    .detail h3 {
+        font-size: 1.3rem;
+        margin-left: -10px;
+    }
+
+    .detail p {
+        font-size: 1.3rem;
+        margin-left: -10px;
+        margin-top: -15px;
+    }
+
+    .title span{
+        font-size: 2.0rem !important;
     }
 }
 

@@ -1,5 +1,7 @@
 from django.urls import path
 from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView
+from AppBase.views import ContractDetailView, ContractDetailPdf
+
 app_name = 'base'
 
 urlpatterns = [
@@ -10,4 +12,6 @@ urlpatterns = [
     path('ingresar-contrato', CreateContractView, name='create-contract'),
     path('ingresar-accidente', CreateAccidentView, name='create-accident'),
     path('contratos', ListContractView, name='list-contract'),
+    path('contratos/detalle/<id>', ContractDetailView, name='contract-detail'),
+    path('contratos/detalle/pdf/<pk>', ContractDetailPdf.as_view(), name='contract-pdf')
 ]

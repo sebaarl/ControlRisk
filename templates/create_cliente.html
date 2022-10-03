@@ -12,7 +12,7 @@
 </div>
 
 <div class="container">
-    <form action="#" method="POST">
+    <form action="#" method="POST" id="formulario">
         {% csrf_token %}
         <div class="form first">
             <div class="details personal">
@@ -50,7 +50,7 @@
                     </div>
                 </div>
 
-                <button class="nextBtn">
+                <button class="nextBtn" type="submit">
                     <span class="btnText">Guardar</span>
                     <i class="uil uil-navigator"></i>
                 </button>
@@ -59,16 +59,39 @@
     </form>
 
     {% if messages %}
-    {% for m in messages %}
-    <script>
-        Swal.fire({
-            'tittle': 'Exito',
-            'text': '{{ m }}',
-            'confirmButtonColor': '#ff131d',
-            'confirmButtonText': 'Aceptar',
-        })
-    </script>
-    {% endfor %}
+        {% for m in messages %}
+                {% if m.tags  == 'success' %}
+                <script>
+                    Swal.fire({
+                        'tittle': 'Exito',
+                        'icon': 'success',
+                        'text': '{{ m }}',
+                        'confirmButtonColor': '#ff131d',
+                        'confirmButtonText': 'Aceptar',
+                    })
+                </script>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% if messages %}
+        {% for m in messages %}
+            {% if m.tags  == 'error' %}
+                <script>
+                    Swal.fire({
+                        'tittle': 'Exito',
+                        'icon': 'error',
+                        'text': '{{ m }}',
+                        'confirmButtonColor': '#ff131d',
+                        'confirmButtonText': 'Aceptar',
+                    })
+                </script>
+            {% endif %}
+        {% endfor %}
     {% endif %}
 </div>
+{% endblock %}
+
+{% block javascript %}
+<script src='{% static "js/validate.js" %}'></script>
 {% endblock %}

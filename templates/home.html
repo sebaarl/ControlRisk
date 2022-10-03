@@ -8,20 +8,19 @@
 {% block contenido %}
 
 {% if user.is_authenticated %}
+<div class="home-title">
+    <img src='{% static "images/ControlRisk_Logo.png" %}' alt="">
     {% if user.is_profesional == 1 %}
-    <div class="home-title">
         <h2>Bienvenido a Intranet Control Risk</h2>
         <p>Panel: Profesional</p>
         <p></p>
-    </div>
     {% endif %}
     {% if user.is_profesional == 0 %}
-    <div class="home-title">
         <h2>Bienvenido a Intranet Control Risk</h2>
         <p>Panel: Cliente</p>
         <p></p>
-    </div>
     {% endif %}
+</div>
 {% endif %}
 
 {% endblock %}

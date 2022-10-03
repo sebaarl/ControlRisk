@@ -14,44 +14,63 @@
 <div class="button-c">
     <a class="btn" href="{% url 'base:create-contract' %}">Agregar contrato</a>
 </div>
-
+<div class=" w">
+    <div class="search-box">
+        <input type="text" placeholder="Busca aquí...">
+    </div>  
+</div>
 
 <div class="dash-content">
     <table>
         <thead>
             <tr>
+                <th>Nro. Contrato</th>
                 <th>Cliente</th>
-                <th>Asesorias</th>
-                <th>Capacitaciones</th>
-                <th>Desde</th>
-                <th>Hasta</th>
-                <th>1er Pago</th>
-                <th>Cuotas</th>
-                <th>Valor</th>
-                <th>Pagado</th>
-                <th>Empleado</th>
+                <th>Razón Social</th>
+                <th>Rut Empleado</th>
+                <th>Nombre Empelado</th>
+                <th>Fecha Creación</th>
+                <th>Estado</th>
+                <th>Acción</th>
             </tr>
         </thead>
         <tbody>
             {% for item in entity %}
             <tr>
-                <td>{{ item.9 }}</td>
+                <td>{{ item.0 }}</td>
                 <td>{{ item.1 }}</td>
+                <td>{{ item.17 }}</td>
                 <td>{{ item.2 }}</td>
-                <td>{{ item.3 }}</td>
-                <td>{{ item.4 }}</td>
-                <td>{{ item.5 }}</td>
-                <td>{{ item.6 }}</td>
-                <td>$ {{ item.7 }}</td>
-                {% if item.8 == 0 %}
-                    <td>No</td>
+                <td>{{ item.16 }}</td>
+                <td>{{ item.8 }}</td>
+                {% if item.6 == 0 %}
+                <td>
+                    <div class="status">
+                        <p>ACTIVO</p>
+                    </div>
+                </td>
                 {% else %}
-                    <td>Si</td>
+                <td>
+                    <div class="status-no">
+                        <p>NO ACTIVO</p>
+                    </div>
+                </td>
                 {% endif %}
-                <td>{{ item.10 }}</td>
+                <td class="action-container">
+                    <div class="action">
+                        <a href="{% url 'base:contract-detail' item.0 %}"><i class="uil uil-arrow-up-right"></i></a>
+                    </div>
+                    <div class="action">
+                        <a href=""><i class="uil uil-trash-alt"></i></a>
+                    </div>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <div>
+        {% include 'paginator.html' %}
+    </div>
 </div>
 {% endblock %}

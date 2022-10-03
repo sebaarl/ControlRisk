@@ -1,11 +1,19 @@
 from multiprocessing.connection import Client
+from turtle import title
+from wsgiref.validate import validator
 from django import forms
 from AppBase.models import Cliente, Empleado, RubroEmpresa
 from django.forms import ValidationError
+from django.utils.translation import gettext_lazy as _
+from django.core.validators import MaxValueValidator, MaxLengthValidator, MinLengthValidator
+from AppBase.validators import validate_length
+from django.forms import ModelForm
 
 
 class CreateClienteForm(forms.Form):
     rut = forms.CharField(
+        max_length=12, 
+        min_length=8,
         widget=forms.TextInput(
             attrs={
                 'id': 'clienteRut',
@@ -13,10 +21,13 @@ class CreateClienteForm(forms.Form):
                 'class': '',
                 'placeholder': 'Ingrese RUT',
                 'name': 'rut',
+                'pattern': '^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$',
+                'title': 'Ingrese RUT en formato correcto XX.XXX.XXX-X',
             }
         )
     )
     razon = forms.CharField(
+        min_length=1,
         widget=forms.TextInput(
             attrs={
                 'id': 'clienteRazon',
@@ -24,6 +35,7 @@ class CreateClienteForm(forms.Form):
                 'class': '',
                 'placeholder': 'Ingrese Razón Social',
                 'name': 'razon',
+                'title': 'Ingrese la Razón Social',
             }
         )
     )
@@ -46,6 +58,8 @@ class CreateClienteForm(forms.Form):
                 'class': '',
                 'placeholder': 'Ingrese telefono',
                 'name': 'telefono',
+                'pattern': '[(\+56)(0?9)[987654321]\d{7}]',
+                'title': 'Ingrese un nro. telefonico correcto',
             }
         )
     )
@@ -57,6 +71,8 @@ class CreateClienteForm(forms.Form):
                 'class': '',
                 'placeholder': 'Ingrese representante legal',
                 'name': 'representante',
+                'pattern': '^([A-Za-zÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-zÁÉÍÓÚñáéíóúÑ\']+[\s])+([A-Za-zÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-zÁÉÍÓÚñáéíóúÑ\'])+[\s]?([A-Za-zÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-zÁÉÍÓÚñáéíóúÑ\'])?$',
+                'title': 'Ingrese nombre de Representante Legal correctamente'
             }
         )
     )
@@ -82,6 +98,10 @@ class CreateClienteForm(forms.Form):
             raise ValidationError("Rut ya registrado!")
 
         return rut
+
+    def clean_telefono(self):
+        
+        return self
 
 
 class CreateEmpleadoForm(forms.Form):
@@ -140,6 +160,8 @@ class CreateContratoForm(forms.Form):
                 'class': '',
                 'placeholder': 'Ingrese n° de asesorias',
                 'name': 'asesoria',
+                'pattern': '[0-9]',
+                'title': 'Ingrese un nro. telefonico correcto',
             }
         )
     )

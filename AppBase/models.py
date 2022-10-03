@@ -1,7 +1,10 @@
 from pyexpat import model
 from django.db import models
+from django.forms import model_to_dict
 from AppUser.models import User
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+from AppBase.validators import validate_length
 
 
 class RubroEmpresa(models.Model):
@@ -113,13 +116,13 @@ class Checklist(models.Model):
 
 
 class Cliente(models.Model):
-    rutcliente = models.CharField(db_column='RutCliente', max_length=12,
+    rutcliente = models.CharField(db_column='RutCliente', max_length=12, unique=True,
                                   db_collation='Modern_Spanish_CI_AS', primary_key=True)
     razonsocial = models.CharField(
         db_column='RazonSocial', max_length=50, db_collation='Modern_Spanish_CI_AS')
     direccion = models.CharField(
         db_column='Direccion', max_length=100, db_collation='Modern_Spanish_CI_AS')
-    telefono = models.IntegerField(db_column='Telefono')
+    telefono = models.PositiveIntegerField(db_column='Telefono', validators=[validate_length])
     representante = models.CharField(
         db_column='Representante', max_length=50, db_collation='Modern_Spanish_CI_AS')
     usuarioid = models.ForeignKey(
@@ -132,6 +135,17 @@ class Cliente(models.Model):
     
     def __str__(self):
         return self.rutcliente
+
+    def formatRut(self):
+        if len(self.rutcliente) == 8:                
+            formato = self.rutcliente[0:1] + '.' + self.rutcliente[1:4] + '.' + self.rutcliente[4:7] + '-' + self.rutcliente[-1]
+        else:
+            formato = self.rutcliente[0:2] + '.' + self.rutcliente[2:5] + '.' + self.rutcliente[5:8] + '-' + self.rutcliente[-1]
+        return formato
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['rubroid'] = [i.toJSON() for i in self.rubroempresa_set.all()]
 
 
 class Contrato(models.Model):
@@ -156,6 +170,11 @@ class Contrato(models.Model):
     def __str__(self):
         rut = str(self.rutcliente)
         return rut
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['cliente'] = [i.toJSON() for i in self.cliente_set.all()]
+        item['empelado'] = [i.toJSON() for i in self.empelado_set.all()]
 
 
 class Empleado(models.Model):

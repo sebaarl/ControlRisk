@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Pagos - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-invoice"></i>
+    <span class="text">Pagos {{ user }}</span>
+</div>
+
+<div class="dash-content">
+    {% if c > 0 %}
+    {% for c in entity %}
+    <div class="acordion-pagos">
+        <details class="detail">
+            <summary>
+                <a href='{% url "base:pago-contract" c.0 %}'>
+                    <i class="uil uil-external-link-alt"></i> Pagos asociados al contrato {{u.username}}-{{ c.19 }}-{{ c.0}}
+                </a>
+            </summary>
+        </details>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="alerta">
+        <p>No presenta pagos asociados a un contrato &#128532</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

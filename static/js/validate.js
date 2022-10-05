@@ -1,38 +1,51 @@
-const formulario = document.getElementById("formulario");
-const inputs = document.querySelectorAll("#formulario input");
+const formulario = document.getElementById("form");
+const inputs = document.querySelectorAll("#form input");
 
-const expresiones = {
-  rut: /^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$/,
-  telefono: /^(\+56)(0?9)[987654321]\d{7}$/,
-
+function sumarDias(fecha, dias) {
+  fecha.setDate(fecha.getDate() + dias);
+  return fecha;
 }
 
 const validarFormulario = (e) => {
   switch (e.target.name) {
-    case "rut":
-      if (expresiones.rut.test()) {
-        
-      }
+    case "fecha":
+      var fecha = new Date(e.target.value);
+      var f1 = new Date(sumarDias(fecha, 1)).toDateString();
+      var f2 = Date.now();
+      var f3 = new Date(f2).toDateString();
 
-    break;
-    case "razon":
-      
-    break;
-    case "direccion":
-      
-    break;
-    case "telefono":
-      
-    break;
-    case "representante":
-      
-    break;
+      var f4 = new Date(f1);
+      var f5 = new Date(f3);
+
+      console.log(f4);
+      console.log(f5);
+
+      if (f4 > f5) {
+        document
+          .querySelector("#input-field .alert-input")
+          .classList.add("alert-input-active");
+
+        const btn = document.getElementById("btn");
+        btn.disabled = true;
+
+      } else {
+        document
+          .querySelector("#input-field .alert-input")
+          .classList.remove("alert-input-active");
+
+        const btn = document.getElementById("btn");
+        btn.disabled = false;
+
+      }
+      break;
   }
-}
+};
 
 inputs.forEach((input) => {
-  input.addEventListener("keyup", validarFormulario)
-  input.addEventListener("blur", validarFormulario)
+  input.addEventListener("keyup", validarFormulario);
+  input.addEventListener("blur", validarFormulario);
 });
 
-formulario.addEventListener("submit", (e) => {});
+formulario.addEventListener("submit", (e) => {
+  e.preventDefault();
+});

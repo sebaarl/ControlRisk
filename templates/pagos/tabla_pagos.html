@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Pagos - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-invoice"></i>
+    <span class="text">Pagos contrato ID: {{ c }}</span>
+</div>
+
+<div class="dash-content">
+    <table>
+        <thead>
+            <tr>
+                <th style="text-transform: uppercase">Cod. Pago</th>
+                <th style="text-transform: uppercase">Fecha Pago</th>
+                <th style="text-transform: uppercase">Fecha Vencimiento</th>
+                <th style="text-transform: uppercase">Valor Cuota</th>
+                <th style="text-transform: uppercase">Estado</th>
+                <th style="text-transform: uppercase">Detalle</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in entity %}
+            <tr>
+                <td>{{ item.0 }}</td>
+                <td>{{ item.1 }}</td>
+                <td>{{ item.2 }}</td>
+                <td>{{ item.4 }}</td>
+                {% if item.5 == False %}
+                <td class="container-status">
+                    <div class="status-no">
+                        <p>NO PAGADO</p>
+                    </div>
+                </td>
+                {% else %}
+                <td class="container-status">
+                    <div class="status">
+                        <p>PAGADO</p>
+                    </div>
+                </td>
+                {% endif %}
+                <td><a href='' class="detail"><i class="uil uil-external-link-alt"></i></a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

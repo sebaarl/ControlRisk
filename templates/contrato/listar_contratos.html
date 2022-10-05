@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Clientes - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-file-contract-dollar"></i>
+    <span class="text">Contratos registrados</span>
+</div>
+
+<div class="button-c">
+    <a class="btn" href="{% url 'base:create-contract' %}">Agregar contrato</a>
+</div>
+<div class=" w">
+    <div class="search-box">
+        <input type="text" placeholder="Busca aquí...">
+    </div>  
+</div>
+
+<div class="dash-content">
+    <table>
+        <thead>
+            <tr>
+                <th style="text-transform: uppercase">Nro. Contrato</th>
+                <th style="text-transform: uppercase">Cliente</th>
+                <th style="text-transform: uppercase">Razón Social</th>
+                <th style="text-transform: uppercase">Rut Empleado</th>
+                <th style="text-transform: uppercase">Nombre Empelado</th>
+                <th style="text-transform: uppercase">Fecha Creación</th>
+                <th style="text-transform: uppercase">Estado</th>
+                <th style="text-transform: uppercase">Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in entity %}
+            <tr>
+                <td>{{ item.0 }}</td>
+                <td>{{ item.1 }}</td>
+                <td>{{ item.17 }}</td>
+                <td>{{ item.2 }}</td>
+                <td>{{ item.16 }}</td>
+                <td>{{ item.8 }}</td>
+                {% if item.18 == 1 %}
+                <td>
+                    <div class="status">
+                        <p>ACTIVO</p>
+                    </div>
+                </td>
+                {% else %}
+                <td>
+                    <div class="status-no">
+                        <p>NO ACTIVO</p>
+                    </div>
+                </td>
+                {% endif %}
+                <td class="action-container">
+                    <div class="action">
+                        <a href="{% url 'base:contract-detail' item.0 %}">
+                            <i class="uil uil-external-link-alt"></i>
+                        </a>
+                    </div>
+                    <div class="action">
+                        <a href=""><i class="uil uil-trash-alt"></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div>
+        {% include 'paginator.html' %}
+    </div>
+</div>
+{% endblock %}

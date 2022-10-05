@@ -14,12 +14,12 @@
     <link rel="icon" href="{% static 'images/prevencion.png'%}">
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     {% block link %}
-    
+
     {% endblock %}
     {% block styles %}
 
     {% endblock %}
-</head>     
+</head>
 
 <body>
     <nav>
@@ -32,41 +32,20 @@
         </div>
 
         <div class="menu-items">
-            <!-- {% if user.is_profesional == 0 %}
             <ul class="nav-links">
                 <li><a href='{% url "base:home" %}'>
                         <i class="uil uil-estate"></i>
                         <span class="link-name">Inicio</span>
                     </a></li>
                 <li><a href="#">
-                        <i class="uil uil-car"></i>
+                        <i class="uil uil-podium"></i>
+                        <span class="link-name">Capacitaciones</span>
+                    </a></li>
+                <li><a href="#">
+                        <i class="uil uil-car-sideview"></i>
                         <span class="link-name">Visitas</span>
                     </a></li>
                 <li><a href="#">
-                        <i class="uil uil-podium"></i>
-                        <span class="link-name">Capacitaciones</span>
-                    </a></li>
-                <li><a href="#">
-                        <i class="uil uil-thumbs-up"></i>
-                        <span class="link-name">Asesorias</span>
-                    </a></li>
-                <li><a href='{% url "base:create-accident" %}'>
-                        <i class="uil uil-band-aid"></i>
-                        <span class="link-name">Accidente</span>
-                    </a></li>
-            </ul>
-            {% endif %} -->
-            {% if user.is_profesional == 1 %}
-            <ul class="nav-links">
-                <li><a href='{% url "base:home" %}'>
-                        <i class="uil uil-estate"></i>
-                        <span class="link-name">Inicio</span>
-                    </a></li>
-                <li><a href="#">
-                        <i class="uil uil-podium"></i>
-                        <span class="link-name">Capacitaciones</span>
-                    </a></li>
-                <li><a href="#">
                         <i class="uil uil-thumbs-up"></i>
                         <span class="link-name">Asesorias</span>
                     </a></li>
@@ -81,37 +60,32 @@
                 <li><a href='{% url "base:list-contract" %}'>
                         <i class="uil uil-file-contract-dollar"></i>
                         <span class="link-name">Contratos</span>
-                    </a></li> 
-            </ul>
-            {% endif %}
-            {% if user.is_staff == 1 %}
-            <ul class="nav-links">
-                <li><a href='{% url "base:home" %}'>
-                        <i class="uil uil-estate"></i>
-                        <span class="link-name">Inicio</span>
                     </a></li>
-                <li><a href="#">
-                        <i class="uil uil-podium"></i>
-                        <span class="link-name">Capacitaciones</span>
-                    </a></li>
-                <li><a href="#">
-                        <i class="uil uil-thumbs-up"></i>
-                        <span class="link-name">Asesorias</span>
-                    </a></li>
-                <li><a href='{% url "base:create-accident" %}'>
-                        <i class="uil uil-band-aid"></i>
-                        <span class="link-name">Accidentes</span>
-                    </a></li>
-                <li><a href='{% url "base:list-client" %}'>
-                        <i class="uil uil-hard-hat"></i>
-                        <span class="link-name">Clientes</span>
-                    </a></li>
-                <li><a href='{% url "base:list-contract" %}'>
+                <li><a href='{% url "base:contract" %}'>
                         <i class="uil uil-file-contract-dollar"></i>
-                        <span class="link-name">Contratos</span>
-                    </a></li> 
+                        <span class="link-name">Mis Contratos</span>
+                    </a></li>
+                <li><a href='{% url "base:pagos" %}'>
+                        <i class="uil uil-invoice"></i>
+                        <span class="link-name">Pagos</span>
+                    </a></li>
+                <li><a href='{% url "base:pagos" %}'>
+                        <i class="uil uil-invoice"></i>
+                        <span class="link-name">Pagos</span>
+                    </a></li>
+                <li><a href='{% url "base:pagos" %}'>
+                        <i class="uil uil-invoice"></i>
+                        <span class="link-name">Pagos</span>
+                    </a></li>
+                <li><a href='{% url "base:pagos" %}'>
+                        <i class="uil uil-invoice"></i>
+                        <span class="link-name">Pagos</span>
+                    </a></li>
+                <li><a href='{% url "base:pagos" %}'>
+                        <i class="uil uil-invoice"></i>
+                        <span class="link-name">Pagos</span>
+                    </a></li>
             </ul>
-            {% endif %}
             <ul class="logout-mode">
                 <li class="mode">
                     <a href="#">

@@ -31,6 +31,7 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.staticfiles import finders
+from rut_chile import rut_chile
 
 
 def rut(rut):
@@ -55,15 +56,16 @@ def HomeView(request):
     return render(request, 'home.html')
 
 
-
 @login_required
 def CreateClient(request):
     data = {
-        'cliente': CreateClienteForm()
+        'form': CreateClienteForm()
     }
 
     if request.method == "POST":
-        if request.POST.get('rut') and request.POST.get('razon') and request.POST.get('rubro') and request.POST.get('direccion') and request.POST.get('telefono') and request.POST.get('representante') and request.POST.get('rutrepre'):
+        formulario = CreateClienteForm(request.POST)
+        if formulario.is_valid():
+            # if request.POST.get('rut') and request.POST.get('razon') and request.POST.get('rubro') and request.POST.get('direccion') and request.POST.get('telefono') and request.POST.get('representante') and request.POST.get('rutrepre'):
             clientesave = Cliente()
             clientesave.rutcliente = request.POST.get('rut')
             clientesave.razonsocial = request.POST.get('razon')
@@ -77,36 +79,40 @@ def CreateClient(request):
             rut_repre = rut(clientesave.rutrepresentante)
 
             if request.method == "POST":
-                existe =  Cliente.objects.filter(rutcliente=rut_cli).exists()
+                existe = Cliente.objects.filter(rutcliente=rut_cli).exists()
                 user_exist = User.objects.filter(username=rut_cli).exists()
 
-                if existe or user_exist:
-                    messages.error(request, "El rut " +
-                                formatRut(rut_cli) +" ya está registrado en el sistema!")
+                if rut_chile.is_valid_rut(clientesave.rutcliente) and rut_chile.is_valid_rut(clientesave.rutrepresentante):
+                    if existe or user_exist:
+                        messages.error(request, "El rut " +
+                                       formatRut(rut_cli) + " ya está registrado en el sistema!")
+                    else:
+                        username = rut_cli
+                        password = rut_cli[4:]
+
+                        user = get_user_model().objects.create(
+                            username=username,
+                            password=make_password(password),
+                            is_active=True,
+                            is_profesional=False
+                        )
+
+                        from django.db import connection
+                        with connection.cursor() as cursor:
+
+                            cursor.execute('EXEC [dbo].[SP_CREATE_CLIENTE] %s, %s, %s, %s, %s, %s, %s', (rut_cli,
+                                                                                                         clientesave.razonsocial, clientesave.rubro,  clientesave.direccion, clientesave.telefono, clientesave.representante,
+                                                                                                         rut_repre))
+
+                            messages.success(request, "Cliente " +
+                                             formatRut(rut_cli) + " registrado correctamente ")
+
+                            return render(request, 'create_cliente.html', data)
                 else:
-                    username = rut_cli
-                    password = rut_cli[4:]
+                    messages.error(request, "Cliente " +
+                                   formatRut(rut_cli) + " invalido ")
 
-                    user = get_user_model().objects.create(
-                        username=username,
-                        password=make_password(password),
-                        is_active=True,
-                        is_profesional=False
-                    )  
-
-                    from django.db import connection
-                    with connection.cursor() as cursor:
-
-                        cursor.execute('EXEC [dbo].[SP_CREATE_CLIENTE] %s, %s, %s, %s, %s, %s, %s', (rut_cli,
-                               clientesave.razonsocial, clientesave.rubro,  clientesave.direccion, clientesave.telefono, clientesave.representante,
-                               rut_repre))
-
-                        messages.success(request, "Cliente " +
-                                    formatRut(rut_cli) +" registrado correctamente ")
-
-                    return render(request, 'create_cliente.html', data)
-
-    return render(request, 'create_cliente.html', data)
+    return render(request, 'cliente/create_cliente.html', data)
 
 
 @login_required
@@ -125,12 +131,12 @@ def CreateEmpleado(request):
             rut_emp = rut(empsave.rutempleado)
 
             if request.method == "POST":
-                existe =  Empleado.objects.filter(rutempleado=rut_emp).exists()
+                existe = Empleado.objects.filter(rutempleado=rut_emp).exists()
                 user_exist = User.objects.filter(username=rut_emp).exists()
 
                 if existe and user_exist:
                     messages.error(request, "El rut " +
-                                formatRut(rut_emp) +" ya está registrado en el sistema!")
+                                   formatRut(rut_emp) + " ya está registrado en el sistema!")
                 else:
                     if request.method == "POST":
                         username = rut_emp
@@ -150,7 +156,7 @@ def CreateEmpleado(request):
                                 empsave.rut, empsave.nombre, empsave.apellido, empsave.cargo))
 
                             messages.success(request, "Empleado " +
-                                        empsave.rut+" registrado correctamente ")
+                                             empsave.rut+" registrado correctamente ")
 
                         return render(request, 'create_empleado.html', data)
 
@@ -175,13 +181,15 @@ def ListClienteView(request):
         "paginator": paginator,
     }
 
-    return render(request, 'listar_clientes.html', data)
+    return render(request, 'cliente/listar_clientes.html', data)
 
 
 def CreateAccidentView(request):
     return render(request, 'create_accident.html')
 
 
+# Vistas Contrato
+# Creación de contrato
 @login_required
 def CreateContractView(request):
     data = {
@@ -196,14 +204,16 @@ def CreateContractView(request):
             contratosave.cuotascontrato = request.POST.get('cuota')
             contratosave.valorcontrato = request.POST.get('valor')
 
-            cliente = Cliente.objects.get(rutcliente=request.POST.get('cliente'))
-            empleado = Empleado.objects.get(rutempleado=request.POST.get('empleado'))
+            cliente = Cliente.objects.get(
+                rutcliente=request.POST.get('cliente'))
+            empleado = Empleado.objects.get(
+                rutempleado=request.POST.get('empleado'))
 
             contratosave.rutcliente = cliente
             contratosave.rutempleado = empleado
 
             now = datetime.now()
-            termino = now + relativedelta(months=12) 
+            termino = now + relativedelta(months=12)
             pago = now + relativedelta(months=1)
 
             from django.db import connection
@@ -212,28 +222,34 @@ def CreateContractView(request):
                 # cantidad = cursor.execute(
                 #     'SELECT COUNT(Pagado) FROM Contrato WHERE RutCliente = {} AND Pagado = 0'.format(str(contratosave.rutcliente)))
 
-                filterRut = Contrato.objects.filter(rutcliente=contratosave.rutcliente)
+                filterRut = Contrato.objects.filter(
+                    rutcliente=contratosave.rutcliente)
                 estado = filterRut.filter(estado=1)
                 cantidad = estado.count()
 
                 if cantidad >= 1:
-                    messages.error(request, 'La empresa {0} presenta un contracto activo'.format(formatRut(str(contratosave.rutcliente))))
+                    messages.error(request, 'La empresa {0} presenta un contracto activo'.format(
+                        formatRut(str(contratosave.rutcliente))))
                 else:
                     # cursor.execute('EXEC [dbo].[SP_CREATE_CONTRATO]  [{0}], [{1}], [{2}], [{3}], [{4}], [{5}], [{6}], [{7}], [{8}]'.format(
                     #     int(contratosave.cantidadasesorias),int(contratosave.cantidadcapacitaciones),termino,pago,int(contratosave.cuotascontrato),
                     #     int(contratosave.valorcontrato), str(contratosave.rutcliente),str(contratosave.rutempleado), now))
                     cursor.execute('EXEC [dbo].[SP_CREATE_CONTRATO]  %s, %s, %s, %s, %s, %s, %s, %s, %s', (
-                        int(contratosave.cantidadasesorias), int(contratosave.cantidadcapacitaciones),termino,pago,
-                        int(contratosave.cuotascontrato), int(contratosave.valorcontrato), 
-                        str(contratosave.rutcliente),str(contratosave.rutempleado), now))
+                        int(contratosave.cantidadasesorias), int(
+                            contratosave.cantidadcapacitaciones), termino, pago,
+                        int(contratosave.cuotascontrato), int(
+                            contratosave.valorcontrato),
+                        str(contratosave.rutcliente), str(contratosave.rutempleado), now))
 
-                    messages.success(request, "Contrato registrado correctamente")
+                    messages.success(
+                        request, "Contrato registrado correctamente")
 
-            return render(request, 'create_contract.html', data)
+            return render(request, 'contrato/create_contract.html', data)
 
-    return render(request, 'create_contract.html', data)
+    return render(request, 'contrato/create_contract.html', data)
 
 
+# Listar todos los contratos del sistema
 @login_required
 def ListContractView(request):
     cursor = connection.cursor()
@@ -252,9 +268,10 @@ def ListContractView(request):
         "paginator": paginator
     }
 
-    return render(request, 'listar_contratos.html', data)
+    return render(request, 'contrato/listar_contratos.html', data)
 
 
+# Mostrar detalle del contrato
 @login_required
 def ContractDetailView(request, id):
     cursor = connection.cursor()
@@ -270,9 +287,70 @@ def ContractDetailView(request, id):
         "contrato": results,
     }
 
-    return render(request, 'contract.html', data)
+    return render(request, 'contrato/contract.html', data)
 
-#PDF Contrato
+
+# Listar contratos del cliente
+def ContratoClientView(request):
+    datos = request.user
+    cursor = connection.cursor()
+    cursor.execute(
+        'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
+    results = cursor.fetchall()
+
+    filtro = Contrato.objects.filter(rutcliente=datos.username)
+    cantidad = filtro.count()
+
+    data = {
+        'user': formatRut(str(datos.username)),
+        'entity': results,
+        'cantidad': cantidad
+    }
+
+    return render(request, 'contrato/contratos_client.html', data)
+
+
+# Pagos
+def ListPagosView(request):
+    datos = request.user
+    filtro = Contrato.objects.all().filter(rutcliente=datos.username)
+
+    cursor = connection.cursor()
+    cursor.execute(
+        'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
+    results = cursor.fetchall()
+    cantidad = filtro.count()
+
+    data = {
+        'user': formatRut(str(datos.username)),
+        'entity': results,
+        'c': cantidad,
+        'u': datos,
+        'contratos': filtro,
+    }
+
+    return render(request, 'pagos/pagos.html', data)
+
+
+def PagosContractView(request, pk):
+    cursor = connection.cursor()
+    cursor.execute('EXEC [dbo].[SP_PAGOS_CONTRATO] {}'.format(str(pk)))
+    results = cursor.fetchall()
+
+    try:
+        results
+    except:
+        raise Http404
+
+    data = {
+        "entity": results,
+        'c': pk,
+    }
+
+    return render(request, 'pagos/tabla_pagos.html', data)
+
+
+# PDF Contrato
 class ContractDetailPdf(View):
     def get(self, request, *args, **kwargs):
         pk = self.kwargs['pk']

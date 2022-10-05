@@ -59,7 +59,6 @@ body.dark {
     --box-shadow: 15px 10px 39px 0px rgb(33, 33, 33);
 }
 
-
 body::-webkit-scrollbar {
     width: 7px;
     background-color: #e7d1fc;
@@ -94,7 +93,13 @@ nav {
     background-color: var(--panel-color);
     /* border-right: 1px solid var(--border-color); */
     transition: var(--tran-05);
+    overflow-y: scroll;
 }
+
+nav::-webkit-scrollbar {
+    display: none;
+}
+
 
 nav.close {
     width: 73px;
@@ -333,13 +338,13 @@ nav.close~.dashboard .top {
 }
 
 .top .title i {
-    font-size: 2.0rem;
+    font-size: 2rem;
     margin-left: 5px;
     color: var(--text-color);
 }
 
 .top .title .text {
-    font-size: 2.0rem;
+    font-size: 2rem;
     font-weight: 500;
     color: var(--text-color);
     margin-left: 20px;
@@ -681,11 +686,11 @@ form .buttons button,
 }
 
 .home-title p {
-    font-size: 2.0rem;
+    font-size: 2rem;
 }
 
 .select-btn i {
-    font-size: 2.0rem;
+    font-size: 2rem;
     transition: 0.3s;
     color: var(--text-color);
 }
@@ -731,7 +736,7 @@ form .buttons button,
 }
 
 .option i {
-    font-size: 2.0rem;
+    font-size: 2rem;
     margin-right: 12px;
     color: var(--text-color);
 }
@@ -765,7 +770,7 @@ body.dark .nav-links li a:hover .option-text {
 }
 
 .noti-btn i {
-    font-size: 2.0rem;
+    font-size: 2rem;
     transition: 0.3s;
     color: var(--text-color);
 }
@@ -809,7 +814,7 @@ body.dark .nav-links li a:hover .option-text {
 }
 
 .noti-option i {
-    font-size: 2.0rem;
+    font-size: 2rem;
     margin-right: 12px;
     color: var(--text-color);
 }
@@ -889,20 +894,113 @@ footer p {
     transition: 0.5s;
 }
 
+.alerta {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.alerta p {
+    font-size: 2.2rem;
+    margin: 5.5rem;
+    letter-spacing: 0.3rem;
+}
+
+.container-card {
+    display: flex;
+    width: 1040px;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+}
+
+.card {
+    margin: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    width: 300px;
+}
+
+.card-header img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    min-height: 250px;
+}
+
+.tag {
+    background: #cccccc;
+    border-radius: 50px;
+    font-size: 12px;
+    margin: 0;
+    color: #fff;
+    padding: 2px 10px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.tag-teal {
+    background-color: #47bcd4;
+}
+
+.tag-purple {
+    background-color: #5e76bf;
+}
+
+.tag-pink {
+    background-color: #cd5b9f;
+}
+
+.card-body p {
+    font-size: 13px;
+    margin: 0 0 40px;
+}
+
+.user {
+    display: flex;
+    margin-top: auto;
+}
+
+.user img {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.user-info h5 {
+    margin: 0;
+}
+
+.user-info small {
+    color: #545d7a;
+}
+
 table {
     width: 100%;
-    font-family: 'Poppins';
+    font-family: "Poppins";
     border-collapse: collapse;
     text-align: center;
 }
 
 th {
-    background-color: #ff131d;
-    color: #fff;
+    /* background-color: #ff131d; */
+    color: var(--text-color);
 }
 
 table thead tr {
-    font-size: 1.0rem;
+    font-size: 1rem;
 }
 
 th,
@@ -916,12 +1014,39 @@ tbody {
     color: var(--text-color);
 }
 
+.alert-input {
+    color: #ff131d;
+    font-size: 1.2rem;
+    letter-spacing: .1rem;
+    padding: .2rem;
+    display: none;
+}
+
+.alert-input-active {
+    display: block;
+}
+
+.container-status {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.detail i {
+    color: var(--text-color);
+    padding: 5px;
+    border-radius: 5px;
+    margin: 0 auto;
+}
+
+
 .status {
     background-color: green;
     display: flex;
     justify-content: center;
     border-radius: 50px;
     align-items: center;
+    width: 120px;
 }
 
 .status p {
@@ -937,6 +1062,7 @@ tbody {
     justify-content: center;
     border-radius: 50px;
     align-items: center;
+    width: 120px;
 }
 
 .status-no p {
@@ -951,7 +1077,6 @@ tbody {
     justify-content: space-around;
 }
 
-
 .action i {
     background-color: #ff131d;
     color: white;
@@ -963,7 +1088,7 @@ tbody {
     display: flex;
     justify-content: center;
     margin: 100px;
-    font-family: 'Poppins';
+    font-family: "Poppins";
     font-size: 1.4rem;
 }
 
@@ -1038,6 +1163,54 @@ tbody {
     width: 200px !important;
 }
 
+
+.acordion-pagos {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 5rem;
+}
+
+
+.details + details {
+    margin-top: .5rem;
+}
+
+summary {
+    list-style: none;
+    color: var(--text-color);
+    font-size: 1.4rem;
+}
+
+summary::-webkit-details-marker {
+    display: none;
+}
+
+summary {
+    border: 1px solid var(--black-light-color);
+    width: 100%;
+    padding: .75em 1em;
+    cursor: pointer;
+    position: relative;
+}
+
+summary a {
+    text-decoration: none;
+    color: var(--text-color);
+}
+
+
+code {
+    font-family: monospace;
+    font-weight: 600;
+}
+
+
+.acordion-pago {
+    width: 100%;
+}
+
+
 @media screen and (max-width: 600px) {
     thead {
         display: none;
@@ -1052,7 +1225,6 @@ tbody {
         color: #fff;
         text-align: center;
     }
-
 
     td {
         text-align: center;
@@ -1132,7 +1304,7 @@ tbody {
     }
 }
 
-@media screen and (max-width:594px) {
+@media screen and (max-width: 594px) {
     .detail {
         flex-direction: column;
     }
@@ -1149,7 +1321,7 @@ tbody {
     }
 
     .title span {
-        font-size: 2.0rem !important;
+        font-size: 2rem !important;
     }
 }
 

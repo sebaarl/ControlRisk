@@ -1,4 +1,5 @@
 from multiprocessing.connection import Client
+from pyexpat import model
 from turtle import title
 from wsgiref.validate import validator
 from django import forms
@@ -8,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MaxValueValidator, MaxLengthValidator, MinLengthValidator
 from AppBase.validators import validate_length
 from django.forms import ModelForm
+from django.forms import fields
 
 
 class CreateClienteForm(forms.Form):
@@ -108,15 +110,9 @@ class CreateClienteForm(forms.Form):
     def clean_rut(self):
         rut = self.cleaned_data["rut"]
         existe = Cliente.objects.filter(rutcliente=rut).exists()
-
         if existe:
             raise ValidationError("Rut ya registrado!")
-
         return rut
-
-    def clean_telefono(self):
-        
-        return self
 
 
 class CreateEmpleadoForm(forms.Form):
@@ -267,7 +263,7 @@ class CreateAccidenteForm(forms.Form):
     fecha = forms.DateTimeField(
         widget=forms.DateTimeInput(
             attrs={
-                'id': 'accidenteTermino',
+                'id': 'accidenteFecha',
                 'type': 'date',
                 'class': '',
                 'placeholder': '',

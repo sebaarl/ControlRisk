@@ -5,6 +5,9 @@ from AppUser.models import User
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from AppBase.validators import validate_length
+import time
+import datetime
+from datetime import date
 
 
 class RubroEmpresa(models.Model):
@@ -125,8 +128,9 @@ class Cliente(models.Model):
     telefono = models.PositiveIntegerField(db_column='Telefono', validators=[validate_length])
     representante = models.CharField(
         db_column='Representante', max_length=50, db_collation='Modern_Spanish_CI_AS')
-    usuarioid = models.ForeignKey(
-        settings.AUTH_USER_MODEL, models.DO_NOTHING, db_column='UsuarioID', null=True, blank=True)
+    rutrepresentante = models.CharField(db_column='RutRepresentante', max_length=12, db_collation='Modern_Spanish_CI_AS')
+    # usuarioid = models.ForeignKey(
+    #     settings.AUTH_USER_MODEL, models.DO_NOTHING, db_column='UsuarioID', null=True, blank=True)
     rubroid = models.ForeignKey('RubroEmpresa', models.DO_NOTHING, db_column='RubroID')
 
     class Meta:
@@ -171,6 +175,10 @@ class Contrato(models.Model):
     def __str__(self):
         rut = str(self.rutcliente)
         return rut
+
+    def year(self):
+        annio = self.fechacreacion.year()
+        return annio
 
     def toJSON(self):
         item = model_to_dict(self)

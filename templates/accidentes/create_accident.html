@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block name %}
-<title>Registro Contrato - ControlRisk</title>
+<title>Registro de accidente - ControlRisk</title>
 {% endblock %}
 
 {% block contenido %}
@@ -12,7 +12,7 @@
 </div>
 
 <div class="container">
-    <form action="#" method="POST" id="form">
+    <form action="#" method="POST" id="form-accident">
         {% csrf_token %}
         <div class="form first">
             <div class="details personal">
@@ -21,8 +21,8 @@
                         <label>Fecha del accidente</label>
                         {{ accidentForm.fecha }}
                         <p class="alert-input" id="alert-input">
-                            <i class="uil uil-exclamation-circle"></i> 
-                            La fecha no puede ser superior a la actual 
+                            <i class="uil uil-exclamation-circle"></i>
+                            La fecha no puede ser superior a la actual
                         </p>
                     </div>
                     <div class="input-field">
@@ -41,7 +41,7 @@
                     <span class="btnText">Guardar</span>
                     <i class="uil uil-navigator"></i>
                 </button>
-            </div> 
+            </div>
         </div>
     </form>
 

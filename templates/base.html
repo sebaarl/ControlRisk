@@ -37,6 +37,42 @@
                         <i class="uil uil-estate"></i>
                         <span class="link-name">Inicio</span>
                     </a></li>
+                {% if user.is_staff == 1 %}
+                {% if user.is_profesional == 0 %}
+                <li><a href='{% url "base:list-client" %}'>
+                        <i class="uil uil-hard-hat"></i>
+                        <span class="link-name">Clientes</span>
+                    </a></li>
+                <li><a href='{% url "base:create-emp" %}'>
+                        <i class="uil uil-users-alt"></i>
+                        <span class="link-name">Emplados</span>
+                    </a></li>
+                <li><a href='{% url "base:list-contract" %}'>
+                        <i class="uil uil-file-contract-dollar"></i>
+                        <span class="link-name">Contratos</span>
+                    </a></li>
+                {% endif %}
+                {% endif %}
+
+                {% if user.is_staff == 0 %}
+                {% if user.is_profesional == 1 %}
+                <li><a href='{% url "base:list-client" %}'>
+                        <i class="uil uil-hard-hat"></i>
+                        <span class="link-name">Clientes</span>
+                    </a></li>
+                <li><a href='{% url "base:list-contract" %}'>
+                        <i class="uil uil-file-contract-dollar"></i>
+                        <span class="link-name">Contratos</span>
+                    </a></li>
+                <li><a href='{% url "base:list-contract" %}'>
+                        <i class="uil uil-file-contract-dollar"></i>
+                        <span class="link-name">Actividades</span>
+                    </a></li>
+                {% endif %}
+                {% endif %}
+
+                {% if user.is_staff == 0 %}
+                {% if user.is_profesional == 0 %}
                 <li><a href="#">
                         <i class="uil uil-podium"></i>
                         <span class="link-name">Capacitaciones</span>
@@ -53,14 +89,6 @@
                         <i class="uil uil-band-aid"></i>
                         <span class="link-name">Accidentes</span>
                     </a></li>
-                <li><a href='{% url "base:list-client" %}'>
-                        <i class="uil uil-hard-hat"></i>
-                        <span class="link-name">Clientes</span>
-                    </a></li>
-                <li><a href='{% url "base:list-contract" %}'>
-                        <i class="uil uil-file-contract-dollar"></i>
-                        <span class="link-name">Contratos</span>
-                    </a></li>
                 <li><a href='{% url "base:contract" %}'>
                         <i class="uil uil-file-contract-dollar"></i>
                         <span class="link-name">Mis Contratos</span>
@@ -69,32 +97,16 @@
                         <i class="uil uil-invoice"></i>
                         <span class="link-name">Pagos</span>
                     </a></li>
-                <li><a href='{% url "base:pagos" %}'>
-                        <i class="uil uil-invoice"></i>
-                        <span class="link-name">Pagos</span>
-                    </a></li>
-                <li><a href='{% url "base:pagos" %}'>
-                        <i class="uil uil-invoice"></i>
-                        <span class="link-name">Pagos</span>
-                    </a></li>
-                <li><a href='{% url "base:pagos" %}'>
-                        <i class="uil uil-invoice"></i>
-                        <span class="link-name">Pagos</span>
-                    </a></li>
-                <li><a href='{% url "base:pagos" %}'>
-                        <i class="uil uil-invoice"></i>
-                        <span class="link-name">Pagos</span>
-                    </a></li>
+                {% endif %}
+                {% endif %}
             </ul>
             <ul class="logout-mode">
                 <li class="mode">
                     <a href="#">
-                        <i class="uil uil-moon"></i>
-                        <span class="link-name">Modo oscuro</span>
                     </a>
 
                     <div class="mode-toggle">
-                        <span class="switch"></span>
+
                     </div>
                 </li>
             </ul>
@@ -105,7 +117,7 @@
         <div class="top">
             <i class="uil uil-draggabledots sidebar-toggle"></i>
 
-            <div class="noti-menu">
+            <!-- <div class="noti-menu">
                 <div class="noti-btn">
                     <i class="uil uil-bell sBtn-text-noti"></i>
                 </div>
@@ -134,7 +146,7 @@
                         <a href="">Ver más</a>
                     </div>
                 </ul>
-            </div>
+            </div> -->
             <div class="select-menu">
                 <div class="select-btn">
                     <span class="sBtn-text">Cuenta</span>

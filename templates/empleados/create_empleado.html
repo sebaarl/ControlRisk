@@ -2,48 +2,32 @@
 {% load static %}
 
 {% block name %}
-<title>Registro Cliente - ControlRisk</title>
+<title>Crear usuario - ControlRisk</title>
 {% endblock %}
 
 {% block contenido %}
 <div class="title">
     <i class="uil uil-user-plus"></i>
-    <span class="text">Nuevo Cliente?, Ingresalo aquí!</span>
+    <span class="text">Nuevo Empleado?, Ingresalo aquí!</span>
 </div>
 
 <div class="container">
-    <form action="#" method="POST" id="form-client">
+    <form action="#" method="POST" id="form-emp">
         {% csrf_token %}
         <div class="form first">
             <div class="details personal">
                 <div class="fields">
                     <div class="input-field" id="input-field-rut">
                         <label>Rut del Cliente</label>
-                        {{ clienteForm.rut }}
+                        {{ empForm.rut }}
                         <p class="alert-input" id="alert-input">
                             <i class="uil uil-exclamation-circle"></i> 
                             Ingrese rut en formato 11.111.111-1
                         </p>
                     </div>
-                    <div class="input-field" id="input-field-razon">
-                        <label>Razón Social del Cliente</label>
-                        {{ clienteForm.razon }}
-                        <p class="alert-input" id="alert-input">
-                            <i class="uil uil-exclamation-circle"></i> 
-                            Ingrese un número valido (+56212345678)
-                        </p>
-                    </div>
-                    <div class="input-field" id="input-field-tel">
-                        <label>Telefono de Contacto del Cliente</label>
-                        {{ clienteForm.telefono }}
-                        <p class="alert-input" id="alert-input">
-                            <i class="uil uil-exclamation-circle"></i> 
-                            Ingrese un número valido (56212345678)
-                        </p>
-                    </div>
-                    <div class="input-field direc" id="input-field-direc">
-                        <label>Dirección del Cliente</label>
-                        {{ clienteForm.direccion }}
+                    <div class="input-field repre" id="input-field-cargo">
+                        <label>Cargo</label>
+                        {{ empForm.cargo }}
                         <p class="alert-input" id="alert-input">
                             <i class="uil uil-exclamation-circle"></i> 
                             Ingrese un número valido (+56212345678)
@@ -54,30 +38,20 @@
 
             <div class="details ID">
                 <div class="fields">
-
-                    <div class="input-field repre" id="input-field-repre">
-                        <label>Representante Legal</label>
-                        {{ clienteForm.representante }}
+                    <div class="input-field direc" id="input-field-nombre">
+                        <label>Cargo</label>
+                        {{ empForm.nombre }}
                         <p class="alert-input" id="alert-input">
                             <i class="uil uil-exclamation-circle"></i> 
                             Ingrese nombres validos (Pedro Juan)
                         </p>
                     </div>
-                    <div class="input-field repre" id="input-field-reprerut">
-                        <label>Rut Representante Legal</label>
-                        {{ clienteForm.rutrepre }}
+                    <div class="input-field direc" id="input-field-apellido">
+                        <label>Cargo</label>
+                        {{ empForm.apellido }}
                         <p class="alert-input" id="alert-input">
                             <i class="uil uil-exclamation-circle"></i> 
-                            Ingrese rut en formato 11.111.111-1
-                        </p>
-                    </div>
-
-                    <div class="input-field" id="input-field-rubro">
-                        <label>Rubro de Empresa del Cliente</label>
-                        {{ clienteForm.rubro }}
-                        <p class="alert-input" id="alert-input">
-                            <i class="uil uil-exclamation-circle"></i> 
-                            Ingrese un número valido (+56212345678)
+                            Ingrese apellidos validos (Perez Perez)
                         </p>
                     </div>
                 </div>
@@ -125,5 +99,5 @@
 {% endblock %}
 
 {% block javascript %}
-<script src='{% static "js/validate-client.js" %}'></script>
+<script src='{% static "js/validate-emp.js" %}'></script>
 {% endblock %}

@@ -10,15 +10,23 @@
 {% if user.is_authenticated %}
 <div class="home-title">
     <img src='{% static "images/ControlRisk_Logo.png" %}' alt="">
+    <h2>Bienvenido a Intranet Control Risk</h2>
+    {% if user.is_staff == 0 %}
     {% if user.is_profesional == 1 %}
-        <h2>Bienvenido a Intranet Control Risk</h2>
-        <p>Panel: Profesional</p>
-        <p></p>
+    <p>Panel: Profesional</p>
     {% endif %}
+    {% endif %}
+
+    {% if user.is_staff == 1 %}
     {% if user.is_profesional == 0 %}
-        <h2>Bienvenido a Intranet Control Risk</h2>
-        <p>Panel: Cliente</p>
-        <p></p>
+    <p>Panel: Administrador</p>
+    {% endif %}
+    {% endif %}
+
+    {% if user.is_staff == 0 %}
+    {% if user.is_profesional == 0 %}
+    <p>Panel: Cliente</p>
+    {% endif %}
     {% endif %}
 </div>
 {% endif %}

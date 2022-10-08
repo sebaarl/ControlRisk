@@ -23,8 +23,8 @@ class CreateClienteForm(forms.Form):
                 'class': '',
                 'placeholder': 'Ingrese RUT',
                 'name': 'rut',
-                'pattern': '^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$',
-                'title': 'Ingrese RUT en formato correcto XX.XXX.XXX-X',
+                # 'pattern': '^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$',
+                # 'title': 'Ingrese RUT en formato correcto XX.XXX.XXX-X',
             }
         )
     )
@@ -73,8 +73,8 @@ class CreateClienteForm(forms.Form):
                 'class': '',
                 'placeholder': 'Ingrese representante legal',
                 'name': 'representante',
-                'pattern': '^([A-Za-zÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-zÁÉÍÓÚñáéíóúÑ\']+[\s])+([A-Za-zÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-zÁÉÍÓÚñáéíóúÑ\'])+[\s]?([A-Za-zÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-zÁÉÍÓÚñáéíóúÑ\'])?$',
-                'title': 'Ingrese nombre de Representante Legal correctamente'
+                # 'pattern': '^([A-Za-zÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-zÁÉÍÓÚñáéíóúÑ\']+[\s])+([A-Za-zÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-zÁÉÍÓÚñáéíóúÑ\'])+[\s]?([A-Za-zÁÉÍÓÚñáéíóúÑ]{0}?[A-Za-zÁÉÍÓÚñáéíóúÑ\'])?$',
+                # 'title': 'Ingrese nombre de Representante Legal correctamente'
             }
         )
     )
@@ -122,7 +122,7 @@ class CreateEmpleadoForm(forms.Form):
                 'id': 'empRut',
                 'type': 'text',
                 'class': '',
-                'placeholder': '',
+                'placeholder': 'Ingrese rut del empleado',
                 'name': 'rut',
             }
         )
@@ -133,7 +133,7 @@ class CreateEmpleadoForm(forms.Form):
                 'id': 'empRut',
                 'type': 'text',
                 'class': '',
-                'placeholder': '',
+                'placeholder': 'Ingrese nombres del empleado',
                 'name': 'nombre',
             }
         )
@@ -144,7 +144,7 @@ class CreateEmpleadoForm(forms.Form):
                 'id': 'empApellido',
                 'type': 'text',
                 'class': '',
-                'placeholder': '',
+                'placeholder': 'Ingrese apellidos del empleado',
                 'name': 'apellido',
             }
         )
@@ -155,7 +155,7 @@ class CreateEmpleadoForm(forms.Form):
                 'id': 'empCargo',
                 'type': 'text',
                 'class': '',
-                'placeholder': '',
+                'placeholder': 'Ingrese cargo del empleado',
                 'name': 'cargo',
             }
         )

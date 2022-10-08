@@ -134,33 +134,44 @@ def CreateEmpleado(request):
                 existe = Empleado.objects.filter(rutempleado=rut_emp).exists()
                 user_exist = User.objects.filter(username=rut_emp).exists()
 
-                if existe and user_exist:
-                    messages.error(request, "El rut " +
-                                   formatRut(rut_emp) + " ya está registrado en el sistema!")
+                if rut_chile.is_valid_rut(empsave.rutempleado):
+                    if existe and user_exist:
+                        messages.error(request, "El rut " +
+                                    formatRut(rut_emp) + " ya está registrado en el sistema!")
+                    else:
+                        if request.method == "POST":
+                            username = rut_emp
+                            password = rut_emp[4:]
+                            
+                            if empsave.cargo == 'Profesional':
+                                user = get_user_model().objects.create(
+                                    username=username,
+                                    password=make_password(password),
+                                    is_active=True,
+                                    is_profesional=True
+                                )
+                            else:
+                                user = get_user_model().objects.create(
+                                    username=username,
+                                    password=make_password(password),
+                                    is_active=True,
+                                    is_profesional=False
+                                )
+
+                            from django.db import connection
+                            with connection.cursor() as cursor:
+
+                                cursor.execute('EXEC [dbo].[SP_CREATE_EMPLEADO] %s, %s, %s, %s', (
+                                    empsave.rut, empsave.nombre, empsave.apellido, empsave.cargo))
+
+                                messages.success(request, "Empleado " +
+                                                empsave.rut+" registrado correctamente ")
+
+                            return render(request, 'empleados/create_empleado.html', data)
                 else:
-                    if request.method == "POST":
-                        username = rut_emp
-                        password = rut_emp[4:]
+                    messages.error(request, "Cliente " + formatRut(rut_emp) + " invalido ")
 
-                        user = get_user_model().objects.create(
-                            username=username,
-                            password=make_password(password),
-                            is_active=True,
-                            is_profesional=True
-                        )
-
-                        from django.db import connection
-                        with connection.cursor() as cursor:
-
-                            cursor.execute('EXEC [dbo].[SP_CREATE_EMPLEADO] %s, %s, %s, %s', (
-                                empsave.rut, empsave.nombre, empsave.apellido, empsave.cargo))
-
-                            messages.success(request, "Empleado " +
-                                             empsave.rut+" registrado correctamente ")
-
-                        return render(request, 'create_empleado.html', data)
-
-    return render(request, 'create_empleado.html', data)
+    return render(request, 'empleados/create_empleado.html', data)
 
 
 @login_required
@@ -184,8 +195,9 @@ def ListClienteView(request):
     return render(request, 'cliente/listar_clientes.html', data)
 
 
+@login_required
 def CreateAccidentView(request):
-    return render(request, 'create_accident.html')
+    return render(request, 'accidentes/create_accident.html')
 
 
 # Vistas Contrato
@@ -219,9 +231,6 @@ def CreateContractView(request):
             from django.db import connection
             with connection.cursor() as cursor:
 
-                # cantidad = cursor.execute(
-                #     'SELECT COUNT(Pagado) FROM Contrato WHERE RutCliente = {} AND Pagado = 0'.format(str(contratosave.rutcliente)))
-
                 filterRut = Contrato.objects.filter(
                     rutcliente=contratosave.rutcliente)
                 estado = filterRut.filter(estado=1)
@@ -231,9 +240,6 @@ def CreateContractView(request):
                     messages.error(request, 'La empresa {0} presenta un contracto activo'.format(
                         formatRut(str(contratosave.rutcliente))))
                 else:
-                    # cursor.execute('EXEC [dbo].[SP_CREATE_CONTRATO]  [{0}], [{1}], [{2}], [{3}], [{4}], [{5}], [{6}], [{7}], [{8}]'.format(
-                    #     int(contratosave.cantidadasesorias),int(contratosave.cantidadcapacitaciones),termino,pago,int(contratosave.cuotascontrato),
-                    #     int(contratosave.valorcontrato), str(contratosave.rutcliente),str(contratosave.rutempleado), now))
                     cursor.execute('EXEC [dbo].[SP_CREATE_CONTRATO]  %s, %s, %s, %s, %s, %s, %s, %s, %s', (
                         int(contratosave.cantidadasesorias), int(
                             contratosave.cantidadcapacitaciones), termino, pago,
@@ -291,6 +297,7 @@ def ContractDetailView(request, id):
 
 
 # Listar contratos del cliente
+@login_required
 def ContratoClientView(request):
     datos = request.user
     cursor = connection.cursor()
@@ -311,6 +318,7 @@ def ContratoClientView(request):
 
 
 # Pagos
+@login_required
 def ListPagosView(request):
     datos = request.user
     filtro = Contrato.objects.all().filter(rutcliente=datos.username)
@@ -332,6 +340,7 @@ def ListPagosView(request):
     return render(request, 'pagos/pagos.html', data)
 
 
+@login_required
 def PagosContractView(request, pk):
     cursor = connection.cursor()
     cursor.execute('EXEC [dbo].[SP_PAGOS_CONTRATO] {}'.format(str(pk)))

@@ -1,5 +1,5 @@
-const formulario = document.getElementById("form");
-const inputs = document.querySelectorAll("#form input");
+const formularioAccident = document.getElementById("form-accident");
+const inputs = document.querySelectorAll("#form-accident input");
 
 function sumarDias(fecha, dias) {
   fecha.setDate(fecha.getDate() + dias);
@@ -17,9 +17,6 @@ const validarFormulario = (e) => {
       var f4 = new Date(f1);
       var f5 = new Date(f3);
 
-      console.log(f4);
-      console.log(f5);
-
       if (f4 > f5) {
         document
           .querySelector("#input-field .alert-input")
@@ -27,7 +24,6 @@ const validarFormulario = (e) => {
 
         const btn = document.getElementById("btn");
         btn.disabled = true;
-
       } else {
         document
           .querySelector("#input-field .alert-input")
@@ -35,9 +31,17 @@ const validarFormulario = (e) => {
 
         const btn = document.getElementById("btn");
         btn.disabled = false;
-
       }
       break;
+
+    case "telefono":
+      if (expresiones.telefono.test(e.target.value)) {
+        console.log('pasó')
+      } else {
+        console.log('no pasó')
+      }
+      break;
+
   }
 };
 
@@ -46,6 +50,6 @@ inputs.forEach((input) => {
   input.addEventListener("blur", validarFormulario);
 });
 
-formulario.addEventListener("submit", (e) => {
+formularioAccident.addEventListener("submit", (e) => {
   e.preventDefault();
 });

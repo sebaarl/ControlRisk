@@ -1,6 +1,6 @@
 from django.urls import path
 from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView
-from AppBase.views import ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView
+from AppBase.views import ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView, ContratoEmpleadoView
 
 app_name = 'base'
 
@@ -8,10 +8,11 @@ urlpatterns = [
     path('', HomeView, name='home'),
 
     path('empleados/ingresar', CreateEmpleado, name='create-emp'),
+    path('empleados/contratos/', ContratoEmpleadoView, name='contract-emp'),
 
     path('clientes/ingresar', CreateClient, name='create-client'),
     path('clientes', ListClienteView, name='list-client'),
-    path('cliente/contratos/', ContratoClientView, name='contract'),
+    path('clientes/contratos/', ContratoClientView, name='contract'),
 
     path('contratos', ListContractView, name='list-contract'),
     path('contratos/ingresar', CreateContractView, name='create-contract'),

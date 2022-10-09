@@ -53,7 +53,24 @@ def formatRut(rut):
 
 @login_required
 def HomeView(request):
-    return render(request, 'home.html')
+    datos = request.user
+
+
+    from django.db import connection
+    with connection.cursor() as cursor:
+
+        data_emp = cursor.execute('SELECT * FROM [dbo].[Empleado] WHERE [RutEmpleado] = {}'.format(datos.username))
+        profesional = data_emp.fetchone()
+        data_cli = cursor.execute('SELECT RazonSocial FROM [dbo].[Cliente] WHERE [RutCliente] = {}'.format(datos.username))
+        cliente = data_cli.fetchone()
+
+    data = {
+        'prof': profesional,
+        'user': datos,
+        'cliente': cliente
+    }
+
+    return render(request, 'home.html', data)
 
 
 @login_required
@@ -78,39 +95,35 @@ def CreateClient(request):
             rut_cli = rut(clientesave.rutcliente)
             rut_repre = rut(clientesave.rutrepresentante)
 
-            if request.method == "POST":
-                existe = Cliente.objects.filter(rutcliente=rut_cli).exists()
-                user_exist = User.objects.filter(username=rut_cli).exists()
+            existe = Cliente.objects.filter(rutcliente=rut_cli).exists()
+            user_exist = User.objects.filter(username=rut_cli).exists()
 
-                if rut_chile.is_valid_rut(clientesave.rutcliente) and rut_chile.is_valid_rut(clientesave.rutrepresentante):
-                    if existe or user_exist:
-                        messages.error(request, "El rut " +
+            if rut_chile.is_valid_rut(clientesave.rutcliente) and rut_chile.is_valid_rut(clientesave.rutrepresentante):
+                if existe or user_exist:
+                    messages.error(request, "El rut " +
                                        formatRut(rut_cli) + " ya está registrado en el sistema!")
-                    else:
-                        username = rut_cli
-                        password = rut_cli[4:]
-
-                        user = get_user_model().objects.create(
-                            username=username,
-                            password=make_password(password),
-                            is_active=True,
-                            is_profesional=False
-                        )
-
-                        from django.db import connection
-                        with connection.cursor() as cursor:
-
-                            cursor.execute('EXEC [dbo].[SP_CREATE_CLIENTE] %s, %s, %s, %s, %s, %s, %s', (rut_cli,
-                                                                                                         clientesave.razonsocial, clientesave.rubro,  clientesave.direccion, clientesave.telefono, clientesave.representante,
-                                                                                                         rut_repre))
-
-                            messages.success(request, "Cliente " +
-                                             formatRut(rut_cli) + " registrado correctamente ")
-
-                            return render(request, 'create_cliente.html', data)
                 else:
-                    messages.error(request, "Cliente " +
-                                   formatRut(rut_cli) + " invalido ")
+                    username = rut_cli
+                    password = rut_cli[4:]
+
+                    user = get_user_model().objects.create(
+                        username=username,
+                        password=make_password(password),
+                        is_active=True,
+                        is_profesional=False
+                    )
+
+                    from django.db import connection
+                    with connection.cursor() as cursor:
+
+                        cursor.execute('EXEC [dbo].[SP_CREATE_CLIENTE] %s, %s, %s, %s, %s, %s, %s', (rut_cli,
+                                    clientesave.razonsocial, clientesave.rubro,  clientesave.direccion, clientesave.telefono, clientesave.representante, rut_repre))
+
+                        messages.success(request, "Cliente " + formatRut(rut_cli) + " registrado correctamente ")
+
+                        return render(request, 'create_cliente.html', data)
+            else:
+                messages.error(request, "Cliente " + formatRut(rut_cli) + " invalido ")
 
     return render(request, 'cliente/create_cliente.html', data)
 
@@ -120,56 +133,51 @@ def CreateEmpleado(request):
     data = {
         'emp': CreateEmpleadoForm()
     }
+
     if request.method == "POST":
-        if request.POST.get('rut') and request.POST.get('nombre') and request.POST.get('apellido') and request.POST.get('cargo'):
+        formulario = CreateEmpleadoForm(request.POST)
+        if formulario.is_valid():
+            # if request.POST.get('rut') and request.POST.get('nombre') and request.POST.get('apellido') and request.POST.get('cargo'):
             empsave = Empleado()
             empsave.rutempleado = request.POST.get('rut')
             empsave.nombre = request.POST.get('nombre')
             empsave.apellido = request.POST.get('apellido')
             empsave.cargo = request.POST.get('cargo')
 
+            if empsave.cargo == 'Profesional':
+                cargo = True
+            else:
+                cargo = False
+
             rut_emp = rut(empsave.rutempleado)
 
-            if request.method == "POST":
-                existe = Empleado.objects.filter(rutempleado=rut_emp).exists()
-                user_exist = User.objects.filter(username=rut_emp).exists()
+            existe = Empleado.objects.filter(rutempleado=rut_emp).exists()
+            user_exist = User.objects.filter(username=rut_emp).exists()
 
-                if rut_chile.is_valid_rut(empsave.rutempleado):
-                    if existe and user_exist:
-                        messages.error(request, "El rut " +
-                                    formatRut(rut_emp) + " ya está registrado en el sistema!")
-                    else:
-                        if request.method == "POST":
-                            username = rut_emp
-                            password = rut_emp[4:]
-                            
-                            if empsave.cargo == 'Profesional':
-                                user = get_user_model().objects.create(
-                                    username=username,
-                                    password=make_password(password),
-                                    is_active=True,
-                                    is_profesional=True
-                                )
-                            else:
-                                user = get_user_model().objects.create(
-                                    username=username,
-                                    password=make_password(password),
-                                    is_active=True,
-                                    is_profesional=False
-                                )
-
-                            from django.db import connection
-                            with connection.cursor() as cursor:
-
-                                cursor.execute('EXEC [dbo].[SP_CREATE_EMPLEADO] %s, %s, %s, %s', (
-                                    empsave.rut, empsave.nombre, empsave.apellido, empsave.cargo))
-
-                                messages.success(request, "Empleado " +
-                                                empsave.rut+" registrado correctamente ")
-
-                            return render(request, 'empleados/create_empleado.html', data)
+            if rut_chile.is_valid_rut(empsave.rutempleado):
+                if existe or user_exist:
+                    messages.error(request, "El rut " + formatRut(rut_emp) + " ya está registrado en el sistema!")
                 else:
-                    messages.error(request, "Cliente " + formatRut(rut_emp) + " invalido ")
+                    username = rut_emp
+                    password = rut_emp[4:]
+
+                    user = get_user_model().objects.create(
+                        username=username,
+                        password=make_password(password),
+                        is_active=True,
+                        is_profesional=cargo
+                    )
+
+                    from django.db import connection
+                    with connection.cursor() as cursor:
+
+                        cursor.execute('EXEC [dbo].[SP_CREATE_EMPLEADO] %s, %s, %s, %s', (rut_emp, empsave.nombre, empsave.apellido, empsave.cargo))
+
+                        messages.success(request, "Empleado " + formatRut(rut_emp) +" registrado correctamente ")
+
+                        return render(request, 'empleados/create_empleado.html', data)
+            else:
+                messages.error(request, "Cliente " + formatRut(rut_emp) + " invalido ")
 
     return render(request, 'empleados/create_empleado.html', data)
 
@@ -315,6 +323,26 @@ def ContratoClientView(request):
     }
 
     return render(request, 'contrato/contratos_client.html', data)
+
+
+@login_required
+def ContratoEmpleadoView(request):
+    datos = request.user
+    cursor = connection.cursor()
+    cursor.execute(
+        'EXEC [dbo].[SP_LISTAR_CONTRATOS_PROFESIONAL] [{}]'.format(str(datos.username)))
+    results = cursor.fetchall()
+
+    filtro = Contrato.objects.filter(rutempleado=datos.username)
+    cantidad = filtro.count()
+
+    data = {
+        'user': formatRut(str(datos.username)),
+        'entity': results,
+        'cantidad': cantidad
+    }
+
+    return render(request, 'contrato/contratos_emp.html', data)
 
 
 # Pagos

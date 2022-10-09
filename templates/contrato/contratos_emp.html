@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Contratos - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-list-ul"></i>
+    <span class="text">Contratos RUT: {{ user }}</span>
+</div>
+
+<div class="dash-content">
+    {% if cantidad > 0 %}
+    <table>
+        <thead>
+            <tr>
+                <th style="text-transform: uppercase">Cod. Contrato</th>
+                <th style="text-transform: uppercase">Cliente</th>
+                <th style="text-transform: uppercase">Rut Empleado</th>
+                <th style="text-transform: uppercase">Nombre Empelado</th>
+                <th style="text-transform: uppercase">Desde</th>
+                <th style="text-transform: uppercase">Hasta</th>
+                <th style="text-transform: uppercase">Estado</th>
+                <th style="text-transform: uppercase">Detalle</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in entity %}
+            <tr>
+                <td>{{ item.0 }}</td>
+                <td>{{ item.1 }}</td>
+                <td>{{ item.17 }}</td>
+                <td>{{ item.2 }}</td>
+                <td>{{ item.8 }}</td>
+                <td>{{ item.10 }}</td>
+                {% if item.18 == '0' %}
+                <td class="container-status">
+                    <div class="status">
+                        <p>ACTIVO</p>
+                    </div>
+                </td>
+                {% else %}
+                <td class="container-status">
+                    <div class="status-no">
+                        <p>NO ACTIVO</p>
+                    </div>
+                </td>
+                {% endif %}
+                <td>
+                    <a href="{% url 'base:contract-detail' item.0 %}" class="detail">
+                        <i class="uil uil-external-link-alt"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alerta">
+        <p>No presenta contratos registrados en el sistema &#128532</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

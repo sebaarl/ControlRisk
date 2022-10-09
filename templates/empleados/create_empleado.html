@@ -21,7 +21,7 @@
                         <label>Rut del Cliente</label>
                         {{ empForm.rut }}
                         <p class="alert-input" id="alert-input">
-                            <i class="uil uil-exclamation-circle"></i> 
+                            <i class="uil uil-exclamation-circle"></i>
                             Ingrese rut en formato 11.111.111-1
                         </p>
                     </div>
@@ -29,8 +29,8 @@
                         <label>Cargo</label>
                         {{ empForm.cargo }}
                         <p class="alert-input" id="alert-input">
-                            <i class="uil uil-exclamation-circle"></i> 
-                            Ingrese un número valido (+56212345678)
+                            <i class="uil uil-exclamation-circle"></i>
+                            Ingrese Profesional o Administrador
                         </p>
                     </div>
                 </div>
@@ -42,7 +42,7 @@
                         <label>Cargo</label>
                         {{ empForm.nombre }}
                         <p class="alert-input" id="alert-input">
-                            <i class="uil uil-exclamation-circle"></i> 
+                            <i class="uil uil-exclamation-circle"></i>
                             Ingrese nombres validos (Pedro Juan)
                         </p>
                     </div>
@@ -50,7 +50,7 @@
                         <label>Cargo</label>
                         {{ empForm.apellido }}
                         <p class="alert-input" id="alert-input">
-                            <i class="uil uil-exclamation-circle"></i> 
+                            <i class="uil uil-exclamation-circle"></i>
                             Ingrese apellidos validos (Perez Perez)
                         </p>
                     </div>
@@ -60,40 +60,40 @@
                     <span class="btnText">Guardar</span>
                     <i class="uil uil-navigator"></i>
                 </button>
-            </div> 
+            </div>
         </div>
     </form>
 
     {% if messages %}
-        {% for m in messages %}
-                {% if m.tags  == 'success' %}
-                <script>
-                    Swal.fire({
-                        'tittle': 'Exito',
-                        'icon': 'success',
-                        'text': '{{ m }}',
-                        'confirmButtonColor': '#ff131d',
-                        'confirmButtonText': 'Aceptar',
-                    })
-                </script>
-            {% endif %}
-        {% endfor %}
+    {% for m in messages %}
+    {% if m.tags == 'success' %}
+    <script>
+        Swal.fire({
+            'tittle': 'Exito',
+            'icon': 'success',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endif %}
+    {% endfor %}
     {% endif %}
 
     {% if messages %}
-        {% for m in messages %}
-            {% if m.tags  == 'error' %}
-                <script>
-                    Swal.fire({
-                        'tittle': 'Exito',
-                        'icon': 'error',
-                        'text': '{{ m }}',
-                        'confirmButtonColor': '#ff131d',
-                        'confirmButtonText': 'Aceptar',
-                    })
-                </script>
-            {% endif %}
-        {% endfor %}
+    {% for m in messages %}
+    {% if m.tags == 'error' %}
+    <script>
+        Swal.fire({
+            'tittle': 'Exito',
+            'icon': 'error',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endif %}
+    {% endfor %}
     {% endif %}
 </div>
 {% endblock %}

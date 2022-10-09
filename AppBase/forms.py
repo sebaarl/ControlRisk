@@ -116,6 +116,11 @@ class CreateClienteForm(forms.Form):
 
 
 class CreateEmpleadoForm(forms.Form):
+    CARGO_CHOICES = [
+        ('Profesional', 'Profesional'),
+        ('Administrador', 'Administrador'),
+    ]
+
     rut = forms.CharField(
         widget=forms.TextInput(
             attrs={
@@ -149,8 +154,8 @@ class CreateEmpleadoForm(forms.Form):
             }
         )
     )
-    cargo = forms.CharField(
-        widget=forms.TextInput(
+    cargo = forms.ChoiceField(
+        widget=forms.Select(
             attrs={
                 'id': 'empCargo',
                 'type': 'text',
@@ -158,7 +163,8 @@ class CreateEmpleadoForm(forms.Form):
                 'placeholder': 'Ingrese cargo del empleado',
                 'name': 'cargo',
             }
-        )
+        ),
+        choices=CARGO_CHOICES
     )
 
 

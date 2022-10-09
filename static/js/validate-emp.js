@@ -4,6 +4,7 @@ const inputsEmp = document.querySelectorAll("#form-emp input");
 const expresiones = {
     nombre: /^[a-zA-ZÀ-ÿ\s]{1,40}$/,
     rut: /^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$/,
+    letra: /^[A-Za-z]+$/,
 };
 
 const validarFormulario = (e) => {
@@ -59,6 +60,39 @@ const validarFormulario = (e) => {
                 btn.disabled = true;
             }
             break;
+        case "cargo":
+                if (expresiones.letra.test(e.target.value)) {
+                    document
+                        .querySelector("#input-field-cargo .alert-input")
+                        .classList.remove("alert-input-active");
+    
+                    const btn = document.getElementById("btn");
+                    btn.disabled = false;
+                } else {
+                    document
+                        .querySelector("#input-field-cargo .alert-input")
+                        .classList.add("alert-input-active");
+    
+                    const btn = document.getElementById("btn");
+                    btn.disabled = true;
+                }
+
+                if (e.target.value == 'Profesional' || e.target.value == 'Administrador') {
+                    document
+                        .querySelector("#input-field-cargo .alert-input")
+                        .classList.remove("alert-input-active");
+    
+                    const btn = document.getElementById("btn");
+                    btn.disabled = false;
+                } else {
+                    document
+                        .querySelector("#input-field-cargo .alert-input")
+                        .classList.add("alert-input-active");
+    
+                    const btn = document.getElementById("btn");
+                    btn.disabled = true;
+                }
+                break;
     }
 };
 

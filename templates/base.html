@@ -60,13 +60,21 @@
                         <i class="uil uil-hard-hat"></i>
                         <span class="link-name">Clientes</span>
                     </a></li>
-                <li><a href='{% url "base:list-contract" %}'>
+                <li><a href='{% url "base:contract-emp" %}'>
                         <i class="uil uil-file-contract-dollar"></i>
                         <span class="link-name">Contratos</span>
                     </a></li>
-                <li><a href='{% url "base:list-contract" %}'>
-                        <i class="uil uil-file-contract-dollar"></i>
-                        <span class="link-name">Actividades</span>
+                <li><a href="#">
+                        <i class="uil uil-podium"></i>
+                        <span class="link-name">Capacitaciones</span>
+                    </a></li>
+                <li><a href="#">
+                        <i class="uil uil-car-sideview"></i>
+                        <span class="link-name">Visitas</span>
+                    </a></li>
+                <li><a href="#">
+                        <i class="uil uil-thumbs-up"></i>
+                        <span class="link-name">Asesorias</span>
                     </a></li>
                 {% endif %}
                 {% endif %}
@@ -149,7 +157,9 @@
             </div> -->
             <div class="select-menu">
                 <div class="select-btn">
-                    <span class="sBtn-text">Cuenta</span>
+                    {% if user.is_authenticated %}
+                    <span class="sBtn-text">Cuenta: {{ user.username }}</span>
+                    {% endif %}
                     <i class="uil uil-angle-down"></i>
                 </div>
 

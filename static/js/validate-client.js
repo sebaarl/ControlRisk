@@ -2,9 +2,10 @@ const formularioClient = document.getElementById("form-client");
 const inputsClient = document.querySelectorAll("#form-client input");
 
 const expresiones = {
-    nombre: /^[a-zA-ZÀ-ÿ\s]{1,40}$/,
+    nombre: /^[a-zA-ZÀ-ÿ]+[\s]+[a-zA-ZÀ-ÿ]+[\s]+[a-zA-ZÀ-ÿ]+[\s]+[a-zA-ZÀ-ÿ]{1,50}$/,
     rut: /^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$/,
     telefono: /^(\+?56)?(\s?)(0?2)(\s?)[0-9]\d{7}$/,
+    direccion: /^[a-zA-ZÀ-ÿ],+[\s]+[0-9],+[\s]+[a-zA-ZÀ-ÿ],+[\s]+[a-zA-ZÀ-ÿ],+[\s]+[a-zA-ZÀ-ÿ]$/
 };
 
 const validarFormulario = (e) => {
@@ -77,6 +78,23 @@ const validarFormulario = (e) => {
                 btn.disabled = true;
             }
             break;
+        // case "direccion":
+        //     if (expresiones.direccion.test(e.target.value)) {
+        //         document
+        //                 .querySelector("#input-field-direc .alert-input")
+        //                 .classList.remove("alert-input-active");
+        
+        //         const btn = document.getElementById("btn");
+        //         btn.disabled = false;
+        //     } else {
+        //         document
+        //             .querySelector("#input-field-direc .alert-input")
+        //             .classList.add("alert-input-active");
+        
+        //         const btn = document.getElementById("btn");
+        //         btn.disabled = true;
+        //     }
+        //     break;        
     }
 };
 

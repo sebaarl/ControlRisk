@@ -2,23 +2,14 @@
 {% load static %}
 
 {% block name %}
-<title>Clientes - ControlRisk</title>
+<title>Detalle de factura - ControlRisk</title>
 {% endblock %}
 
 {% block contenido %}
 <div class="title">
-    <i class="uil uil-file-contract-dollar"></i>
+    <i class="uil uil-bill"></i>
     <span class="text">Contratos registrados</span>
-</div>
-
-<div class="button-c">
-    <a class="btn" href="{% url 'base:create-contract' %}">Agregar contrato</a>
-</div>
-<div class=" w">
-    <div class="search-box">
-        <input type="text" placeholder="Busca aquí...">
-    </div>  
-</div>
+</div>  
 
 <div class="dash-content">
     <table>
@@ -68,9 +59,5 @@
             {% endfor %}
         </tbody>
     </table>
-
-    <div>
-        {% include 'paginator.html' %}
-    </div>
 </div>
 {% endblock %}

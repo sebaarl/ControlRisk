@@ -14,7 +14,7 @@ from django.forms import fields
 
 class CreateClienteForm(forms.Form):
     rut = forms.CharField(
-        max_length=12, 
+        max_length=12,
         min_length=8,
         widget=forms.TextInput(
             attrs={
@@ -60,8 +60,6 @@ class CreateClienteForm(forms.Form):
                 'class': '',
                 'placeholder': 'Ingrese telefono',
                 'name': 'telefono',
-                'pattern': '[(\+56)(0?9)[987654321]\d{7}]',
-                'title': 'Ingrese un nro. telefonico correcto',
             }
         )
     )
@@ -79,7 +77,7 @@ class CreateClienteForm(forms.Form):
         )
     )
     rutrepre = forms.CharField(
-        max_length=12, 
+        max_length=12,
         min_length=8,
         widget=forms.TextInput(
             attrs={
@@ -282,6 +280,35 @@ class CreateAccidenteForm(forms.Form):
         )
     )
     medidas = forms.CharField(
+        widget=forms.Textarea(
+        )
+    )
+
+
+class CreateAsesoriaEspecial(forms.Form):
+    fecha = forms.DateField(
+        widget=forms.DateInput(
+            attrs={
+                'id': 'especialFecha',
+                'type': 'date',
+                'class': '',
+                'placeholder': '',
+                'name': 'fecha',
+            }
+        )
+    )
+    hora = forms.TimeField(
+        widget=forms.TimeInput(
+            attrs={
+                'id': 'especialHora',
+                'type': 'time',
+                'class': '',
+                'placeholder': '',
+                'name': 'fecha',
+            }
+        )
+    )
+    descripcion = forms.CharField(
         widget=forms.Textarea(
         )
     )

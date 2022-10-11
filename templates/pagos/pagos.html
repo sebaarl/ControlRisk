@@ -2,13 +2,13 @@
 {% load static %}
 
 {% block name %}
-<title>Pagos {{ user }}- ControlRisk</title>
+<title>Pagos - ControlRisk</title>
 {% endblock %}
 
 {% block contenido %}
 <div class="title">
     <i class="uil uil-invoice"></i>
-    <span class="text">Pagos {{ user }}</span>
+    <span class="text">Pagos asociados a contratos</span>
 </div>
 
 <div class="dash-content">
@@ -18,7 +18,7 @@
         <details class="detail">
             <summary>
                 <a href='{% url "base:pago-contract" c.0 %}'>
-                    <i class="uil uil-external-link-alt"></i> Pagos asociados al contrato {{u.username}}-{{ c.19 }}-{{ c.0}}
+                    <i class="uil uil-external-link-alt"></i> Pagos asociados al contrato {{ c.20 }}-{{ c.19 }}-{{ c.0 }}
                 </a>
             </summary>
         </details>

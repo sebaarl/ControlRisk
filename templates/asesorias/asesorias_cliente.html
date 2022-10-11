@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Clientes - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-thumbs-up"></i>
+    <span class="text">Asesorias</span>
+</div>
+
+<div class="especial">
+    <a href="{% url 'base:asesoria-especial' %}">Solicitar asesoria especial <i class="uil uil-arrow-right"></i></a>
+    
+</div>
+
+<div class="dash-content">
+
+</div>
+{% endblock %}

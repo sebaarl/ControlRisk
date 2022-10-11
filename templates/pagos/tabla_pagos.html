@@ -41,7 +41,7 @@
                     </div>
                 </td>
                 {% endif %}
-                <td><a href='' class="detail"><i class="uil uil-external-link-alt"></i></a></td>
+                <td><a href='{% url "base:pago-detail" item.0 %}' class="detail"><i class="uil uil-external-link-alt"></i></a></td>
             </tr>
             {% endfor %}
         </tbody>

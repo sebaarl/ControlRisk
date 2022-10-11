@@ -7,8 +7,8 @@
 
 {% block contenido %}
 <div class="title">
-    <i class="uil uil-list-ul"></i>
-    <span class="text">Contratos RUT: {{ user }}</span>
+    <i class="uil uil-invoice"></i>
+    <span class="text">Contratos asociados a su RUT</span>
 </div>
 
 <div class="dash-content">
@@ -35,7 +35,7 @@
                 <td>{{ item.2 }}</td>
                 <td>{{ item.8 }}</td>
                 <td>{{ item.10 }}</td>
-                {% if item.18 == '0' %}
+                {% if item.18 == '1' %}
                 <td class="container-status">
                     <div class="status">
                         <p>ACTIVO</p>

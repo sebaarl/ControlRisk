@@ -125,7 +125,7 @@ class Cliente(models.Model):
         db_column='RazonSocial', max_length=50, db_collation='Modern_Spanish_CI_AS')
     direccion = models.CharField(
         db_column='Direccion', max_length=100, db_collation='Modern_Spanish_CI_AS')
-    telefono = models.PositiveIntegerField(db_column='Telefono', validators=[validate_length])
+    telefono = models.CharField(db_column='Telefono', max_length=12)
     representante = models.CharField(
         db_column='Representante', max_length=50, db_collation='Modern_Spanish_CI_AS')
     rutrepresentante = models.CharField(db_column='RutRepresentante', max_length=12, db_collation='Modern_Spanish_CI_AS')

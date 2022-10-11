@@ -654,7 +654,7 @@ form .buttons button,
 }
 
 .select-menu .select-btn {
-    width: 185px;
+    width: 190px;
     display: flex;
     background: var(--panel-color);
     padding: 10px;
@@ -1208,6 +1208,24 @@ code {
 
 .acordion-pago {
     width: 100%;
+}
+
+
+.especial {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.especial a {
+    color: var(--text-color);
+    font-size: 1.5rem;
+    text-decoration: none;
+}
+
+.especial a:hover {
+    color: #ff131d;
+    text-decoration: underline;
 }
 
 

@@ -12,12 +12,13 @@ from datetime import date
 
 class RubroEmpresa(models.Model):
     rubroid = models.AutoField(db_column='RubroID', primary_key=True)
-    nombre = models.CharField(db_column='Nombre', max_length=50, db_collation='Modern_Spanish_CI_AS')
+    nombre = models.CharField(
+        db_column='Nombre', max_length=50, db_collation='Modern_Spanish_CI_AS')
 
     class Meta:
         managed = False
         db_table = 'RubroEmpresa'
-    
+
     def __str__(self):
         return self.nombre
 
@@ -38,40 +39,34 @@ class Accidente(models.Model):
         db_table = 'Accidente'
 
 
-class Actividad(models.Model):
-    actividadid = models.AutoField(
-        db_column='ActividadID', primary_key=True)
-    fechacreacion = models.DateTimeField(db_column='FechaCreacion')
-    estadoactividad = models.SmallIntegerField(db_column='EstadoActividad')
-    actividadextra = models.SmallIntegerField(db_column='ActividadExtra')
-    contratoid = models.ForeignKey('Contrato', models.DO_NOTHING,
-                                   db_column='ContratoID', blank=True, null=True, related_name='contrato_contrato_actividad')
-    rutempleado = models.ForeignKey(
-        'Empleado', models.DO_NOTHING, db_column='RutEmpleado', related_name="empleado_empleado")
-    asesoriaid = models.ForeignKey(
-        'Asesoria', models.DO_NOTHING, db_column='AsesoriaID', blank=True, null=True, related_name="asesoria_asesoria")
-    capacitacionid = models.ForeignKey(
-        'Capacitacion', models.DO_NOTHING, db_column='CapacitacionID', blank=True, null=True, related_name="asesoria_capacitacion")
-    visitaid = models.ForeignKey(
-        'Visita', models.DO_NOTHING, db_column='VisitaID', blank=True, null=True, related_name="asesoria_visita")
-
-    class Meta:
-        managed = False
-        db_table = 'Actividad'
-        unique_together = (('actividadid', 'rutempleado', 'contratoid'),)
-
-
 class Asesoria(models.Model):
+    # Field name made lowercase.
     asesoriaid = models.AutoField(db_column='AsesoriaID', primary_key=True)
-    estado = models.SmallIntegerField(
-        db_column='Estado', blank=True, null=True)
-    fechaasesoria = models.DateTimeField(db_column='FechaAsesoria')
+    # Field name made lowercase.
+    fechacreado = models.DateTimeField(db_column='FechaCreado')
+    # Field name made lowercase.
+    fechaasesoria = models.DateField(
+        db_column='FechaAsesoria', blank=True, null=True)
+    # Field name made lowercase.
     descripcionasesoria = models.CharField(
         db_column='DescripcionAsesoria', max_length=500, db_collation='Modern_Spanish_CI_AS')
+    # Field name made lowercase.
+    estado = models.BooleanField(db_column='Estado')
+    # Field name made lowercase.
+    contratoid = models.ForeignKey(
+        'Contrato', models.DO_NOTHING, db_column='ContratoID', blank=True, null=True)
+    # Field name made lowercase.
+    hora = models.TimeField(db_column='Hora', blank=True, null=True)
+    # Field name made lowercase.
+    extra = models.BooleanField(db_column='Extra')
 
     class Meta:
         managed = False
         db_table = 'Asesoria'
+
+    def __str__(self):
+        contrato = str(self.contratoid)
+        return contrato
 
 
 class Asesoriatelefonica(models.Model):
@@ -89,16 +84,25 @@ class Asesoriatelefonica(models.Model):
         managed = False
         db_table = 'AsesoriaTelefonica'
 
+    def __str__(self):
+        contrato = str(self.contratoid)
+        return contrato
+
 
 class Capacitacion(models.Model):
     capacitacionid = models.AutoField(
         db_column='CapacitacionID', primary_key=True)
-    fecha = models.DateTimeField(db_column='Fecha')
+    fechacreacion = models.DateTimeField(db_column='FechaCreacion')
+    fechacapacitacion = models.DateTimeField(
+        db_column='FechaCapacitacion', blank=True, null=True)
     cantidadasistentes = models.IntegerField(db_column='CantidadAsistentes')
     materiales = models.CharField(db_column='Materiales', max_length=200,
                                   db_collation='Modern_Spanish_CI_AS', blank=True, null=True)
     descripcion = models.CharField(db_column='Descripcion', max_length=200,
                                    db_collation='Modern_Spanish_CI_AS', blank=True, null=True)
+    estado = models.BooleanField(db_column='Estado')
+    contratoid = models.ForeignKey(
+        'Contrato', models.DO_NOTHING, db_column='ContratoID', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -128,23 +132,27 @@ class Cliente(models.Model):
     telefono = models.CharField(db_column='Telefono', max_length=12)
     representante = models.CharField(
         db_column='Representante', max_length=50, db_collation='Modern_Spanish_CI_AS')
-    rutrepresentante = models.CharField(db_column='RutRepresentante', max_length=12, db_collation='Modern_Spanish_CI_AS')
+    rutrepresentante = models.CharField(
+        db_column='RutRepresentante', max_length=12, db_collation='Modern_Spanish_CI_AS')
     # usuarioid = models.ForeignKey(
     #     settings.AUTH_USER_MODEL, models.DO_NOTHING, db_column='UsuarioID', null=True, blank=True)
-    rubroid = models.ForeignKey('RubroEmpresa', models.DO_NOTHING, db_column='RubroID')
+    rubroid = models.ForeignKey(
+        'RubroEmpresa', models.DO_NOTHING, db_column='RubroID')
 
     class Meta:
         managed = False
         db_table = 'Cliente'
-    
+
     def __str__(self):
         return self.rutcliente
 
     def formatRut(self):
-        if len(self.rutcliente) == 8:                
-            formato = self.rutcliente[0:1] + '.' + self.rutcliente[1:4] + '.' + self.rutcliente[4:7] + '-' + self.rutcliente[-1]
+        if len(self.rutcliente) == 8:
+            formato = self.rutcliente[0:1] + '.' + self.rutcliente[1:4] + \
+                '.' + self.rutcliente[4:7] + '-' + self.rutcliente[-1]
         else:
-            formato = self.rutcliente[0:2] + '.' + self.rutcliente[2:5] + '.' + self.rutcliente[5:8] + '-' + self.rutcliente[-1]
+            formato = self.rutcliente[0:2] + '.' + self.rutcliente[2:5] + \
+                '.' + self.rutcliente[5:8] + '-' + self.rutcliente[-1]
         return formato
 
     def toJSON(self):
@@ -165,8 +173,10 @@ class Contrato(models.Model):
         db_column='ValorContrato')
     estado = models.BooleanField(db_column='Estado')
     pagado = models.BooleanField(db_column='Pagado', default=False)
-    rutcliente = models.OneToOneField(Cliente, models.DO_NOTHING, db_column='RutCliente', blank=True, null=True)
-    rutempleado = models.OneToOneField('Empleado', models.DO_NOTHING, db_column='RutEmpleado')
+    rutcliente = models.OneToOneField(
+        Cliente, models.DO_NOTHING, db_column='RutCliente', blank=True, null=True)
+    rutempleado = models.OneToOneField(
+        'Empleado', models.DO_NOTHING, db_column='RutEmpleado')
 
     class Meta:
         managed = False
@@ -188,7 +198,7 @@ class Contrato(models.Model):
 
 class Empleado(models.Model):
     rutempleado = models.CharField(db_column='RutEmpleado', max_length=12,
-                           db_collation='Modern_Spanish_CI_AS', primary_key=True)
+                                   db_collation='Modern_Spanish_CI_AS', primary_key=True)
     nombre = models.CharField(
         db_column='Nombre', max_length=50, db_collation='Modern_Spanish_CI_AS')
     apellido = models.CharField(
@@ -197,7 +207,8 @@ class Empleado(models.Model):
         db_column='Cargo', max_length=50, db_collation='Modern_Spanish_CI_AS')
     usuarioid = models.ForeignKey(
         settings.AUTH_USER_MODEL, models.DO_NOTHING, db_column='UsuarioID', null=True, blank=True)
-    estado = models.BooleanField(db_column='Estado')  # Field name made lowercase.
+    # Field name made lowercase.
+    estado = models.BooleanField(db_column='Estado')
 
     class Meta:
         managed = False
@@ -205,6 +216,41 @@ class Empleado(models.Model):
 
     def __str__(self):
         return self.rutempleado
+
+
+class Historialactividad(models.Model):
+    # Field name made lowercase.
+    historialactividadid = models.AutoField(
+        db_column='HistorialActividadID', primary_key=True)
+    # Field name made lowercase.
+    tipoactividad = models.CharField(
+        db_column='TipoActividad', max_length=50, db_collation='Modern_Spanish_CI_AS')
+    # Field name made lowercase.
+    fechacreacion = models.DateTimeField(db_column='FechaCreacion')
+    # Field name made lowercase.
+    fecharealizada = models.DateTimeField(db_column='FechaRealizada')
+    # Field name made lowercase.
+    estado = models.BooleanField(db_column='Estado')
+    # Field name made lowercase.
+    rutempleado = models.ForeignKey(
+        Empleado, models.DO_NOTHING, db_column='RutEmpleado')
+    # Field name made lowercase.
+    asesoriaid = models.ForeignKey(
+        Asesoria, models.DO_NOTHING, db_column='AsesoriaID', blank=True, null=True)
+    # Field name made lowercase.
+    capacitacionid = models.ForeignKey(
+        Capacitacion, models.DO_NOTHING, db_column='CapacitacionID', blank=True, null=True)
+    # Field name made lowercase.
+    visitaid = models.ForeignKey(
+        'Visita', models.DO_NOTHING, db_column='VisitaID', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'HistorialActividad'
+
+    def __str__(self):
+        emp = str(self.rutempleado)
+        return emp
 
 
 class Informevisita(models.Model):
@@ -222,6 +268,10 @@ class Informevisita(models.Model):
         managed = False
         db_table = 'InformeVisita'
         unique_together = (('informevisitaid', 'visitaid', 'contratoid'),)
+
+    def __str__(self):
+        contrato = str(self.contratoid)
+        return contrato
 
 
 class Itemschecklist(models.Model):
@@ -263,6 +313,10 @@ class Mejora(models.Model):
         managed = False
         db_table = 'Mejora'
 
+    def __str__(self):
+        contrato = str(self.contratoid)
+        return contrato
+
 
 class Pagos(models.Model):
     pagosid = models.AutoField(db_column='PagosID', primary_key=True)
@@ -283,6 +337,10 @@ class Pagos(models.Model):
         managed = False
         db_table = 'Pagos'
 
+    def __str__(self):
+        contrato = str(self.contratoid)
+        return contrato
+
 
 class Tipopagos(models.Model):
     tipopagoid = models.AutoField(db_column='TipoPagoID', primary_key=True)
@@ -294,11 +352,39 @@ class Tipopagos(models.Model):
         db_table = 'TipoPagos'
 
 
+class Valorextra(models.Model):
+    # Field name made lowercase.
+    valorid = models.AutoField(db_column='ValorID', primary_key=True)
+    # Field name made lowercase.
+    nombre = models.CharField(
+        db_column='Nombre', max_length=50, db_collation='Modern_Spanish_CI_AS')
+    # Field name made lowercase.
+    valor = models.DecimalField(
+        db_column='Valor', max_digits=19, decimal_places=4)
+
+    class Meta:
+        managed = False
+        db_table = 'ValorExtra'
+
+
 class Visita(models.Model):
+    # Field name made lowercase.
     visitaid = models.AutoField(db_column='VisitaID', primary_key=True)
-    fechavisita = models.DateTimeField(db_column='FechaVisita')
-    estado = models.SmallIntegerField(db_column='Estado')
+    # Field name made lowercase.
+    fechacreacion = models.DateTimeField(db_column='FechaCreacion')
+    # Field name made lowercase.
+    fechavisita = models.DateTimeField(
+        db_column='FechaVisita', blank=True, null=True)
+    # Field name made lowercase.
+    estado = models.BooleanField(db_column='Estado')
+    # Field name made lowercase.
+    contratoid = models.ForeignKey(
+        Contrato, models.DO_NOTHING, db_column='ContratoID', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Visita'
+
+    def __str__(self):
+        contrato = str(self.contratoid)
+        return contrato

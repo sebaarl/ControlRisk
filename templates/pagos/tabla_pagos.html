@@ -18,6 +18,7 @@
                 <th style="text-transform: uppercase">Fecha Pago</th>
                 <th style="text-transform: uppercase">Fecha Vencimiento</th>
                 <th style="text-transform: uppercase">Valor Cuota</th>
+                <th style="text-transform: uppercase">Monto Extra</th>
                 <th style="text-transform: uppercase">Estado</th>
                 <th style="text-transform: uppercase">Detalle</th>
             </tr>
@@ -28,6 +29,7 @@
                 <td>{{ item.1 }}</td>
                 <td>{{ item.2 }}</td>
                 <td>{{ item.4 }}</td>
+                <td>{{ item.9 }}</td>
                 {% if item.5 == False %}
                 <td class="container-status">
                     <div class="status-no">

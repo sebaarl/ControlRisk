@@ -451,19 +451,19 @@ def AsesoriaEspecialClienteView(request):
         if formulario.is_valid():
             asesoria = Asesoria()
             asesoria.fechaasesoria = request.POST.get('fecha')
-            hora = request.POST.get('hora')
+            asesoria.hora = request.POST.get('hora')
             asesoria.descripcionasesoria = request.POST.get('descripcion')
 
-            fHora = datetime.strptime(hora, '%H:%M').time()
-            fFecha = datetime.strptime(
-                asesoria.fechaasesoria, '%Y-%m-%d').date()
+            # fHora = datetime.strptime(hora, '%H:%M').time()
+            # fFecha = datetime.strptime(
+            #     asesoria.fechaasesoria, '%Y-%m-%d').date()
 
             from django.db import connection
             with connection.cursor() as cursor:
 
                 cursor = connection.cursor()
                 cursor.execute('EXEC [dbo].[SP_ASESORIA_ESPECIAL] %s, %s, %s, %s',
-                               (fFecha, asesoria.descripcionasesoria, fHora, usuario.username))
+                               (asesoria.fechaasesoria, asesoria.descripcionasesoria, asesoria.hora, usuario.username))
 
                 messages.success(
                     request, "Solicitud de asesoria ingresada correctamente")

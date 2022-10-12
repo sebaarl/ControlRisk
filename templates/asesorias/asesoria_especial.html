@@ -12,25 +12,25 @@
 </div>
 
 <div class="container">
-    <form action="#" method="POST" id="form-client">
+    <form action="#" method="POST" id="form-asesoria">
         {% csrf_token %}
         <div class="form first">
             <div class="details personal">
                 <div class="fields">
-                    <div class="input-field repre" id="input-field-rut">
+                    <div class="input-field repre" id="input-field-fecha">
                         <label>Fecha para Asesoria</label>
                         {{ especialForm.fecha }}
                         <p class="alert-input" id="alert-input">
                             <i class="uil uil-exclamation-circle"></i> 
-                            Ingrese rut en formato 11.111.111-1
+                            La fecha ingresada no puede ser inferior a 
                         </p>
                     </div>
-                    <div class="input-field" id="input-field-razon">
+                    <div class="input-field" id="input-field-hora">
                         <label>Hora para Asesoria </label>
                         {{ especialForm.hora }}
                         <p class="alert-input" id="alert-input">
                             <i class="uil uil-exclamation-circle"></i> 
-                            Ingrese un número valido (+56212345678)
+                            La hora ingresada debe ser entre las 10:00 am y las 16:00 pm
                         </p>
                     </div>
                 </div>
@@ -89,4 +89,8 @@
         {% endfor %}
     {% endif %}
 </div>
+{% endblock %}
+
+{% block javascript %}
+<script src='{% static "js/validate-asesoria.js" %}'></script>
 {% endblock %}

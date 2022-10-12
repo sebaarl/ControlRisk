@@ -33,23 +33,10 @@ const validarFormulario = (e) => {
         btn.disabled = false;
       }
       break;
-
-    case "telefono":
-      if (expresiones.telefono.test(e.target.value)) {
-        console.log('pasó')
-      } else {
-        console.log('no pasó')
-      }
-      break;
-
   }
 };
 
 inputs.forEach((input) => {
   input.addEventListener("keyup", validarFormulario);
   input.addEventListener("blur", validarFormulario);
-});
-
-formularioAccident.addEventListener("submit", (e) => {
-  e.preventDefault();
 });

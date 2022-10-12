@@ -13,8 +13,8 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.urls import reverse_lazy
 
-from AppBase.forms import CreateAsesoriaEspecial, CreateClienteForm, CreateEmpleadoForm, CreateContratoForm
-from AppBase.models import Asesoria, Cliente, Empleado, Contrato
+from AppBase.forms import CreateAsesoriaEspecial, CreateClienteForm, CreateEmpleadoForm, CreateContratoForm, CreateAccidenteForm
+from AppBase.models import Asesoria, Cliente, Empleado, Contrato, Accidente
 from AppUser.models import User
 
 from datetime import date
@@ -102,7 +102,7 @@ def CreateClient(request):
             if rut_chile.is_valid_rut(clientesave.rutcliente) and rut_chile.is_valid_rut(clientesave.rutrepresentante):
                 if existe or user_exist:
                     messages.error(request, "El rut " +
-                                       formatRut(rut_cli) + " ya está registrado en el sistema!")
+                                   formatRut(rut_cli) + " ya está registrado en el sistema!")
                 else:
                     username = rut_cli
                     password = rut_cli[4:]
@@ -118,9 +118,10 @@ def CreateClient(request):
                     with connection.cursor() as cursor:
 
                         cursor.execute('EXEC [dbo].[SP_CREATE_CLIENTE] %s, %s, %s, %s, %s, %s, %s', (rut_cli,
-                                    clientesave.razonsocial, clientesave.rubro,  clientesave.direccion, clientesave.telefono, clientesave.representante, rut_repre))
+                                                                                                     clientesave.razonsocial, clientesave.rubro,  clientesave.direccion, clientesave.telefono, clientesave.representante, rut_repre))
 
-                        messages.success(request, "Cliente " + formatRut(rut_cli) + " registrado correctamente ")
+                        messages.success(
+                            request, "Cliente " + formatRut(rut_cli) + " registrado correctamente ")
 
                         return render(request, 'cliente/create_cliente.html', data)
             else:
@@ -213,7 +214,39 @@ def ListClienteView(request):
 
 @login_required
 def CreateAccidentView(request):
-    return render(request, 'accidentes/create_accident.html')
+    datos = request.user
+
+    data = {
+        'accidente': CreateAccidenteForm()
+    }
+
+    if request.method == "POST":
+
+        formulario = CreateAccidenteForm(request.POST)
+        if formulario.is_valid():
+
+            accidentesave = Accidente()
+            accidentesave.fecha = request.POST['fecha']
+            accidentesave.descripcion = request.POST['descripcion']
+            accidentesave.medidas = request.POST['medidas']
+
+            print(accidentesave.fecha, accidentesave.descripcion,
+                  accidentesave.medidas)
+
+            from django.db import connection
+            with connection.cursor() as cursor:
+                cursor.execute('EXEC [dbo].[SP_CREATE_ACCIDENTE]  %s, %s, %s, %s', (accidentesave.fecha,
+                                                                                    accidentesave.descripcion,
+                                                                                    accidentesave.medidas,
+                                                                                    str(datos.username)))
+
+                messages.success(request, "Accidente registrado correctamente")
+
+                return render(request, 'accidentes/create_accident.html', data)
+        else:
+            messages.error(request, "Formulario no valido")
+
+    return render(request, 'accidentes/create_accident.html', data)
 
 
 # Vistas Contrato
@@ -435,10 +468,20 @@ class ContractDetailPdf(View):
 # Asesorias ciente
 @login_required
 def AsesoriaClienteView(request):
+    usuario = request.user
+    cursor = connection.cursor()
+    cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE] [{}]'.format(
+        str(usuario.username)))
+    result = cursor.fetchall()
 
-    return render(request, 'asesorias/asesorias_cliente.html')
+    data = {
+        'entity': result
+    }
+
+    return render(request, 'asesorias/asesorias_cliente.html', data)
 
 
+# Asesorias
 @login_required
 def AsesoriaEspecialClienteView(request):
     usuario = request.user
@@ -453,10 +496,6 @@ def AsesoriaEspecialClienteView(request):
             asesoria.fechaasesoria = request.POST.get('fecha')
             asesoria.hora = request.POST.get('hora')
             asesoria.descripcionasesoria = request.POST.get('descripcion')
-
-            # fHora = datetime.strptime(hora, '%H:%M').time()
-            # fFecha = datetime.strptime(
-            #     asesoria.fechaasesoria, '%Y-%m-%d').date()
 
             from django.db import connection
             with connection.cursor() as cursor:

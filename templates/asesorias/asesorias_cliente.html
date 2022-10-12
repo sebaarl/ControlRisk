@@ -13,10 +13,11 @@
 
 <div class="especial">
     <a href="{% url 'base:asesoria-especial' %}">Solicitar asesoria especial <i class="uil uil-arrow-right"></i></a>
-    
 </div>
 
 <div class="dash-content">
-
+    {% for item in entity %}
+    <p>{{ item.0 }}</p>
+    {% endfor %}
 </div>
 {% endblock %}

@@ -312,3 +312,23 @@ class CreateAsesoriaEspecial(forms.Form):
         widget=forms.Textarea(
         )
     )
+
+
+class EstadoAsesoria(forms.Form):
+    ESTADO_CHOICES = [
+        ('FINALIZADA', 'FINALIZADA'),
+        ('EN PROGRESO', 'EN PROGRESO'),
+    ]
+
+    estado = forms.ChoiceField(
+        widget=forms.Select(
+            attrs={
+                'id': 'asesoriaEstado',
+                'type': 'text',
+                'class': '',
+                'placeholder': 'Ingrese cargo del empleado',
+                'name': 'estado',
+            }
+        ),
+        choices=ESTADO_CHOICES
+    )

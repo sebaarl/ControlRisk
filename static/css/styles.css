@@ -552,6 +552,12 @@ form .buttons button,
     }
 }
 
+.act {
+    font-size: 2rem;
+    color: var(--text-color);
+    margin-bottom: 20px;
+}
+
 .input-content {
     display: flex;
     flex-direction: column;

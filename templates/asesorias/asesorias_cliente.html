@@ -18,6 +18,11 @@
 <div class="dash-content">
     {% for item in entity %}
     <p>{{ item.0 }}</p>
+    {% if item.4 == 0 %}
+        <p>Incluida</p>
+    {% else %}
+        <p>Asesoria Extra</p>
+    {% endif %}
     {% endfor %}
 </div>
 {% endblock %}

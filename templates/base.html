@@ -64,18 +64,17 @@
                         <i class="uil uil-file-contract-dollar"></i>
                         <span class="link-name">Contratos</span>
                     </a></li>
-                <li><a href="#">
+                <li><a href="{% url 'base:capacitacion-emp' %}">
                         <i class="uil uil-podium"></i>
                         <span class="link-name">Capacitaciones</span>
                     </a></li>
-                <li><a href="#">
+                <li><a href="{% url 'base:visitas-emp' %}">
                         <i class="uil uil-car-sideview"></i>
                         <span class="link-name">Visitas</span>
                     </a></li>
-                <li><a href="#">
+                <li><a href="{% url 'base:asesorias-emp' %}">
                         <i class="uil uil-thumbs-up"></i>
                         <span class="link-name">Asesorias</span>
-                    </a></li>
                 {% endif %}
                 {% endif %}
 
@@ -104,6 +103,10 @@
                 <li><a href='{% url "base:pagos" %}'>
                         <i class="uil uil-invoice"></i>
                         <span class="link-name">Pagos</span>
+                    </a></li>
+                <li><a href='{% url "base:pagos" %}'>
+                        <i class="uil uil-document-layout-left"></i>
+                        <span class="link-name"></span>
                     </a></li>
                 {% endif %}
                 {% endif %}

@@ -51,8 +51,7 @@ class Asesoria(models.Model):
     descripcionasesoria = models.CharField(
         db_column='DescripcionAsesoria', max_length=500, db_collation='Modern_Spanish_CI_AS')
     # Field name made lowercase.
-    estado = models.BooleanField(db_column='Estado')
-    # Field name made lowercase.
+    estado = models.CharField(db_column='Estado', max_length=20)
     contratoid = models.ForeignKey(
         'Contrato', models.DO_NOTHING, db_column='ContratoID', blank=True, null=True)
     # Field name made lowercase.

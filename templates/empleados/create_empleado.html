@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block name %}
-<title>Crear usuario - ControlRisk</title>
+<title>Registro de Empleado - ControlRisk</title>
 {% endblock %}
 
 {% block contenido %}
@@ -77,16 +77,22 @@
         })
     </script>
     {% endif %}
-    {% endfor %}
-    {% endif %}
-
-    {% if messages %}
-    {% for m in messages %}
     {% if m.tags == 'error' %}
     <script>
         Swal.fire({
             'tittle': 'Exito',
             'icon': 'error',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endif %}
+    {% if m.tags == 'warning' %}
+    <script>
+        Swal.fire({
+            'tittle': 'Exito',
+            'icon': 'warning',
             'text': '{{ m }}',
             'confirmButtonColor': '#ff131d',
             'confirmButtonText': 'Aceptar',

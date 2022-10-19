@@ -1,28 +1,67 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block name %}
+{% extends 'base.html' %} {% load static %} {% block name %}
 <title>Clientes - ControlRisk</title>
-{% endblock %}
-
-{% block contenido %}
+{% endblock %} {% block contenido %}
 <div class="title">
-    <i class="uil uil-thumbs-up"></i>
-    <span class="text">Asesorias</span>
+  <i class="uil uil-thumbs-up"></i>
+  <span class="text">Asesorias</span>
 </div>
 
 <div class="especial">
-    <a href="{% url 'base:asesoria-especial' %}">Solicitar asesoria especial <i class="uil uil-arrow-right"></i></a>
+  <a href="{% url 'base:asesoria-especial' %}"
+    >Solicitar asesoria especial <i class="uil uil-arrow-right"></i
+  ></a>
 </div>
 
-<div class="dash-content">
-    {% for item in entity %}
-    <p>{{ item.0 }}</p>
-    {% if item.4 == 0 %}
-        <p>Incluida</p>
-    {% else %}
-        <p>Asesoria Extra</p>
-    {% endif %}
-    {% endfor %}
+<div class="dash-content" class="table-container">
+  <table class="table-rwd">
+    <thead>
+      <tr>
+        <th style="text-transform: uppercase">Asesoria ID</th>
+        <th style="text-transform: uppercase">Fecha Asesoria</th>
+        <th style="text-transform: uppercase">Estado</th>
+        <th style="text-transform: uppercase">Hora</th>
+        <th style="text-transform: uppercase">Extra</th>
+        <th style="text-transform: uppercase">Rut Empleado</th>
+        <th style="text-transform: uppercase">Nombre Empleado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in entity %}
+      <tr>
+        <td>{{ item.0 }}</td>
+        <td>{{ item.1 }}</td>
+        {% if item.3 == True %}
+        <td class="container-status">
+          <div class="status">
+            <p>ACTIVO</p>
+          </div>
+        </td>
+        {% else %}
+        <td class="container-status">
+          <div class="status-no">
+            <p>NO ACTIVO</p>
+          </div>
+        </td>
+        {% endif %}
+        <td>{{ item.2 }}</td>
+        {% if item.4 == True %}
+        <td class="container-status">
+          <div>
+            <p>SI</p>
+          </div>
+        </td>
+        {% else %}
+        <td class="container-status">
+          <div>
+            <p>NO</p>
+          </div>
+        </td>
+        {% endif %}
+        <td>{{ item.5 }}</td>
+        <td>{{ item.6 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

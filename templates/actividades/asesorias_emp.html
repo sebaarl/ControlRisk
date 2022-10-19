@@ -13,18 +13,19 @@
 
 <div class="dash-content">
     {% if c > 0 %}
-        <h2 style="text-align: center" class="act">ESTAS SON TUS ASESORIAS DE LA SEMANA</h2>
-        {% for item in entity %}
-            <p>{{ item.2 }}</p>
-            <p>{{ item.3 }}</p>
-            <a href="{% url 'base:asesorias-detalle-emp' item.6 %}" class="detail">
-                <i class="uil uil-external-link-alt"></i>
-            </a>
-        {% endfor %}
+    <h2 style="text-align: center" class="act">ESTAS SON TUS ASESORIAS DE LA SEMANA</h2>
+    {% for item in entity %}
+    <p>{{ item.2 }}</p>
+    <p>{{ item.3 }}</p>
+    <a href="{% url 'base:asesorias-detalle-emp' item.6 %}" class="detail">
+        <i class="uil uil-external-link-alt"></i>
+    </a>
+    {% endfor %}
     {% else %}
-        <div class="alerta">
-            <p>No presenta asesorias para esta semana &#128532</p>
-        </div>
+    <div class="alerta">
+        <img src="{% static 'images/task.png' %}" alt="">
+        <p>No presentas asesorias para esta semana</p>
+    </div>
     {% endif %}
 </div>
 {% endblock %}

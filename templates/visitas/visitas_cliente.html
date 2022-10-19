@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Visitas - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-thumbs-up"></i>
+    <span class="text">Visitas</span>
+</div>
+
+<div class="dash-content">
+    {% for item in entity %}
+    <p>{{ item.0 }}</p>
+    {% if item.4 == 0 %}
+        <p>Incluida</p>
+    {% else %}
+        <p>Asesoria Extra</p>
+    {% endif %}
+    <a href="{% url 'base:visita-detalle' item.0 %}" class="detail">
+        <i class="uil uil-external-link-alt"></i>
+    </a>
+    {% endfor %}
+</div>
+{% endblock %}

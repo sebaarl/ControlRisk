@@ -23,6 +23,9 @@
     {% else %}
         <p>Asesoria Extra</p>
     {% endif %}
+    <a href="{% url 'base:asesoria-detalle' item.0 %}" class="detail">
+        <i class="uil uil-external-link-alt"></i>
+    </a>
     {% endfor %}
 </div>
 {% endblock %}

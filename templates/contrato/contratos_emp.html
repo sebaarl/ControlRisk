@@ -10,10 +10,10 @@
     <i class="uil uil-list-ul"></i>
     <span class="text">Contratos, Empleado : {{ rut }}</span>
 </div>
-
 <div class="button-c">
     <a class="btn" href="{% url 'base:create-contract' %}">Agregar contrato</a>
 </div>
+
 
 <div class="dash-content">
     {% if cantidad > 0 %}
@@ -59,7 +59,8 @@
     </table>
     {% else %}
     <div class="alerta">
-        <p>No presenta contratos registrados en el sistema &#128532</p>
+        <img src="{% static 'images/contract.svg' %}" alt="" style="max-width: 250px">
+        <p>No presentas contratos asociados a tu rut</p>
     </div>
     {% endif %}
 </div>

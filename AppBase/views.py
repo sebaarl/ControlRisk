@@ -503,27 +503,7 @@ class ContractDetailPdf(View):
         return response
 
 
-# Actividades
-# Asesorias ciente
-@login_required
-def AsesoriaClienteView(request):
-    usuario = request.user
-
-    if usuario.is_staff == 0 and usuario.is_profesional == 0:
-        cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE] [{}]'.format(
-            str(usuario.username)))
-        result = cursor.fetchall()
-
-        data = {
-            'entity': result
-        }
-
-        return render(request, 'asesorias/asesorias_cliente.html', data)
-    else:
-        return render(request, 'error/auth.html')
-
-# Asesorias
+# Asesorias especial
 @login_required
 def AsesoriaEspecialClienteView(request):
     usuario = request.user
@@ -556,6 +536,124 @@ def AsesoriaEspecialClienteView(request):
                     request, "Error al ingresar solicitud")
 
         return render(request, 'asesorias/asesoria_especial.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+# Asesorias ciente
+@login_required
+def AsesoriaClienteView(request):
+    usuario = request.user
+
+    if usuario.is_staff == 0 and usuario.is_profesional == 0:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE] [{}]'.format(
+            str(usuario.username)))
+        result = cursor.fetchall()
+
+        data = {
+            'entity': result
+        }
+
+        return render(request, 'asesorias/asesorias_cliente.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+@login_required
+def DetalleAsesoriaClienteView(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 0 and datos.is_staff == 0:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_DETALLE_ASESORIA] {}'.format(pk))
+        results = cursor.fetchall()
+
+        try:
+            results
+        except:
+            raise Http404
+
+        data = {
+            'entity': results,
+            'id': pk
+        }
+
+        # if request.method == "POST":
+        #     formulario = EstadoAsesoria(request.POST)
+        #     if formulario.is_valid():
+        #         estado = request.POST.get('estado')
+
+        #         cursor.execute(
+        #             'EXEC [dbo].[SP_CAMBIAR_ESTADO_ASESORIA] %s, %s', (estado, pk))
+        #         messages.success(
+        #             request, "Se ha modificado el estado correctamente")
+
+        #         return render(request, 'asesorias/asesoria_detalle.html', data)
+        #     else:
+        #         messages.error(
+        #             request, "Error al modificar estado")
+
+        return render(request, 'asesorias/detalle_asesoria_cliente.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+# Visitas ciente
+@login_required
+def VisitasClienteView(request):
+    usuario = request.user
+
+    if usuario.is_staff == 0 and usuario.is_profesional == 0:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_VISITAS_CLIENTE] [{}]'.format(
+            str(usuario.username)))
+        result = cursor.fetchall()
+
+        data = {
+            'entity': result
+        }
+
+        return render(request, 'visitas/visitas_cliente.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+    
+@login_required
+def DetalleVisitaView(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 0 and datos.is_staff == 0:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_DETALLE_VISITA] {}'.format(pk))
+        results = cursor.fetchall()
+
+        try:
+            results
+        except:
+            raise Http404
+
+        data = {
+            'entity': results,
+            'id': pk
+        }
+
+        # if request.method == "POST":
+        #     formulario = EstadoAsesoria(request.POST)
+        #     if formulario.is_valid():
+        #         estado = request.POST.get('estado')
+
+        #         cursor.execute(
+        #             'EXEC [dbo].[SP_CAMBIAR_ESTADO_ASESORIA] %s, %s', (estado, pk))
+        #         messages.success(
+        #             request, "Se ha modificado el estado correctamente")
+
+        #         return render(request, 'asesorias/asesoria_detalle.html', data)
+        #     else:
+        #         messages.error(
+        #             request, "Error al modificar estado")
+
+        return render(request, 'visitas/detalle_visita.html', data)
     else:
         return render(request, 'error/auth.html')
 
@@ -616,16 +714,17 @@ def DetalleAsesoriaView(request, pk):
                 messages.error(
                     request, "Error al modificar estado")
 
-        return render(request, 'asesorias/asesoria_detalle.html', data)
+        return render(request, 'actividades/asesoria_detalle.html', data)
     else:
         return render(request, 'error/auth.html')
 
 
+# Capacitaciones empleado por semana
 @login_required
 def CapacitacioesEmpleadoView(request):
     datos = request.user
 
-    if datos.is_profesionall == 1:
+    if datos.is_profesional == 1:
         cursor = connection.cursor()
         cursor.execute('EXEC [dbo].[SP_ACTIVIDAD_EMPLEADO_CAPACITACION] [{}]'.format(
             str(datos.username)))
@@ -642,6 +741,7 @@ def CapacitacioesEmpleadoView(request):
         return render(request, 'error/auth.html')
 
 
+# Visitas empleado por semana 
 @login_required
 def VisitasEmpleadoView(request):
     datos = request.user
@@ -659,5 +759,44 @@ def VisitasEmpleadoView(request):
         }
 
         return render(request, 'actividades/visitas_emp.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+@login_required
+def DetalleVisitaEmpleadoView(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 1:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_DETALLE_VISITA] {}'.format(pk))
+        results = cursor.fetchall()
+
+        try:
+            results
+        except:
+            raise Http404
+
+        data = {
+            'entity': results,
+            'id': pk
+        }
+
+        # if request.method == "POST":
+        #     formulario = EstadoAsesoria(request.POST)
+        #     if formulario.is_valid():
+        #         estado = request.POST.get('estado')
+
+        #         cursor.execute(
+        #             'EXEC [dbo].[SP_CAMBIAR_ESTADO_ASESORIA] %s, %s', (estado, pk))
+        #         messages.success(
+        #             request, "Se ha modificado el estado correctamente")
+
+        #         return render(request, 'asesorias/asesoria_detalle.html', data)
+        #     else:
+        #         messages.error(
+        #             request, "Error al modificar estado")
+
+        return render(request, 'actividades/visita_detalle_empleado.html', data)
     else:
         return render(request, 'error/auth.html')

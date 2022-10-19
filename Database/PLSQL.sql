@@ -645,6 +645,181 @@ END
 GO
 
 
+/****** Object:  Trigger [dbo].[TRG_GENERAR_VISITAS]    Script Date: 18-10-2022 22:25:15 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE OR ALTER TRIGGER [dbo].[TRG_GENERAR_VISITAS] ON [dbo].[Contrato]
+AFTER INSERT
+AS
+BEGIN
+	DECLARE @cantidad INT = 2
+	DECLARE @cliente NVARCHAR(12)
+	DECLARE @empleado NVARCHAR(12)
+	DECLARE @empresa NVARCHAR(50)
+	DECLARE @id INT
+	DECLARE @n INT = 1
+	DECLARE @fecha DATETIME
+
+	SELECT @cantidad = CantidadAsesorias FROM inserted
+	SELECT @cliente = RutCliente FROM inserted
+	SELECT @empleado = RutEmpleado FROM inserted
+	SELECT @id = ContratoID FROM inserted
+	SELECT @fecha = CAST(FechaCreacion AS DATETIME) FROM inserted
+
+	SELECT @empresa = RazonSocial FROM Cliente WHERE RutCliente = @cliente
+
+	WHILE @n <= @cantidad
+	BEGIN
+		BEGIN TRY
+			INSERT INTO Visita(FechaCreacion, Estado, ContratoID, Extra)
+			VALUES (@fecha, 'SIN REALIZAR', @id, 0)
+		END TRY
+		BEGIN CATCH
+			DECLARE @mensaje NVARCHAR(500) = ERROR_MESSAGE()
+
+			INSERT INTO Error (MensajeError, Descripcion)
+			VALUES ('Error en el TRG_GENERAR_ASESORIAS' + GETDATE(), @mensaje)
+		END CATCH
+		SET @n = @n + 1
+	END
+END
+
+
+/****** Object:  Trigger [dbo].[TRG_ACTIVIDAD_VISITA]    Script Date: 18-10-2022 22:25:15 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE OR ALTER TRIGGER [dbo].[TRG_ACTIVIDAD_VISITA] ON [dbo].[Visita]
+AFTER INSERT
+AS
+BEGIN
+	DECLARE @tipo NVARCHAR(59) = 'Visita'
+	DECLARE @fechacreacion DATETIME
+	DECLARE @estado BIT
+	DECLARE @id INT
+	DECLARE @empleado NVARCHAR(12)
+	DECLARE @contrato INT
+
+	SELECT @fechacreacion = FechaCreacion FROM inserted
+	SELECT @estado = Estado FROM inserted
+	SELECT @id = VisitaID FROM inserted
+	SELECT @contrato = ContratoID FROM inserted
+
+	SELECT @empleado = RutEmpleado FROM Contrato WHERE ContratoID = @contrato AND Estado = 1
+
+	BEGIN TRY
+		INSERT INTO HistorialActividad (TipoActividad, FechaCreacion, Estado, RutEmpleado, AsesoriaID)
+		VALUES (@tipo, @fechacreacion, @estado, @empleado, @id)
+	END TRY
+	BEGIN CATCH
+		DECLARE @mensaje NVARCHAR(500) = ERROR_MESSAGE()
+
+		INSERT INTO Error (MensajeError, Descripcion)
+		VALUES ('Error en el procedimiento TRG_ACTIVIDAD_VISITA' + GETDATE(), @mensaje)
+	END CATCH
+END
+
+
+/****** Object:  Trigger [dbo].[TRG_ESTADO_ACTIVIDAD_VISITA]    Script Date: 18-10-2022 22:41:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE OR ALTER TRIGGER [dbo].[TRG_ESTADO_ACTIVIDAD_VISITA] ON [dbo].[Visita]
+FOR UPDATE
+AS
+BEGIN
+	DECLARE @estado NVARCHAR(20)
+	DECLARE @id INT
+
+	SELECT @id = VisitaID FROM inserted
+	SELECT @estado = Estado FROM inserted
+
+	BEGIN TRY
+		UPDATE HistorialActividad 
+		SET Estado = @estado
+		WHERE VisitaID = @id
+	END TRY
+	BEGIN CATCH
+		DECLARE @mensaje NVARCHAR(500) = ERROR_MESSAGE()
+		INSERT INTO Error (MensajeError, Descripcion)
+		VALUES ('Error en el procedimiento TRG_ESTADO_ACTIVIDAD_VISITA' + GETDATE(), @mensaje)
+	END CATCH
+END
+GO
+
+
+/****** Object:  Trigger [dbo].[TRG_VALOR_VISITA_ESPECIAL]    Script Date: 18-10-2022 22:41:47 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE OR ALTER TRIGGER [dbo].[TRG_VALOR_VISITA_ESPECIAL] ON [dbo].[Visita]
+AFTER INSERT
+AS
+BEGIN
+	DECLARE @contrato INT
+	DECLARE @fecha DATE
+	DECLARE @inicio DATE
+	DECLARE @fechapago DATE
+	DECLARE @id INT
+	DECLARE @visitaextra BIT
+	DECLARE @total MONEY
+	DECLARE @valorvisita MONEY
+	DECLARE @valorpago MONEY
+	DECLARE @valorextra MONEY
+
+	SELECT @contrato = ContratoID FROM inserted
+	SELECT @fecha = CAST(FechaVisita AS DATE) FROM inserted
+	SELECT @visitaextra = Extra FROM inserted
+	SELECT @valorvisita = Valor FROM ValorExtra WHERE Nombre = 'Visita' 
+
+	DECLARE Pagos CURSOR FOR SELECT CAST(Pagos.FechaPago AS DATE), CAST(DATEADD(MONTH, -1,Pagos.FechaPago) AS DATE),
+							PagosID, ValorCuota, MontoExtra
+							FROM Pagos JOIN Contrato ON (Pagos.ContratoID = Contrato.ContratoID) 
+							WHERE Pagos.ContratoID = @contrato AND Contrato.Estado = 1
+	
+	OPEN Pagos
+	FETCH Pagos INTO @fechapago, @inicio, @id, @valorpago, @valorextra
+
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		SET @total = @valorextra + @valorvisita
+		IF @visitaextra = 1
+		BEGIN
+			IF @fecha BETWEEN @inicio AND @fechapago
+			BEGIN
+				BEGIN TRY
+					UPDATE Pagos
+					SET MontoExtra = @total
+					WHERE PagosID = @id
+				END TRY
+				BEGIN CATCH
+					DECLARE @mensaje NVARCHAR(500) = ERROR_MESSAGE()
+
+					INSERT INTO Error (MensajeError, Descripcion)
+					VALUES ('Error en el procedimiento TRG_VALOR_VISITA_ESPECIAL' + GETDATE(), @mensaje)
+				END CATCH
+			END
+		END
+		FETCH Pagos INTO @fechapago, @inicio, @id, @valorpago, @valorextra
+	END
+	CLOSE Pagos
+	DEALLOCATE Pagos 
+END
+GO
+
+
 /****** Object:  UserDefinedFunction [dbo].[FN_COUNT_ACTIVIDAD_EMP]    Script Date: 18-10-2022 0:35:19 ******/
 SET ANSI_NULLS ON
 GO
@@ -652,7 +827,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
-CREATE   FUNCTION [dbo].[FN_COUNT_ACTIVIDAD_EMP] (@rut NVARCHAR(12))
+CREATE OR ALTER FUNCTION [dbo].[FN_COUNT_ACTIVIDAD_EMP] (@rut NVARCHAR(12))
 RETURNS INT
 AS
 BEGIN
@@ -674,7 +849,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
-CREATE   FUNCTION [dbo].[FN_FormatearRut](@Rut VARCHAR(12))
+CREATE OR ALTER FUNCTION [dbo].[FN_FormatearRut](@Rut VARCHAR(12))
 RETURNS VARCHAR(12)
 AS
 BEGIN
@@ -722,7 +897,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
-CREATE   FUNCTION [dbo].[FN_GET_ID] (@rut NVARCHAR(12))
+CREATE OR ALTER FUNCTION [dbo].[FN_GET_ID] (@rut NVARCHAR(12))
 RETURNS INT
 AS
 BEGIN
@@ -731,3 +906,29 @@ BEGIN
 	RETURN @id
 END
 GO
+
+
+/****** Object:  UserDefinedFunction [dbo].[FN_TASA_ACCIDENTABILIDAD]    Script Date: 18-10-2022 22:35:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE OR ALTER FUNCTION [dbo].[FN_TASA_ACCIDENTABILIDAD] (@rut NVARCHAR(12), @periodo DATE)
+RETURNS INT
+AS
+BEGIN
+	DECLARE @resultado INT
+	DECLARE @tasa INT
+	DECLARE @final NVARCHAR(12)
+	DECLARE @inicio NVARCHAR(12)
+
+	SELECT @tasa = COUNT(AccidenteID)*100/CantidadTrabajadores 
+	FROM Accidente JOIN Contrato ON (Accidente.ContratoID = Contrato.ContratoID)
+		JOIN Cliente ON (Contrato.RutCliente = Cliente.RutCliente)
+	WHERE Cliente.RutCliente = @rut 
+		AND CONVERT(NVARCHAR, Accidente.Fecha,23) BETWEEN  DATEADD(DAY, 1, EOMONTH(@periodo, -1)) AND EOMONTH(@periodo)
+	GROUP BY CantidadTrabajadores
+	RETURN @tasa
+END

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Visitas - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-thumbs-up"></i>
+    <span class="text">Detalle de Visita</span>
+</div>
+
+<div class="dash-content">
+    {% for item in entity %}
+    <p>{{ item.0 }}</p>
+    <p>{{ item.3 }}</p>
+    {% endfor %}
+</div>
+{% endblock %}

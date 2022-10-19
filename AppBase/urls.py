@@ -1,5 +1,5 @@
 from django.urls import path
-from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView,ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView,ContratoEmpleadoView, PagosDetailView, AsesoriaClienteView, AsesoriaEspecialClienteView, AsesoriaClienteView, AsesoriasEmpleadoView, CapacitacioesEmpleadoView, VisitasEmpleadoView, DetalleAsesoriaView
+from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView,ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView,ContratoEmpleadoView, PagosDetailView, AsesoriaClienteView, AsesoriaEspecialClienteView, AsesoriaClienteView, AsesoriasEmpleadoView, CapacitacioesEmpleadoView, VisitasEmpleadoView, DetalleAsesoriaView, VisitasClienteView, DetalleVisitaView, DetalleAsesoriaClienteView, DetalleVisitaEmpleadoView
 
 app_name = 'base'
 
@@ -9,16 +9,23 @@ urlpatterns = [
     path('profesional/ingresar/', CreateEmpleado, name='create-emp'),
     path('profesional/contratos/', ContratoEmpleadoView, name='contract-emp'),
     path('profesional/actividades/asesorias/', AsesoriasEmpleadoView, name='asesorias-emp'),
-    path('profesional/actividades/asesorias/detalle/<pk>', DetalleAsesoriaView, name='asesorias-detalle-emp'),
+    path('profesional/actividades/asesorias/detalle/<pk>/', DetalleAsesoriaView, name='asesorias-detalle-emp'),
     path('profesional/actividades/capacitaciones/', CapacitacioesEmpleadoView, name='capacitacion-emp'),
     path('profesional/actividades/visitas/', VisitasEmpleadoView, name='visitas-emp'),
+    path('profesional/actividades/visitas/detalle/<pk>/', DetalleVisitaEmpleadoView, name='visitas-detalle-emp'),
 
     path('clientes/ingresar/', CreateClient, name='create-client'),
     
     path('clientes/', ListClienteView, name='list-client'),
     path('clientes/contratos/', ContratoClientView, name='contract'),
+
     path('clientes/asesorias/', AsesoriaClienteView, name='asesoria-client'),
+    path('clientes/asesorias/detalle/<pk>/', DetalleAsesoriaClienteView, name='asesoria-detalle'),
     path('clientes/asesorias/solicitud/', AsesoriaEspecialClienteView, name='asesoria-especial'),
+
+    path('clientes/visitas/', VisitasClienteView, name='visita-client'),
+    path('clientes/visitas/detalle/<pk>/', DetalleVisitaView, name='visita-detalle'),
+
     path('clientes/accidentes/ingresar/', CreateAccidentView, name='create-accident'),
 
     path('contratos/', ListContractView, name='list-contract'),

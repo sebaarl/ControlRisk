@@ -367,18 +367,13 @@ class Valorextra(models.Model):
 
 
 class Visita(models.Model):
-    # Field name made lowercase.
-    visitaid = models.AutoField(db_column='VisitaID', primary_key=True)
-    # Field name made lowercase.
-    fechacreacion = models.DateTimeField(db_column='FechaCreacion')
-    # Field name made lowercase.
-    fechavisita = models.DateTimeField(
-        db_column='FechaVisita', blank=True, null=True)
-    # Field name made lowercase.
-    estado = models.BooleanField(db_column='Estado')
-    # Field name made lowercase.
-    contratoid = models.ForeignKey(
-        Contrato, models.DO_NOTHING, db_column='ContratoID', blank=True, null=True)
+    visitaid = models.AutoField(db_column='VisitaID', primary_key=True)  # Field name made lowercase.
+    fechacreacion = models.DateTimeField(db_column='FechaCreacion')  # Field name made lowercase.
+    fechavisita = models.DateField(db_column='FechaVisita', blank=True, null=True)  # Field name made lowercase.
+    estado = models.CharField(db_column='Estado', max_length=20, db_collation='Modern_Spanish_CI_AS')  # Field name made lowercase.
+    contratoid = models.ForeignKey(Contrato, models.DO_NOTHING, db_column='ContratoID', blank=True, null=True)  # Field name made lowercase.
+    extra = models.BooleanField(db_column='Extra')  # Field name made lowercase.
+    hora = models.TimeField(db_column='Hora', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False

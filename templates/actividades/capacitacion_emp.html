@@ -13,16 +13,17 @@
 
 <div class="dash-content">
     {% if c > 0 %}
-        <h2 style="text-align: center" class="act">ESTAS SON TUS CAPACITACIONES DE LA SEMANA</h2>
-        {% for item in entity %}
-            <p>{{ item.2 }}</p>
-            <p>{{ item.3 }}</p>
-            {{ asesoriaForm.estado }}
-        {% endfor %}
+    <h2 style="text-align: center" class="act">ESTAS SON TUS CAPACITACIONES DE LA SEMANA</h2>
+    {% for item in entity %}
+    <p>{{ item.2 }}</p>
+    <p>{{ item.3 }}</p>
+    {{ asesoriaForm.estado }}
+    {% endfor %}
     {% else %}
-        <div class="alerta">
-            <p>No presentas capacitaciones para esta semana &#128532</p>
-        </div>
+    <div class="alerta">
+        <img src="{% static 'images/task.png' %}" alt="">
+        <p>No presentas capacitaciones para esta semana</p>
+    </div>
     {% endif %}
 </div>
 {% endblock %}

@@ -127,6 +127,11 @@ form {
   color: #232836;
 }
 
+.forget {
+  padding: .7rem;
+  text-align: center;
+}
+
 .form a {
   color: #0171d3;
   text-decoration: none;

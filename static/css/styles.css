@@ -83,6 +83,12 @@ body::-webkit-scrollbar-thumb {
     margin-top: -50px;
 }
 
+.home-title .imagen {
+    max-width: 350px;
+    margin-top: -180px;
+}
+
+
 nav {
     position: fixed;
     top: 0;
@@ -908,9 +914,13 @@ footer p {
     align-items: center;
 }
 
+.alerta img {
+    width: 300px;
+    max-width: 300px;
+}
+
 .alerta p {
     font-size: 2.2rem;
-    margin: 5.5rem;
     letter-spacing: 0.3rem;
 }
 

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>¿Estás perdido? - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="dash-content">
+    <div class="alerta">
+        <img src="{% static 'images/q.png' %}" alt="">
+        <div>
+            <h2>¿Estás perdido?</h2>
+            <p>No tienes los permisos para estar aquí</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

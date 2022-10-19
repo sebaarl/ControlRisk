@@ -53,64 +53,124 @@ def formatRut(rut):
 
 @login_required
 def HomeView(request):
-    datos = request.user
-
-    # from django.db import connection
-    # with connection.cursor() as cursor:
-
-    #     data_emp = cursor.execute(
-    #         'SELECT * FROM [dbo].[Empleado] WHERE [RutEmpleado] = {}'.format(datos.username))
-    #     profesional = data_emp.fetchone()
-    #     data_cli = cursor.execute(
-    #         'SELECT RazonSocial FROM [dbo].[Cliente] WHERE [RutCliente] = {}'.format(datos.username))
-    #     cliente = data_cli.fetchone()
+    datos = request.session
 
     data = {
-        'user': datos,
+        'c': datos
     }
-
     return render(request, 'home.html', data)
 
 
 @login_required
 def CreateClient(request):
+    datos = request.user
     data = {
         'form': CreateClienteForm()
     }
+    if datos.is_profesional == 1 or datos.is_staff == 1:
+        if request.method == "POST":
+            formulario = CreateClienteForm(request.POST)
+            if formulario.is_valid():
+                clientesave = Cliente()
+                clientesave.rutcliente = request.POST.get('rut')
+                clientesave.razonsocial = request.POST.get('razon')
+                clientesave.direccion = request.POST.get('direccion')
+                clientesave.telefono = request.POST.get('telefono')
+                clientesave.representante = request.POST.get('representante')
+                clientesave.rutrepresentante = request.POST.get('rutrepre')
+                clientesave.rubro = request.POST.get('rubro')
 
-    if request.method == "POST":
-        formulario = CreateClienteForm(request.POST)
-        if formulario.is_valid():
-            clientesave = Cliente()
-            clientesave.rutcliente = request.POST.get('rut')
-            clientesave.razonsocial = request.POST.get('razon')
-            clientesave.direccion = request.POST.get('direccion')
-            clientesave.telefono = request.POST.get('telefono')
-            clientesave.representante = request.POST.get('representante')
-            clientesave.rutrepresentante = request.POST.get('rutrepre')
-            clientesave.rubro = request.POST.get('rubro')
+                rut_cli = rut(clientesave.rutcliente)
+                rut_repre = rut(clientesave.rutrepresentante)
 
-            rut_cli = rut(clientesave.rutcliente)
-            rut_repre = rut(clientesave.rutrepresentante)
+                existe = Cliente.objects.filter(rutcliente=rut_cli).exists()
+                user_exist = User.objects.filter(username=rut_cli).exists()
 
-            existe = Cliente.objects.filter(rutcliente=rut_cli).exists()
-            user_exist = User.objects.filter(username=rut_cli).exists()
+                if rut_chile.is_valid_rut(clientesave.rutcliente) == True:
+                    if rut_chile.is_valid_rut(clientesave.rutrepresentante) == True:
+                        if existe or user_exist:
+                            messages.error(
+                                request, "El rut " + formatRut(rut_cli) + " ya está registrado en el sistema!")
 
-            if rut_chile.is_valid_rut(clientesave.rutcliente) == True:
-                if rut_chile.is_valid_rut(clientesave.rutrepresentante) == True:
+                        else:
+                            username = rut_cli
+                            password = rut_cli[4:]
+                            group = Group.objects.get(name='Cliente')
+                            user = get_user_model().objects.create(
+                                username=username,
+                                password=make_password(password),
+                                is_active=True,
+                                is_profesional=False
+                            )
+
+                            user.groups.add(group)
+
+                            from django.db import connection
+                            with connection.cursor() as cursor:
+
+                                cursor.execute('EXEC [dbo].[SP_CREATE_CLIENTE] %s, %s, %s, %s, %s, %s, %s', (rut_cli,
+                                                                                                             clientesave.razonsocial, clientesave.rubro,  clientesave.direccion, clientesave.telefono, clientesave.representante, rut_repre))
+
+                                messages.success(
+                                    request, "Cliente " + formatRut(rut_cli) + " registrado correctamente ")
+                                return render(request, 'cliente/create_cliente.html', data)
+                    else:
+                        messages.warning(request, "RUT: " +
+                                         formatRut(rut_repre) + " es invalido")
+                else:
+                    messages.warning(request, "RUT: " +
+                                     formatRut(rut_cli) + " es invalido")
+
+        return render(request, 'cliente/create_cliente.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+@login_required
+def CreateEmpleado(request):
+    datos = request.user
+
+    if datos.is_staff == 1:
+        data = {
+            'emp': CreateEmpleadoForm()
+        }
+
+        if request.method == "POST":
+            formulario = CreateEmpleadoForm(request.POST)
+            if formulario.is_valid():
+                empsave = Empleado()
+                empsave.rutempleado = request.POST.get('rut')
+                empsave.nombre = request.POST.get('nombre')
+                empsave.apellido = request.POST.get('apellido')
+                empsave.cargo = request.POST.get('cargo')
+
+                if empsave.cargo == 'Profesional':
+                    profesional = True
+                    staff = False
+                    group = Group.objects.get(name='Profesional')
+                else:
+                    profesional = False
+                    staff = True
+                    group = Group.objects.get(name='Administrador')
+
+                rut_emp = rut(empsave.rutempleado)
+
+                existe = Empleado.objects.filter(rutempleado=rut_emp).exists()
+                user_exist = User.objects.filter(username=rut_emp).exists()
+
+                if rut_chile.is_valid_rut(empsave.rutempleado) == True:
                     if existe or user_exist:
                         messages.error(
-                            request, "El rut " + formatRut(rut_cli) + " ya está registrado en el sistema!")
-
+                            request, "El rut " + formatRut(rut_emp) + " ya está registrado en el sistema!")
                     else:
-                        username = rut_cli
-                        password = rut_cli[4:]
-                        group = Group.objects.get(name='Cliente')
+                        username = rut_emp
+                        password = rut_emp[4:]
                         user = get_user_model().objects.create(
                             username=username,
                             password=make_password(password),
                             is_active=True,
-                            is_profesional=False
+                            is_profesional=profesional,
+                            is_staff=staff,
                         )
 
                         user.groups.add(group)
@@ -118,103 +178,45 @@ def CreateClient(request):
                         from django.db import connection
                         with connection.cursor() as cursor:
 
-                            cursor.execute('EXEC [dbo].[SP_CREATE_CLIENTE] %s, %s, %s, %s, %s, %s, %s', (rut_cli,
-                                                                                                         clientesave.razonsocial, clientesave.rubro,  clientesave.direccion, clientesave.telefono, clientesave.representante, rut_repre))
+                            cursor.execute('EXEC [dbo].[SP_CREATE_EMPLEADO] %s, %s, %s, %s', (
+                                rut_emp, empsave.nombre, empsave.apellido, empsave.cargo))
 
                             messages.success(
-                                request, "Cliente " + formatRut(rut_cli) + " registrado correctamente ")
-                            return render(request, 'cliente/create_cliente.html', data)
+                                request, "Empleado " + formatRut(rut_emp) + " registrado correctamente ")
+                            return render(request, 'empleados/create_empleado.html', data)
                 else:
                     messages.warning(request, "RUT: " +
-                                     formatRut(rut_repre) + " es invalido")
-            else:
-                messages.warning(request, "RUT: " +
-                                 formatRut(rut_cli) + " es invalido")
+                                     formatRut(rut_emp) + " es invalido")
 
-    return render(request, 'cliente/create_cliente.html', data)
-
-
-@login_required
-def CreateEmpleado(request):
-    data = {
-        'emp': CreateEmpleadoForm()
-    }
-
-    if request.method == "POST":
-        formulario = CreateEmpleadoForm(request.POST)
-        if formulario.is_valid():
-            empsave = Empleado()
-            empsave.rutempleado = request.POST.get('rut')
-            empsave.nombre = request.POST.get('nombre')
-            empsave.apellido = request.POST.get('apellido')
-            empsave.cargo = request.POST.get('cargo')
-
-            if empsave.cargo == 'Profesional':
-                profesional = True
-                staff = False
-                group = Group.objects.get(name='Profesional')
-            else:
-                profesional = False
-                staff = True
-                group = Group.objects.get(name='Administrador')
-
-            rut_emp = rut(empsave.rutempleado)
-
-            existe = Empleado.objects.filter(rutempleado=rut_emp).exists()
-            user_exist = User.objects.filter(username=rut_emp).exists()
-
-            if rut_chile.is_valid_rut(empsave.rutempleado) == True:
-                if existe or user_exist:
-                    messages.error(
-                        request, "El rut " + formatRut(rut_emp) + " ya está registrado en el sistema!")
-                else:
-                    username = rut_emp
-                    password = rut_emp[4:]
-                    user = get_user_model().objects.create(
-                        username=username,
-                        password=make_password(password),
-                        is_active=True,
-                        is_profesional=profesional,
-                        is_staff=staff,
-                    )
-
-                    user.groups.add(group)
-
-                    from django.db import connection
-                    with connection.cursor() as cursor:
-
-                        cursor.execute('EXEC [dbo].[SP_CREATE_EMPLEADO] %s, %s, %s, %s', (
-                            rut_emp, empsave.nombre, empsave.apellido, empsave.cargo))
-
-                        messages.success(
-                            request, "Empleado " + formatRut(rut_emp) + " registrado correctamente ")
-                        return render(request, 'empleados/create_empleado.html', data)
-            else:
-                messages.warning(request, "RUT: " +
-                                 formatRut(rut_emp) + " es invalido")
-
-    return render(request, 'empleados/create_empleado.html', data)
+        return render(request, 'empleados/create_empleado.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 
 @login_required
 def ListClienteView(request):
-    cursor = connection.cursor()
-    cursor.execute('EXEC [dbo].[SP_LISTAR_CLIENTES]')
-    results = cursor.fetchall()
-    page = request.GET.get('page', 1)
+    datos = request.user
 
-    try:
-        paginator = Paginator(results, 10)
-        results = paginator.page(page)
-    except:
-        raise Http404
+    if datos.is_staff == 1 or datos.is_profesional == 1:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_LISTAR_CLIENTES]')
+        results = cursor.fetchall()
+        page = request.GET.get('page', 1)
 
-    data = {
-        "entity": results,
-        "paginator": paginator,
-    }
+        try:
+            paginator = Paginator(results, 10)
+            results = paginator.page(page)
+        except:
+            raise Http404
 
-    return render(request, 'cliente/listar_clientes.html', data)
+        data = {
+            "entity": results,
+            "paginator": paginator,
+        }
+
+        return render(request, 'cliente/listar_clientes.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 
 @login_required
@@ -225,110 +227,123 @@ def CreateAccidentView(request):
         'accidente': CreateAccidenteForm()
     }
 
-    if request.method == "POST":
+    if datos.is_staff == 1 or datos.is_profesional == 1:
+        return render(request, 'error/auth.html')
+    else:
+        if request.method == "POST":
 
-        formulario = CreateAccidenteForm(request.POST)
-        if formulario.is_valid():
+            formulario = CreateAccidenteForm(request.POST)
+            if formulario.is_valid():
 
-            accidentesave = Accidente()
-            accidentesave.fecha = request.POST['fecha']
-            accidentesave.descripcion = request.POST['descripcion']
-            accidentesave.medidas = request.POST['medidas']
+                accidentesave = Accidente()
+                accidentesave.fecha = request.POST['fecha']
+                accidentesave.descripcion = request.POST['descripcion']
+                accidentesave.medidas = request.POST['medidas']
 
-            print(accidentesave.fecha, accidentesave.descripcion,
-                  accidentesave.medidas)
+                print(accidentesave.fecha, accidentesave.descripcion,
+                    accidentesave.medidas)
 
-            from django.db import connection
-            with connection.cursor() as cursor:
-                cursor.execute('EXEC [dbo].[SP_CREATE_ACCIDENTE]  %s, %s, %s, %s', (accidentesave.fecha,
-                                                                                    accidentesave.descripcion,
-                                                                                    accidentesave.medidas,
-                                                                                    str(datos.username)))
+                from django.db import connection
+                with connection.cursor() as cursor:
+                    cursor.execute('EXEC [dbo].[SP_CREATE_ACCIDENTE]  %s, %s, %s, %s', (accidentesave.fecha,
+                                                                                        accidentesave.descripcion,
+                                                                                        accidentesave.medidas,
+                                                                                        str(datos.username)))
 
-                messages.success(request, "Accidente registrado correctamente")
+                    messages.success(request, "Accidente registrado correctamente")
 
-                return render(request, 'accidentes/create_accident.html', data)
-        else:
-            messages.error(request, "Formulario no valido")
+                    return render(request, 'accidentes/create_accident.html', data)
+            else:
+                messages.error(request, "Formulario no valido")
 
-    return render(request, 'accidentes/create_accident.html', data)
+        return render(request, 'accidentes/create_accident.html', data)
 
 
 # Vistas Contrato
 # Creación de contrato
 @login_required
 def CreateContractView(request):
+    datos = request.user
+
     data = {
         'contract': CreateContratoForm()
     }
 
-    if request.method == "POST":
-        if request.POST.get('asesoria') and request.POST.get('capa') and request.POST.get('cuota') and request.POST.get('valor') and request.POST.get('cliente') and request.POST.get('empleado'):
-            contratosave = Contrato()
-            contratosave.cantidadasesorias = request.POST.get('asesoria')
-            contratosave.cantidadcapacitaciones = request.POST.get('capa')
-            contratosave.cuotascontrato = request.POST.get('cuota')
-            contratosave.valorcontrato = request.POST.get('valor')
+    if datos.is_staff == 1 or datos.is_profesional == 1:
+        if request.method == "POST":
+            if request.POST.get('asesoria') and request.POST.get('capa') and request.POST.get('cuota') and request.POST.get('valor') and request.POST.get('cliente') and request.POST.get('empleado'):
+                contratosave = Contrato()
+                contratosave.cantidadasesorias = request.POST.get('asesoria')
+                contratosave.cantidadcapacitaciones = request.POST.get('capa')
+                contratosave.cuotascontrato = request.POST.get('cuota')
+                contratosave.valorcontrato = request.POST.get('valor')
 
-            cliente = Cliente.objects.get(
-                rutcliente=request.POST.get('cliente'))
-            empleado = Empleado.objects.get(
-                rutempleado=request.POST.get('empleado'))
+                cliente = Cliente.objects.get(
+                    rutcliente=request.POST.get('cliente'))
+                empleado = Empleado.objects.get(
+                    rutempleado=request.POST.get('empleado'))
 
-            contratosave.rutcliente = cliente
-            contratosave.rutempleado = empleado
+                contratosave.rutcliente = cliente
+                contratosave.rutempleado = empleado
 
-            now = datetime.now()
-            termino = now + relativedelta(months=12)
-            pago = now + relativedelta(months=1)
+                now = datetime.now()
+                termino = now + relativedelta(months=12)
+                pago = now + relativedelta(months=1)
 
-            from django.db import connection
-            with connection.cursor() as cursor:
+                from django.db import connection
+                with connection.cursor() as cursor:
 
-                filterRut = Contrato.objects.filter(
-                    rutcliente=contratosave.rutcliente)
-                estado = filterRut.filter(estado=1)
-                cantidad = estado.count()
+                    filterRut = Contrato.objects.filter(
+                        rutcliente=contratosave.rutcliente)
+                    estado = filterRut.filter(estado=1)
+                    cantidad = estado.count()
 
-                if cantidad >= 1:
-                    messages.error(request, 'La empresa {0} presenta un contracto activo'.format(
-                        formatRut(str(contratosave.rutcliente))))
-                else:
-                    cursor.execute('EXEC [dbo].[SP_CREATE_CONTRATO]  %s, %s, %s, %s, %s, %s, %s, %s, %s', (
-                        int(contratosave.cantidadasesorias), int(
-                            contratosave.cantidadcapacitaciones), termino, pago,
-                        int(contratosave.cuotascontrato), int(
-                            contratosave.valorcontrato),
-                        str(contratosave.rutcliente), str(contratosave.rutempleado), now))
+                    if cantidad >= 1:
+                        messages.error(request, 'La empresa {0} presenta un contracto activo'.format(
+                            formatRut(str(contratosave.rutcliente))))
+                    else:
+                        cursor.execute('EXEC [dbo].[SP_CREATE_CONTRATO]  %s, %s, %s, %s, %s, %s, %s, %s, %s', (
+                            int(contratosave.cantidadasesorias), int(
+                                contratosave.cantidadcapacitaciones), termino, pago,
+                            int(contratosave.cuotascontrato), int(
+                                contratosave.valorcontrato),
+                            str(contratosave.rutcliente), str(contratosave.rutempleado), now))
 
-                    messages.success(
-                        request, "Contrato registrado correctamente")
+                        messages.success(
+                            request, "Contrato registrado correctamente")
 
-            return render(request, 'contrato/create_contract.html', data)
+                return render(request, 'contrato/create_contract.html', data)
 
-    return render(request, 'contrato/create_contract.html', data)
+        return render(request, 'contrato/create_contract.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 
 # Listar todos los contratos del sistema
 @login_required
 def ListContractView(request):
-    cursor = connection.cursor()
-    cursor.execute('EXEC [dbo].[SP_CONTRATO_CLIENTE]')
-    results = cursor.fetchall()
-    page = request.GET.get('page', 1)
+    datos = request.user
 
-    try:
-        paginator = Paginator(results, 10)
-        results = paginator.page(page)
-    except:
-        raise Http404
+    if datos.is_staff == 1:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_CONTRATO_CLIENTE]')
+        results = cursor.fetchall()
+        page = request.GET.get('page', 1)
 
-    data = {
-        "entity": results,
-        "paginator": paginator
-    }
+        try:
+            paginator = Paginator(results, 10)
+            results = paginator.page(page)
+        except:
+            raise Http404
 
-    return render(request, 'contrato/listar_contratos.html', data)
+        data = {
+            "entity": results,
+            "paginator": paginator
+        }
+
+        return render(request, 'contrato/listar_contratos.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 
 # Mostrar detalle del contrato
@@ -355,39 +370,45 @@ def ContractDetailView(request, id):
 def ContratoClientView(request):
     datos = request.user
 
-    cursor = connection.cursor()
-    cursor.execute(
-        'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
-    results = cursor.fetchall()
+    if datos.is_staff == 0 and datos.is_profesional == 0:
+        cursor = connection.cursor()
+        cursor.execute(
+            'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
+        results = cursor.fetchall()
 
-    cantidad = Contrato.objects.filter(rutcliente=datos.username).count()
+        cantidad = Contrato.objects.filter(rutcliente=datos.username).count()
 
-    data = {
-        # 'user': formatRut(str(datos.username)),
-        'entity': results,
-        'cantidad': cantidad
-    }
+        data = {
+            # 'user': formatRut(str(datos.username)),
+            'entity': results,
+            'cantidad': cantidad
+        }
 
-    return render(request, 'contrato/contratos_client.html', data)
+        return render(request, 'contrato/contratos_client.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 
 @login_required
 def ContratoEmpleadoView(request):
     datos = request.user
 
-    cantidad = Contrato.objects.filter(rutempleado=datos.username).count()
-    cursor = connection.cursor()
-    cursor.execute('EXEC [dbo].[SP_LISTAR_CONTRATOS_PROFESIONAL] [{}]'.format(
-        str(datos.username)))
-    results = cursor.fetchall()
+    if datos.is_profesional == 1:
+        cantidad = Contrato.objects.filter(rutempleado=datos.username).count()
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_LISTAR_CONTRATOS_PROFESIONAL] [{}]'.format(
+            str(datos.username)))
+        results = cursor.fetchall()
 
-    data = {
-        'rut': formatRut(str(datos.username)),
-        'entity': results,
-        'cantidad': cantidad
-    }
+        data = {
+            'rut': formatRut(str(datos.username)),
+            'entity': results,
+            'cantidad': cantidad
+        }
 
-    return render(request, 'contrato/contratos_emp.html', data)
+        return render(request, 'contrato/contratos_emp.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 
 # Pagos
@@ -395,57 +416,70 @@ def ContratoEmpleadoView(request):
 def ListPagosView(request):
     datos = request.user
 
-    cantidad = Contrato.objects.all().filter(rutcliente=datos.username).count()
-    cursor = connection.cursor()
-    cursor.execute(
-        'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
-    results = cursor.fetchall()
+    if datos.is_profesional == 0 and datos.is_staff == 0:
+        cantidad = Contrato.objects.all().filter(rutcliente=datos.username).count()
+        cursor = connection.cursor()
+        cursor.execute(
+            'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
+        results = cursor.fetchall()
 
-    data = {
-        # 'user': formatRut(datos.username),
-        'entity': results,
-        'c': cantidad
-    }
+        data = {
+            # 'user': formatRut(datos.username),
+            'entity': results,
+            'c': cantidad
+        }
 
-    return render(request, 'pagos/pagos.html', data)
+        return render(request, 'pagos/pagos.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 
 @login_required
 def PagosContractView(request, pk):
-    cursor = connection.cursor()
-    cursor.execute('EXEC [dbo].[SP_PAGOS_CONTRATO] {}'.format(str(pk)))
-    results = cursor.fetchall()
+    datos = request.user
 
-    try:
-        results
-    except:
-        raise Http404
+    if datos.is_profesional == 0 and datos.is_staff == 0:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_PAGOS_CONTRATO] {}'.format(str(pk)))
+        results = cursor.fetchall()
 
-    data = {
-        "entity": results,
-        'c': pk,
-    }
+        try:
+            results
+        except:
+            raise Http404
 
-    return render(request, 'pagos/tabla_pagos.html', data)
+        data = {
+            "entity": results,
+            'c': pk,
+        }
+
+        return render(request, 'pagos/tabla_pagos.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 
 @login_required
 def PagosDetailView(request, pk):
-    cursor = connection.cursor()
-    cursor.execute('EXEC [dbo].[SP_PAGOS_CONTRATO] {}'.format(str(pk)))
-    results = cursor.fetchall()
+    datos = request.user
 
-    try:
-        results
-    except:
-        raise Http404
+    if datos.is_staff == 0 and datos.is_profesional == 0:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_PAGOS_CONTRATO] {}'.format(str(pk)))
+        results = cursor.fetchall()
 
-    data = {
-        "entity": results,
-        'c': pk,
-    }
+        try:
+            results
+        except:
+            raise Http404
 
-    return render(request, 'pagos/detalle_pago.html', data)
+        data = {
+            "entity": results,
+            'c': pk,
+        }
+
+        return render(request, 'pagos/detalle_pago.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 
 # PDF Contrato
@@ -474,17 +508,20 @@ class ContractDetailPdf(View):
 @login_required
 def AsesoriaClienteView(request):
     usuario = request.user
-    cursor = connection.cursor()
-    cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE] [{}]'.format(
-        str(usuario.username)))
-    result = cursor.fetchall()
 
-    data = {
-        'entity': result
-    }
+    if usuario.is_staff == 0 and usuario.is_profesional == 0:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE] [{}]'.format(
+            str(usuario.username)))
+        result = cursor.fetchall()
 
-    return render(request, 'asesorias/asesorias_cliente.html', data)
+        data = {
+            'entity': result
+        }
 
+        return render(request, 'asesorias/asesorias_cliente.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 # Asesorias
 @login_required
@@ -494,113 +531,133 @@ def AsesoriaEspecialClienteView(request):
         'form': CreateAsesoriaEspecial()
     }
 
-    if request.method == "POST":
-        formulario = CreateAsesoriaEspecial(request.POST)
-        if formulario.is_valid():
-            asesoria = Asesoria()
-            asesoria.fechaasesoria = request.POST.get('fecha')
-            asesoria.hora = request.POST.get('hora')
-            asesoria.descripcionasesoria = request.POST.get('descripcion')
+    if usuario.is_staff == 0 and usuario.is_profesional == 0:
+        if request.method == "POST":
+            formulario = CreateAsesoriaEspecial(request.POST)
+            if formulario.is_valid():
+                asesoria = Asesoria()
+                asesoria.fechaasesoria = request.POST.get('fecha')
+                asesoria.hora = request.POST.get('hora')
+                asesoria.descripcionasesoria = request.POST.get('descripcion')
 
-            from django.db import connection
-            with connection.cursor() as cursor:
+                from django.db import connection
+                with connection.cursor() as cursor:
 
-                cursor = connection.cursor()
-                cursor.execute('EXEC [dbo].[SP_ASESORIA_ESPECIAL] %s, %s, %s, %s',
-                               (asesoria.fechaasesoria, asesoria.descripcionasesoria, asesoria.hora, usuario.username))
+                    cursor = connection.cursor()
+                    cursor.execute('EXEC [dbo].[SP_ASESORIA_ESPECIAL] %s, %s, %s, %s',
+                                (asesoria.fechaasesoria, asesoria.descripcionasesoria, asesoria.hora, usuario.username))
 
-                messages.success(
-                    request, "Solicitud de asesoria ingresada correctamente")
+                    messages.success(
+                        request, "Solicitud de asesoria ingresada correctamente")
 
-            return render(request, 'asesorias/asesoria_especial.html', data)
-        else:
-            messages.error(
-                request, "Error al ingresar solicitud")
+                return render(request, 'asesorias/asesoria_especial.html', data)
+            else:
+                messages.error(
+                    request, "Error al ingresar solicitud")
 
-    return render(request, 'asesorias/asesoria_especial.html', data)
+        return render(request, 'asesorias/asesoria_especial.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 
 # Actividades empleado
 @login_required
 def AsesoriasEmpleadoView(request):
     datos = request.user
-    cursor = connection.cursor()
-    cursor.execute(
-        'EXEC [dbo].[SP_ACTIVIDAD_EMPLEADO] [{}]'.format(str(datos.username)))
-    results = cursor.fetchall()
 
-    data = {
-        'entity': results,
-        'rut': formatRut(datos.username),
-        'c': len(results)
-    }
+    if datos.is_profesional == 1:
+        cursor = connection.cursor()
+        cursor.execute(
+            'EXEC [dbo].[SP_ACTIVIDAD_EMPLEADO] [{}]'.format(str(datos.username)))
+        results = cursor.fetchall()
 
-    return render(request, 'actividades/asesorias_emp.html', data)
+        data = {
+            'entity': results,
+            'rut': formatRut(datos.username),
+            'c': len(results)
+        }
+
+        return render(request, 'actividades/asesorias_emp.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 
 @login_required
 def DetalleAsesoriaView(request, pk):
-    cursor = connection.cursor()
-    cursor.execute('EXEC [dbo].[SP_DETALLE_ASESORIA] {}'.format(pk))
-    results = cursor.fetchall()
+    datos = request.user
 
-    try:
-        results
-    except:
-        raise Http404
+    if datos.is_profesional == 1:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_DETALLE_ASESORIA] {}'.format(pk))
+        results = cursor.fetchall()
 
-    data = {
-        'entity': results,
-        'id': pk
-    }
+        try:
+            results
+        except:
+            raise Http404
 
-    if request.method == "POST":
-        formulario = EstadoAsesoria(request.POST)
-        if formulario.is_valid():
-            estado = request.POST.get('estado')
+        data = {
+            'entity': results,
+            'id': pk
+        }
 
-            cursor.execute(
-                'EXEC [dbo].[SP_CAMBIAR_ESTADO_ASESORIA] %s, %s', (estado, pk))
-            messages.success(
-                request, "Se ha modificado el estado correctamente")
+        if request.method == "POST":
+            formulario = EstadoAsesoria(request.POST)
+            if formulario.is_valid():
+                estado = request.POST.get('estado')
 
-            return render(request, 'asesorias/asesoria_detalle.html', data)
-        else:
-            messages.error(
-                request, "Error al modificar estado")
+                cursor.execute(
+                    'EXEC [dbo].[SP_CAMBIAR_ESTADO_ASESORIA] %s, %s', (estado, pk))
+                messages.success(
+                    request, "Se ha modificado el estado correctamente")
 
-    return render(request, 'asesorias/asesoria_detalle.html', data)
+                return render(request, 'asesorias/asesoria_detalle.html', data)
+            else:
+                messages.error(
+                    request, "Error al modificar estado")
+
+        return render(request, 'asesorias/asesoria_detalle.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 
 @login_required
 def CapacitacioesEmpleadoView(request):
     datos = request.user
-    cursor = connection.cursor()
-    cursor.execute('EXEC [dbo].[SP_ACTIVIDAD_EMPLEADO_CAPACITACION] [{}]'.format(
-        str(datos.username)))
-    results = cursor.fetchall()
 
-    data = {
-        'entity': results,
-        'rut': formatRut(datos.username),
-        'c': len(results)
-    }
+    if datos.is_profesionall == 1:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_ACTIVIDAD_EMPLEADO_CAPACITACION] [{}]'.format(
+            str(datos.username)))
+        results = cursor.fetchall()
 
-    return render(request, 'actividades/capacitacion_emp.html', data)
+        data = {
+            'entity': results,
+            'rut': formatRut(datos.username),
+            'c': len(results)
+        }
+
+        return render(request, 'actividades/capacitacion_emp.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 
 @login_required
 def VisitasEmpleadoView(request):
     datos = request.user
-    cursor = connection.cursor()
-    cursor.execute(
-        'EXEC [dbo].[SP_ACTIVIDAD_EMPLEADO_VISITA] [{}]'.format(str(datos.username)))
-    results = cursor.fetchall()
 
-    data = {
-        'entity': results,
-        'rut': formatRut(datos.username),
-        'c': len(results)
-    }
+    if datos.is_profesional == 1:
+        cursor = connection.cursor()
+        cursor.execute(
+            'EXEC [dbo].[SP_ACTIVIDAD_EMPLEADO_VISITA] [{}]'.format(str(datos.username)))
+        results = cursor.fetchall()
 
-    return render(request, 'actividades/visitas_emp.html', data)
+        data = {
+            'entity': results,
+            'rut': formatRut(datos.username),
+            'c': len(results)
+        }
+
+        return render(request, 'actividades/visitas_emp.html', data)
+    else:
+        return render(request, 'error/auth.html')

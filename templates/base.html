@@ -45,7 +45,7 @@
                     </a></li>
                 <li><a href='{% url "base:create-emp" %}'>
                         <i class="uil uil-users-alt"></i>
-                        <span class="link-name">Emplados</span>
+                        <span class="link-name">Empleados</span>
                     </a></li>
                 <li><a href='{% url "base:list-contract" %}'>
                         <i class="uil uil-file-contract-dollar"></i>
@@ -106,7 +106,7 @@
                     </a></li>
                 <li><a href='{% url "base:pagos" %}'>
                         <i class="uil uil-document-layout-left"></i>
-                        <span class="link-name"></span>
+                        <span class="link-name">Informes</span>
                     </a></li>
                 {% endif %}
                 {% endif %}
@@ -127,6 +127,11 @@
     <section class="dashboard">
         <div class="top">
             <i class="uil uil-draggabledots sidebar-toggle"></i>
+
+            <div class="search-box">
+                <i class="uil uil-search"></i>
+                <input type="text" placeholder="Busca aquí...">
+            </div>
 
             <!-- <div class="noti-menu">
                 <div class="noti-btn">
@@ -178,7 +183,6 @@
                 </ul>
             </div>
         </div>
-
         <div class="dash-content">
             {% block contenido %}
 

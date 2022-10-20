@@ -1,4 +1,4 @@
-from .forms import CreateClienteForm, CreateEmpleadoForm, CreateContratoForm, CreateAccidenteForm, CreateAsesoriaEspecial, EstadoAsesoria
+from .forms import CreateClienteForm, CreateEmpleadoForm, CreateContratoForm, CreateAccidenteForm, CreateAsesoriaEspecial, EstadoAsesoria, EstadoVisita
 
 
 def BaseForms(request):
@@ -8,6 +8,7 @@ def BaseForms(request):
     accident_form = CreateAccidenteForm()
     especial_form = CreateAsesoriaEspecial()
     asesoria_form = EstadoAsesoria()
+    visita_form = EstadoVisita()
 
     return {
         'clienteForm': cliente_form,
@@ -16,4 +17,5 @@ def BaseForms(request):
         'accidentForm': accident_form,
         'especialForm': especial_form,
         'asesoriaForm': asesoria_form,
+        'visitaForm': visita_form,
     }

@@ -12,7 +12,7 @@ urlpatterns = [
     path('profesional/actividades/asesorias/detalle/<pk>/', DetalleAsesoriaView, name='asesorias-detalle-emp'),
     path('profesional/actividades/capacitaciones/', CapacitacioesEmpleadoView, name='capacitacion-emp'),
     path('profesional/actividades/visitas/', VisitasEmpleadoView, name='visitas-emp'),
-    path('profesional/actividades/visitas/detalle/<pk>/', DetalleVisitaEmpleadoView, name='visitas-detalle-emp'),
+    path('profesional/actividades/visitas/detalle/<pk>/',  DetalleVisitaEmpleadoView, name='visitas-detalle-emp'),
 
     path('clientes/ingresar/', CreateClient, name='create-client'),
     

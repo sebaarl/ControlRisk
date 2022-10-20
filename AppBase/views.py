@@ -13,7 +13,7 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.urls import reverse_lazy
 
-from AppBase.forms import CreateAsesoriaEspecial, CreateClienteForm, CreateEmpleadoForm, CreateContratoForm, CreateAccidenteForm, EstadoAsesoria
+from AppBase.forms import CreateAsesoriaEspecial, CreateClienteForm, CreateEmpleadoForm, CreateContratoForm, CreateAccidenteForm, EstadoAsesoria, EstadoVisita
 from AppBase.models import Asesoria, Cliente, Empleado, Contrato, Accidente, Historialactividad
 from AppUser.models import User
 
@@ -782,20 +782,20 @@ def DetalleVisitaEmpleadoView(request, pk):
             'id': pk
         }
 
-        # if request.method == "POST":
-        #     formulario = EstadoAsesoria(request.POST)
-        #     if formulario.is_valid():
-        #         estado = request.POST.get('estado')
+        if request.method == "POST":
+            formulario = EstadoVisita(request.POST)
+            if formulario.is_valid():
+                estado = request.POST.get('estado')
 
-        #         cursor.execute(
-        #             'EXEC [dbo].[SP_CAMBIAR_ESTADO_ASESORIA] %s, %s', (estado, pk))
-        #         messages.success(
-        #             request, "Se ha modificado el estado correctamente")
+                cursor.execute(
+                    'EXEC [dbo].[SP_CAMBIAR_ESTADO_VISITA] %s, %s', (estado, pk))
+                messages.success(
+                    request, "Se ha modificado el estado correctamente")
 
-        #         return render(request, 'asesorias/asesoria_detalle.html', data)
-        #     else:
-        #         messages.error(
-        #             request, "Error al modificar estado")
+                return render(request, 'actividades/visita_detalle_empleado.html', data)
+            else:
+                messages.error(
+                    request, "Error al modificar estado")
 
         return render(request, 'actividades/visita_detalle_empleado.html', data)
     else:

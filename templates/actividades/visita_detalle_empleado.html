@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Asesoria : {{ id }} - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-clipboard-notes"></i>
+    <span class="text">Detalle Visita : {{ id }}</span>
+</div>
+
+<div class="especial">
+    <a href=""><i class="uil uil-file-check-alt"></i> Generar CheckList</a>
+</div>
+<div class="container">
+    {% for item in entity %}
+    <p>{{ item.1 }}</p>
+    <form action="#" method="POST">
+        {% csrf_token %}
+        <div class="form first">
+            <div class="details personal">
+                <div class="fields acci">
+                    <div class="input-field" id="input-field">
+                        <label>Estado de Visita</label>
+                        {{ visitaForm.estado }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="details ID">
+                <button class="nextBtn" id="btn">
+                    <span class="btnText">Guardar</span>
+                    <i class="uil uil-navigator"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+    {% endfor %}
+    {% if messages %}
+    {% for m in messages %}
+    {% if m.tags == 'success' %}
+    <script>
+        Swal.fire({
+            'tittle': 'Exito',
+            'icon': 'success',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    {% if messages %}
+    {% for m in messages %}
+    {% if m.tags == 'error' %}
+    <script>
+        Swal.fire({
+            'tittle': 'Exito',
+            'icon': 'error',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

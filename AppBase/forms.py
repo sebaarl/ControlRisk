@@ -326,7 +326,25 @@ class EstadoAsesoria(forms.Form):
                 'id': 'asesoriaEstado',
                 'type': 'text',
                 'class': '',
-                'placeholder': 'Ingrese cargo del empleado',
+                'name': 'estado',
+            }
+        ),
+        choices=ESTADO_CHOICES
+    )
+
+
+class EstadoVisita(forms.Form):
+    ESTADO_CHOICES = [
+        ('FINALIZADA', 'FINALIZADA'),
+        ('EN PROGRESO', 'EN PROGRESO'),
+    ]
+
+    estado = forms.ChoiceField(
+        widget=forms.Select(
+            attrs={
+                'id': 'visitaEstado',
+                'type': 'text',
+                'class': '',
                 'name': 'estado',
             }
         ),

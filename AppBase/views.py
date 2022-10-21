@@ -1,4 +1,6 @@
 from multiprocessing import connection, context
+from re import I
+import re
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -13,8 +15,8 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.urls import reverse_lazy
 
-from AppBase.forms import CreateAsesoriaEspecial, CreateClienteForm, CreateEmpleadoForm, CreateContratoForm, CreateAccidenteForm, EstadoAsesoria, EstadoVisita
-from AppBase.models import Asesoria, Cliente, Empleado, Contrato, Accidente, Historialactividad
+from AppBase.forms import CreateAsesoriaEspecial, CreateClienteForm, CreateEmpleadoForm, CreateContratoForm, CreateAccidenteForm, EstadoAsesoria, EstadoVisita, ChecklistItem, ChecklistForm
+from AppBase.models import Asesoria, Cliente, Empleado, Contrato, Accidente, Historialactividad, Itemschecklist
 from AppUser.models import User
 
 from datetime import date
@@ -241,7 +243,7 @@ def CreateAccidentView(request):
                 accidentesave.medidas = request.POST['medidas']
 
                 print(accidentesave.fecha, accidentesave.descripcion,
-                    accidentesave.medidas)
+                      accidentesave.medidas)
 
                 from django.db import connection
                 with connection.cursor() as cursor:
@@ -250,7 +252,8 @@ def CreateAccidentView(request):
                                                                                         accidentesave.medidas,
                                                                                         str(datos.username)))
 
-                    messages.success(request, "Accidente registrado correctamente")
+                    messages.success(
+                        request, "Accidente registrado correctamente")
 
                     return render(request, 'accidentes/create_accident.html', data)
             else:
@@ -525,7 +528,7 @@ def AsesoriaEspecialClienteView(request):
 
                     cursor = connection.cursor()
                     cursor.execute('EXEC [dbo].[SP_ASESORIA_ESPECIAL] %s, %s, %s, %s',
-                                (asesoria.fechaasesoria, asesoria.descripcionasesoria, asesoria.hora, usuario.username))
+                                   (asesoria.fechaasesoria, asesoria.descripcionasesoria, asesoria.hora, usuario.username))
 
                     messages.success(
                         request, "Solicitud de asesoria ingresada correctamente")
@@ -618,7 +621,7 @@ def VisitasClienteView(request):
     else:
         return render(request, 'error/auth.html')
 
-    
+
 @login_required
 def DetalleVisitaView(request, pk):
     datos = request.user
@@ -741,7 +744,7 @@ def CapacitacioesEmpleadoView(request):
         return render(request, 'error/auth.html')
 
 
-# Visitas empleado por semana 
+# Visitas empleado por semana
 @login_required
 def VisitasEmpleadoView(request):
     datos = request.user
@@ -798,5 +801,68 @@ def DetalleVisitaEmpleadoView(request, pk):
                     request, "Error al modificar estado")
 
         return render(request, 'actividades/visita_detalle_empleado.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+def ChecklistView(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 1:
+        items = Itemschecklist.objects.all().filter(visitaid=pk)
+        results = items
+
+        data = {
+            'id': pk,
+            'entity': results,
+            'form': ChecklistItem(),
+            'c': len(items)
+        }
+
+        if 'btnitem' in request.POST:
+            nombre = request.POST.get('nombre')
+            existe = Itemschecklist.objects.filter(nombre=nombre).exists()
+            if existe:
+                messages.error(request, "Ya está ingresado")
+            else:
+                cursor = connection.cursor()
+                cursor.execute(
+                    'EXEC [dbo].[SP_AGREGAR_ITEM_CHECKLIST] %s, %s', (nombre, pk))
+
+                messages.success(request, "Item agregado correctamente")
+
+                return render(request, 'checklist/checklist.html', data)
+
+        if 'btn' in request.POST:
+            id_list_a = request.POST.getlist('boxesa')
+            id_list_sa = request.POST.getlist('boxessa')
+            id_list_r = request.POST.getlist('boxesr')
+
+            for x in id_list_a:
+                Itemschecklist.objects.filter(pk=int(x)).update(aprobado=True)
+                Itemschecklist.objects.filter(
+                    pk=int(x)).update(semiaprobado=False)
+                Itemschecklist.objects.filter(
+                    pk=int(x)).update(reprobado=False)
+
+            for x in id_list_sa:
+                Itemschecklist.objects.filter(pk=int(x)).update(aprobado=False)
+                Itemschecklist.objects.filter(
+                    pk=int(x)).update(semiaprobado=True)
+                Itemschecklist.objects.filter(
+                    pk=int(x)).update(reprobado=False)
+
+            for x in id_list_r:
+                Itemschecklist.objects.filter(pk=int(x)).update(aprobado=False)
+                Itemschecklist.objects.filter(
+                    pk=int(x)).update(semiaprobado=False)
+                Itemschecklist.objects.filter(
+                    pk=int(x)).update(reprobado=True)
+
+            messages.success(request, "Checklist guardada correctamente")
+
+            return render(request, 'checklist/checklist.html', data)
+        else:
+            return render(request, 'checklist/checklist.html', data)
     else:
         return render(request, 'error/auth.html')

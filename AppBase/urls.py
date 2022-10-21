@@ -1,5 +1,5 @@
 from django.urls import path
-from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView,ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView,ContratoEmpleadoView, PagosDetailView, AsesoriaClienteView, AsesoriaEspecialClienteView, AsesoriaClienteView, AsesoriasEmpleadoView, CapacitacioesEmpleadoView, VisitasEmpleadoView, DetalleAsesoriaView, VisitasClienteView, DetalleVisitaView, DetalleAsesoriaClienteView, DetalleVisitaEmpleadoView
+from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView,ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView,ContratoEmpleadoView, PagosDetailView, AsesoriaClienteView, AsesoriaEspecialClienteView, AsesoriaClienteView, AsesoriasEmpleadoView, CapacitacioesEmpleadoView, VisitasEmpleadoView, DetalleAsesoriaView, VisitasClienteView, DetalleVisitaView, DetalleAsesoriaClienteView, DetalleVisitaEmpleadoView, ChecklistView
 
 app_name = 'base'
 
@@ -8,11 +8,13 @@ urlpatterns = [
 
     path('profesional/ingresar/', CreateEmpleado, name='create-emp'),
     path('profesional/contratos/', ContratoEmpleadoView, name='contract-emp'),
-    path('profesional/actividades/asesorias/', AsesoriasEmpleadoView, name='asesorias-emp'),
-    path('profesional/actividades/asesorias/detalle/<pk>/', DetalleAsesoriaView, name='asesorias-detalle-emp'),
-    path('profesional/actividades/capacitaciones/', CapacitacioesEmpleadoView, name='capacitacion-emp'),
-    path('profesional/actividades/visitas/', VisitasEmpleadoView, name='visitas-emp'),
-    path('profesional/actividades/visitas/detalle/<pk>/',  DetalleVisitaEmpleadoView, name='visitas-detalle-emp'),
+    path('actividades/asesorias/', AsesoriasEmpleadoView, name='asesorias-emp'),
+    path('actividades/asesorias/detalle/<pk>/', DetalleAsesoriaView, name='asesorias-detalle-emp'),
+    path('actividades/capacitaciones/', CapacitacioesEmpleadoView, name='capacitacion-emp'),
+    path('actividades/visitas/', VisitasEmpleadoView, name='visitas-emp'),
+    path('actividades/visitas/detalle/<pk>/',  DetalleVisitaEmpleadoView, name='visitas-detalle-emp'),
+
+    path('actividades/visitas/<pk>/checklist/',  ChecklistView, name='visita-checklist'),
 
     path('clientes/ingresar/', CreateClient, name='create-client'),
     
@@ -38,3 +40,4 @@ urlpatterns = [
     path('pagos/contrato/<pk>/', PagosContractView, name='pago-contract'),
     path('pagos/detalle/<pk>/', PagosDetailView, name='pago-detail'),
 ]
+

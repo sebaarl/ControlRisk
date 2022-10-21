@@ -1,0 +1,16 @@
+<form action="#" method="POST" id="item-form">
+    {% csrf_token %}
+    <div class="item-add">
+        <div class="fields">
+            <div class="input-field repre" id="input-field-repre">
+                <label>Item checklist</label>
+                {{ itemForm.nombre }}
+            </div>
+        </div>
+        <input type="text" name="id" id="id" value="{{ id }}" style="display: none" required>
+        <button class="nextBtn" type="submit" id="btn" name="btnitem">
+            <span class="btnText">AGREGAR ITEM </span>
+            <i class="uil uil-plus-circle"></i>
+        </button>
+    </div>
+</form>

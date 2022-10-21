@@ -11,11 +11,14 @@
     <span class="text">Detalle Visita : {{ id }}</span>
 </div>
 
-<div class="especial">
-    <a href=""><i class="uil uil-file-check-alt"></i> Generar CheckList</a>
-</div>
 <div class="container">
     {% for item in entity %}
+    <div class="especial">
+        <a href="{% url 'base:visita-checklist'  item.0%}">
+            <i class="uil uil-file-check-alt"></i> 
+            Generar CheckList
+        </a>
+    </div>
     <p>{{ item.1 }}</p>
     <form action="#" method="POST">
         {% csrf_token %}

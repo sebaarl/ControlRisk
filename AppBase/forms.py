@@ -350,3 +350,39 @@ class EstadoVisita(forms.Form):
         ),
         choices=ESTADO_CHOICES
     )
+
+
+class ChecklistForm(forms.Form):
+    ESTADO_CHOICES = [
+        ('NO CUMPLE', 'NO CUMPLE'),
+        ('MEDIANAMENTE CUMPLIDO', 'MEDIANAMENTE CUMPLIDO'),
+        ('CUMPLE', 'CUMPLE'),
+    ]
+    estado = forms.ChoiceField(
+        widget=forms.Select(
+            attrs={
+                'class': 'estado-radio'
+            }
+        ), 
+        choices=ESTADO_CHOICES
+    )
+
+
+class ChecklistItem(forms.Form):
+    nombre = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'id': 'nombre',
+                'type': 'text',
+                'class': '',
+                'placeholder': 'Ingrese item que desea agregar',
+                'name': 'nombre',
+            }
+        )
+    )
+
+    ap = forms.BooleanField()
+
+    sa = forms.BooleanField()
+
+    r = forms.BooleanField()

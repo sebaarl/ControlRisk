@@ -1245,6 +1245,44 @@ code {
     text-decoration: underline;
 }
 
+.estado-radio {
+    display: flex;
+}
+
+.estado-radio label {
+    margin: 5px;
+    text-align: center;
+    display: flex;
+}
+
+.estado-radio input {
+    margin-right: 5px;
+}
+
+.check-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.check-item p {
+    font-size: 1.5rem;
+    text-transform: uppercase;
+}
+
+.item-add {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.item-add input {
+    width: 500px;
+    margin-bottom: 25px;
+}
 
 @media screen and (max-width: 600px) {
     thead {

@@ -28,37 +28,41 @@
     <tbody>
       {% for item in entity %}
       <tr>
-        <td>{{ item.0 }}</td>
-        <td>{{ item.1 }}</td>
+        <td data-titulo="Asesoria ID">{{ item.0 }}</td>
+        <td data-titulo="Fecha Asesoria">
+          <div id="fechasesoria">{{ item.1 }}</div>
+        </td>
         {% if item.3 == True %}
-        <td class="container-status">
+        <td class="container-status" data-titulo="Estado">
           <div class="status">
             <p>ACTIVO</p>
           </div>
         </td>
         {% else %}
-        <td class="container-status">
+        <td class="container-status" data-titulo="Estado">
           <div class="status-no">
             <p>NO ACTIVO</p>
           </div>
         </td>
         {% endif %}
-        <td>{{ item.2 }}</td>
+        <td data-titulo="Hora">{{ item.2 }}</td>
         {% if item.4 == True %}
-        <td class="container-status">
-          <div>
+        <td class="container-status" data-titulo="Extra">
+          <div class="centrar">
             <p>SI</p>
           </div>
         </td>
         {% else %}
-        <td class="container-status">
-          <div>
+        <td class="container-status" data-titulo="Extra">
+          <div class="centrar">
             <p>NO</p>
           </div>
         </td>
         {% endif %}
-        <td>{{ item.5 }}</td>
-        <td>{{ item.6 }}</td>
+        <td data-titulo="Rut Empleado">
+          <div id="rutempleado">{{ item.5 }}</div>
+        </td>
+        <td data-titulo="Nombre Empleado">{{ item.6 }}</td>
       </tr>
       {% endfor %}
     </tbody>

@@ -556,7 +556,8 @@ def AsesoriaClienteView(request):
         result = cursor.fetchall()
 
         data = {
-            'entity': result
+            'entity': result,
+            'rut': formatRut(usuario.username)
         }
 
         return render(request, 'asesorias/asesorias_cliente.html', data)
@@ -580,7 +581,8 @@ def DetalleAsesoriaClienteView(request, pk):
 
         data = {
             'entity': results,
-            'id': pk
+            'id': pk,
+            'rut': formatRut(datos.username)
         }
 
         # if request.method == "POST":
@@ -615,7 +617,8 @@ def VisitasClienteView(request):
         result = cursor.fetchall()
 
         data = {
-            'entity': result
+            'entity': result,
+            'rut': formatRut(usuario.username)
         }
 
         return render(request, 'visitas/visitas_cliente.html', data)
@@ -639,23 +642,9 @@ def DetalleVisitaView(request, pk):
 
         data = {
             'entity': results,
-            'id': pk
+            'id': pk,
+            'rut': formatRut(datos.username)
         }
-
-        # if request.method == "POST":
-        #     formulario = EstadoAsesoria(request.POST)
-        #     if formulario.is_valid():
-        #         estado = request.POST.get('estado')
-
-        #         cursor.execute(
-        #             'EXEC [dbo].[SP_CAMBIAR_ESTADO_ASESORIA] %s, %s', (estado, pk))
-        #         messages.success(
-        #             request, "Se ha modificado el estado correctamente")
-
-        #         return render(request, 'asesorias/asesoria_detalle.html', data)
-        #     else:
-        #         messages.error(
-        #             request, "Error al modificar estado")
 
         return render(request, 'visitas/detalle_visita.html', data)
     else:
@@ -713,7 +702,7 @@ def DetalleAsesoriaView(request, pk):
                 messages.success(
                     request, "Se ha modificado el estado correctamente")
 
-                return render(request, 'asesorias/asesoria_detalle.html', data)
+                return render(request, 'actividades/asesoria_detalle.html', data)
             else:
                 messages.error(
                     request, "Error al modificar estado")
@@ -941,3 +930,22 @@ def PerfilUsuario(request, pk):
         }
 
     return render(request, 'perfil/perfil.html', data)
+
+
+@login_required
+def DetalleChecklist(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 0 and datos.is_staff == 0:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_DETALLE_CHECKLIST] {}'.format(pk))
+        result = cursor.fetchall()
+
+        data = {
+            'entity': result,
+            'id': pk
+        }
+
+        return render(request, 'checklist/detalle_checklist.html', data)
+    else:
+        return render(request, 'error/auth.html')

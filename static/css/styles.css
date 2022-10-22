@@ -920,6 +920,54 @@ footer p {
     max-width: 300px;
 }
 
+.item th {
+    text-align: start;
+}
+
+.ap {
+    background-color: rgb(40, 181, 52);
+    width: 130px;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50px;
+    color: white;
+    font-weight: bold;
+}
+
+.sa {
+    background-color: rgb(203, 156, 45);
+    width: 130px;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50px;
+    color: white;
+    font-weight: bold;
+}
+
+.re {
+    background-color: rgb(186, 9, 9);
+    width: 130px;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50px;
+    color: white;
+    font-weight: bold;
+}
+
+.estado {
+    text-align: start;
+}
+
+.name-item {
+    text-align: start;
+}
+
 .alerta p {
     font-size: 2.2rem;
     letter-spacing: 0.3rem;
@@ -938,7 +986,7 @@ footer p {
     border-radius: 10px;
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
     overflow: hidden;
-    width: 300px;
+    width: auto;
 }
 
 .card-header img {
@@ -977,6 +1025,26 @@ footer p {
 
 .tag-pink {
     background-color: #cd5b9f;
+}
+
+.card {
+    padding: 1rem;
+}
+
+.card-detail {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    margin-left: 10px;
+}
+
+.card-detail h3 {
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+
+.card-detail p {
+    font-size: 1.5rem;
 }
 
 .card-body p {

@@ -1,31 +1,63 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block name %}
-<title>Clientes - ControlRisk</title>
-{% endblock %}
-
-{% block contenido %}
+{% extends 'base.html' %} {% load static %} {% block name %}
+<title>Asesorias - ControlRisk</title>
+{% endblock %} {% block contenido %}
 <div class="title">
     <i class="uil uil-thumbs-up"></i>
-    <span class="text">Asesorias</span>
+    <span class="text">Asesorias, Cliente : {{ rut }}</span>
 </div>
 
 <div class="especial">
     <a href="{% url 'base:asesoria-especial' %}">Solicitar asesoria especial <i class="uil uil-arrow-right"></i></a>
 </div>
 
-<div class="dash-content">
-    {% for item in entity %}
-    <p>{{ item.0 }}</p>
-    {% if item.4 == 0 %}
-        <p>Incluida</p>
-    {% else %}
-        <p>Asesoria Extra</p>
-    {% endif %}
-    <a href="{% url 'base:asesoria-detalle' item.0 %}" class="detail">
-        <i class="uil uil-external-link-alt"></i>
-    </a>
-    {% endfor %}
+<div class="dash-content" class="table-container">
+    <table class="table-rwd">
+        <thead>
+            <tr>
+                <th style="text-transform: uppercase">Asesoria ID</th>
+                <th style="text-transform: uppercase">Fecha Asesoria</th>
+                <th style="text-transform: uppercase">Estado</th>
+                <th style="text-transform: uppercase">Hora</th>
+                <th style="text-transform: uppercase">Extra</th>
+                <th style="text-transform: uppercase">Rut Empleado</th>
+                <th style="text-transform: uppercase">Nombre Empleado</th>
+                <th style="text-transform: uppercase">Detalle</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in entity %}
+            <tr>
+                <td data-titulo="Asesoria ID">{{ item.0 }}</td>
+                <td data-titulo="Fecha Asesoria">
+                    <div id="fechasesoria">{{ item.1 }}</div>
+                </td>
+                <td data-titulo="Estado">{{ item.3 }}</td>
+                <td data-titulo="Hora">{{ item.2 }}</td>
+                {% if item.4 == True %}
+                <td class="container-status" data-titulo="Extra">
+                    <div class="centrar">
+                        <p>SI</p>
+                    </div>
+                </td>
+                {% else %}
+                <td class="container-status" data-titulo="Extra">
+                    <div class="centrar">
+                        <p>NO</p>
+                    </div>
+                </td>
+                {% endif %}
+                <td data-titulo="Rut Empleado">
+                    <div id="rutempleado">{{ item.5 }}</div>
+                </td>
+                <td data-titulo="Nombre Empleado">{{ item.6 | upper }}</td>
+                <td>
+                    <a href="{% url 'base:asesoria-detalle' item.0 %}" class="detail">
+                        <i class="uil uil-external-link-alt"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

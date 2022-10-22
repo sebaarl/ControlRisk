@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Detalle Checklist - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-file-check-alt"></i> 
+    <span class="text">Detalle de Checklist : {{ id }}</span>
+</div>
+
+<div class="dash-content">
+    <table class="table-rwd">
+        <thead class="item">
+            <tr>
+                <th style="text-transform: uppercase">Nombre item</th>
+                <th style="text-transform: uppercase">Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in entity %}
+            <tr class="estado">
+                <td data-titulo="Item" class="name-item">{{ item.0 | upper }}</td>
+                <td data-titulo="Estado">
+                    {% if item.3 == True %}
+                    <p class="ap">APROBADO</p>
+                    {%  endif %}
+                    {% if item.2 == True %}
+                    <p class="sa">SEMI APROBADO</p>
+                    {%  endif %}
+                    {% if item.1 == True %}
+                    <p class="re">REPROBADO</p>
+                    {%  endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

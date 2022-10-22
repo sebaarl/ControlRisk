@@ -12,13 +12,35 @@
 </div>
 
 <div class="dash-content">
-    {% for item in entity %}
-    <p>{{ item.0 }}</p>
-    {% if item.4 == 0 %}
-        <p>Incluida</p>
-    {% else %}
-        <p>Asesoria Extra</p>
-    {% endif %}
-    {% endfor %}
+    <div class="container-card">
+        <div class="card">
+            {% for item in entity %}
+            <div class="card-detail">
+                <h3>NRO. Asesoria : </h3>
+                <p>{{ item.0 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Rut Empleado Encargado : </h3>
+                <p>{{ item.12 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Nombre Empleado Encargado : </h3>
+                <p>{{ item.11 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Estado Asesoria : </h3>
+                <p>{{ item.4 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Fecha Asesoria : </h3>
+                <p>{{ item.1 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Hora Asesoria : </h3>
+                <p>{{ item.2 }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endblock %}

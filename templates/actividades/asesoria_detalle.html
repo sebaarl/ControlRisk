@@ -12,21 +12,55 @@
 </div>
 
 <div class="container">
-    {% for item in entity %}
-    <p>{{ item.1 }}</p>
     <form action="#" method="POST">
         {% csrf_token %}
-        <div class="form first">
-            <div class="details personal">
-                <div class="fields acci">
-                    <div class="input-field" id="input-field">
-                        <label>Estado de asesoria</label>
-                        {{ asesoriaForm.estado }}
-                        </p>
-                    </div>
+        <div class="container-card">
+            <div class="card">
+                {% for item in entity %}
+                <div class="card-detail">
+                    <h3>NRO. Asesoria : </h3>
+                    <p>{{ item.0 }}</p>
                 </div>
+                <div class="card-detail">
+                    <h3>Rut Empresa Cliente : </h3>
+                    <p>{{ item.6 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Razón Social Empresa : </h3>
+                    <p>{{ item.7 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Telefono Empresa : </h3>
+                    <p>+ {{ item.9 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>RUT Representante Legal Empresa : </h3>
+                    <p>{{ item.15 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Nombre Representante Legal Empresa : </h3>
+                    <p>{{ item.14 | upper }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Dirección Empresa : </h3>
+                    <p>{{ item.8 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Fecha Asesoria : </h3>
+                    <p>{{ item.1 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Hora Visita : </h3>
+                    <p>{{ item.2 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Estado Visita : </h3>
+                    <p>{{ item.4 }}</p>
+                </div>
+                {% endfor %}
             </div>
-            <div class="details ID">
+            <div>
+                {{ asesoriaForm.estado }}
                 <button class="nextBtn" id="btn">
                     <span class="btnText">Guardar</span>
                     <i class="uil uil-navigator"></i>
@@ -34,7 +68,7 @@
             </div>
         </div>
     </form>
-    {% endfor %}
+
     {% if messages %}
     {% for m in messages %}
     {% if m.tags == 'success' %}

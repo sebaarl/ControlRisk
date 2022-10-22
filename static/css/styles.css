@@ -38,7 +38,7 @@ html {
 
 body {
   min-height: 100vh;
-  background-color: var(--primary-color);
+  background-color: var(--panel-color);
 }
 
 body.dark {
@@ -61,7 +61,7 @@ body.dark {
 
 body::-webkit-scrollbar {
   width: 7px;
-  background-color: #e7d1fc;
+  background-color: var(--panel-color);
 }
 
 body::-webkit-scrollbar-thumb {
@@ -1241,32 +1241,6 @@ code {
   text-decoration: underline;
 }
 
-@media screen and (max-width: 600px) {
-  /* thead {
-    display: none;
-  }
-
-  td {
-    display: block;
-  } */
-
-  td:first-child {
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-  }
-
-  td {
-    text-align: center;
-  }
-
-  td::before {
-    float: left;
-    margin-right: 3rem;
-    font-weight: bold;
-  }
-}
-
 @media (max-width: 1000px) {
   nav {
     width: 73px;
@@ -1402,5 +1376,65 @@ code {
   nav.close ~ .dashboard .top {
     left: 0;
     width: 100%;
+  }
+}
+
+@media screen and (max-width: 780px) {
+  table tr {
+    display: flex;
+    flex-direction: column;
+  }
+
+  table td[data-titulo] {
+    text-align: center;
+  }
+
+  table td[data-titulo]::before {
+    content: attr(data-titulo);
+    width: 90px;
+    text-align: left;
+  }
+
+  .container-status {
+    display: block;
+  }
+
+  .status,
+  .status-no {
+    width: auto;
+  }
+
+  td div .centrar {
+    justify-content: center;
+  }
+
+  #fechasesoria,
+  #rutempleado,
+  #fechavencimiento {
+    margin-top: 10px;
+  }
+
+  table thead {
+    display: none;
+  }
+
+  table tbody tr:hover {
+    color: #000;
+  }
+
+  td:first-child {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+  }
+
+  td {
+    text-align: center;
+  }
+
+  td::before {
+    float: left;
+    margin-right: 3rem;
+    font-weight: bold;
   }
 }

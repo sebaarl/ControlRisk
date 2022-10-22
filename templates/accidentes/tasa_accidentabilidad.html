@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Tasa de Accidentabilidad - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-accessible-icon-alt"></i>
+    {% for i in contrato %}
+    {% for a in annio %}
+    <span class="text">Tasa de Accidentabilidad, Contrato : {{ i.rutcliente }}-{{ a.0 }}-{{ i.contratoid }}</span>
+    {% endfor %}
+    {% endfor %}
+</div>
+
+<div class="container">
+    <form action="#" method="POST" id="item-form">
+        {% csrf_token %}
+        <div class="item-add">
+            <button class="nextBtn" type="submit" id="btn" name="btnmensual">
+                <span class="btnText">CALCULAR MES ACTUAL </span>
+            </button>
+
+            <button class="nextBtn" type="submit" id="btn" name="btnanual">
+                <span class="btnText">CALCULAR ANUAL </span>
+            </button>
+        </div>
+    </form>
+    <div>
+        <h2 style="text-align: center" class="act">TASA ACCIDENTABILIDAD MENSUAL</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th style="text-transform: uppercase">CONTRATO</th>
+                    <th style="text-transform: uppercase">CANTIDAD ACCIDENTES</th>
+                    <th style="text-transform: uppercase">CANTIDAD TRABAJADORES</th>
+                    <th style="text-transform: uppercase">PERIODO</th>
+                    <th style="text-transform: uppercase">TASA ACCIDENTABILIDAD</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in entity %}
+                <tr>
+                    {% for i in contrato %}
+                    {% for a in annio %}
+                    <td>{{ i.rutcliente }}-{{ a.0 }}-{{ i.contratoid }}</td>
+                    {% endfor %}
+                    {% endfor %}
+                    <td>{{ item.5 }}</td>
+                    <td>{{ item.3 }}</td>
+                    <td>{{ item.2}}</td>
+                    <td>{{ item.0 }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div style="margin-top: 100px;">
+        <h2 style="text-align: center" class="act">TASA ACCIDENTABILIDAD ANUAL</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th style="text-transform: uppercase">CONTRATO</th>
+                    <th style="text-transform: uppercase">CANTIDAD ACCIDENTES</th>
+                    <th style="text-transform: uppercase">CANTIDAD TRABAJADORES</th>
+                    <th style="text-transform: uppercase">PERIODO</th>
+                    <th style="text-transform: uppercase">TASA ACCIDENTABILIDAD</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in anual %}
+                <tr>
+                    {% for i in contrato %}
+                    {% for a in annio %}
+                    <td>{{ i.rutcliente }}-{{ a.0 }}-{{ i.contratoid }}</td>
+                    {% endfor %}
+                    {% endfor %}
+                    <td>{{ item.5 }}</td>
+                    <td>{{ item.3 }}</td>
+                    <td>{{ item.2}}</td>
+                    <td>{{ item.0 }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

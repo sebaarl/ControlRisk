@@ -866,7 +866,8 @@ def ClientesEmpleadoView(request):
 
     if datos.is_profesional == 1:
         cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_LISTAR_CLIENTES_EMP] {}'.format(str(datos.username)))
+        cursor.execute(
+            'EXEC [dbo].[SP_LISTAR_CLIENTES_EMP] {}'.format(str(datos.username)))
         result = cursor.fetchall()
 
         data = {
@@ -907,11 +908,12 @@ def ClienteDetalle(request, pk):
 
 @login_required
 def PerfilUsuario(request, pk):
-    datos = request.user 
+    datos = request.user
 
     if datos.is_profesional == 1:
         cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_DETALLE_CUENTA_EMPLEADO] {}'.format(str(datos.username)))
+        cursor.execute(
+            'EXEC [dbo].[SP_DETALLE_CUENTA_EMPLEADO] {}'.format(str(datos.username)))
         result = cursor.fetchall()
 
         data = {
@@ -921,7 +923,8 @@ def PerfilUsuario(request, pk):
 
     if datos.is_profesional == 0 and datos.is_staff == 0 and datos.is_superuser == 0:
         cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_DETALLE_CUENTA_CLIENTE] {}'.format(str(datos.username)))
+        cursor.execute(
+            'EXEC [dbo].[SP_DETALLE_CUENTA_CLIENTE] {}'.format(str(datos.username)))
         result = cursor.fetchall()
 
         data = {
@@ -947,5 +950,60 @@ def DetalleChecklist(request, pk):
         }
 
         return render(request, 'checklist/detalle_checklist.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+@login_required
+def TasaAccidentabildiadView(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 1:
+        contrato = Contrato.objects.filter(contratoid=int(pk)).filter(estado=1)
+        cursor = connection.cursor()
+        cursor.execute(
+            'SELECT YEAR([FechaCreacion]) FROM [Contrato] WHERE [ContratoID] = {}'.format(pk))
+        annio = cursor.fetchall()
+
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_LISTAR_TASA_CONTRATO] {}'.format(pk))
+        result = cursor.fetchall()
+
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_LISTAR_TASA_CONTRATO_ANUAL] {}'.format(pk))
+        anual = cursor.fetchall()
+
+        cursor.execute(
+            'SELECT [dbo].[FN_ACCIDENTES_PERIODO](%s, %s)', (pk, '10-2022'))
+        accidentes = cursor.fetchall()
+
+        date = datetime.now()
+        periodo = date.strftime('%Y-%m')
+
+        data = {
+            'id': pk,
+            'contrato': contrato,
+            'annio': annio,
+            'entity': result,
+            'accidente': accidentes,
+            'anual': anual
+        }
+
+        if 'btnmensual' in request.POST:
+            cursor = connection.cursor()
+            cursor.execute(
+                'EXEC [dbo].[SP_TASA_ACCIDENTE_MENSUAL] %s, %s', (pk, periodo))
+
+            return render(request, 'accidentes/tasa_accidentabilidad.html', data)
+
+        if 'btnanual' in request.POST:
+            cursor = connection.cursor()
+            cursor.execute(
+                'EXEC [dbo].[SP_TASA_ACCIDENTE_ANUAL] {}'.format(pk))
+
+
+            return render(request, 'accidentes/tasa_accidentabilidad.html', data)
+
+        return render(request, 'accidentes/tasa_accidentabilidad.html', data)
     else:
         return render(request, 'error/auth.html')

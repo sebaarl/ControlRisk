@@ -29,26 +29,26 @@
         <tbody>
             {% for item in entity %}
             <tr>
-                <td>{{ item.0 }}</td>
-                <td>{{ item.1 }}</td>
-                <td>{{ item.17 }}</td>
-                <td>{{ item.2 }}</td>
-                <td>{{ item.8 }}</td>
-                <td>{{ item.10 }}</td>
+                <td data-titulo="Cod. Contrato">{{ item.0 }}</td>
+                <td data-titulo="Cliente">{{ item.1 }}</td>
+                <td data-titulo="Rut Empleado">{{ item.17 }}</td>
+                <td data-titulo="Nombre Empelado">{{ item.2 }}</td>
+                <td data-titulo="Desde">{{ item.8 }}</td>
+                <td data-titulo="Hasta">{{ item.10 }}</td>
                 {% if item.18 == '1' %}
-                <td class="container-status">
+                <td class="container-status" data-titulo="Estado">
                     <div class="status">
                         <p>ACTIVO</p>
                     </div>
                 </td>
                 {% else %}
-                <td class="container-status">
+                <td class="container-status" data-titulo="Estado">
                     <div class="status-no">
                         <p>NO ACTIVO</p>
                     </div>
                 </td>
                 {% endif %}
-                <td>
+                <td data-titulo="Detalle">
                     <a href="{% url 'base:contract-detail' item.0 %}" class="detail">
                         <i class="uil uil-external-link-alt"></i>
                     </a>

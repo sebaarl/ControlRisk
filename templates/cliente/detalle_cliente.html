@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Detalle {{ rut }} - ControlRisk</title>
+{% endblock %}
+
+{% block link %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-hard-hat"></i>
+    <span class="text">Detalle, Cliente : {{ rut }}</span>
+</div>
+<div class="dash-content">
+    {% for item in entity %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <!-- Page title -->
+                <div class="my-5">
+                    <h3></h3>
+                    <hr>
+                </div>
+                <!-- Form START -->
+                <form class="file-upload">
+                    <div class="row mb-5 gx-5">
+                        <!-- Contact detail -->
+                        <div class="col-xxl-8 mb-5 mb-xxl-0">
+                            <div class="bg-secondary-soft px-4 py-5 rounded">
+                                <div class="row g-3">
+                                    <h4 class="mb-4 mt-0 fs-1 card-title">Detalle Empresa Cliente</h4>
+                                    <div class="col-md-6">
+                                        <label class="form-label fs-4">Rut Empresa :</label>
+                                        <p class="fs-4 text-dark">{{ item.0 }}</p>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fs-4">Razón Social :</label>
+                                        <p class="fs-4 text-dark">{{ item.1 | upper }}</p>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <label class="form-label fs-4">Rubro Empresa :</label>
+                                        <p class="fs-4 text-dark">{{ item.8 | upper }}</p>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <label class="form-label fs-4">Dirección Empresa :</label>
+                                        <p class="fs-4 text-dark">{{ item.2 | upper }}</p>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label class="form-label fs-4">Nombre Representante Legal Empresa :</label>
+                                        <p class="fs-4 text-dark">{{ item.5 | upper }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fs-4">Rut Representante Legal Empresa :</label>
+                                        <p class="fs-4 text-dark">{{ item.6 }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fs-4">Contrato Activo :</label>
+                                        {% if activo == 0 %}
+                                        <p class="fs-4 text-dark">NO PRESENTA CONTRATO ACTIVO</p>
+                                        {% else %}
+                                        <p class="fs-4 text-dark">PRESENTA CONTRATO ACTIVO :
+                                            {% for i in contrato %}
+                                            <a href="{% url 'base:contract-detail' i.2 %}">{{ i.0 }}-{{ i.1 }}-{{ i.2 }}</a>
+                                            {% endfor %}
+                                        </p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fs-4 me-3">Tasa de Accidentabilidad :</label>
+                                        <p class="fs-4 text-dark">
+                                            <a href="" class="btn btn-danger p-3 fs-4">CALCULAR TASA <i class="uil uil-accessible-icon-alt"></i></a>
+                                        </p>
+                                    </div>
+                                </div> <!-- Row END -->
+                            </div>
+                        </div>
+                    </div> <!-- Row END -->
+                </form> <!-- Form END -->
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Clientes {{ rut }} - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-hard-hat"></i>
+    <span class="text">Clientes, Empleado : {{ rut }}</span>
+</div>
+
+<div class=" w">
+    <div class="search-box">
+        <input type="text" placeholder="Busca aquí...">
+    </div>  
+</div>
+
+<div class="dash-content">
+    <table>
+        <thead>
+            <tr>
+                <th style="text-transform: uppercase">Rut</th>
+                <th style="text-transform: uppercase">Razon social</th>
+                <th style="text-transform: uppercase">Telefono</th>
+                <th style="text-transform: uppercase">Representante</th>
+                <th style="text-transform: uppercase">Rut Representante</th>
+                <th style="text-transform: uppercase">Detalle</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in clientes %}
+            <tr>
+                <td>{{ item.0 }}</td>
+                <td>{{ item.1 | upper }}</td>
+                <td>+{{ item.3 }}</td>
+                <td>{{ item.4 | upper}}</td>
+                <td>{{ item.5 }}</td>
+                <td class="action-container">
+                    <a href="{% url 'base:client-detalle' item.8 %}" class="detail">
+                        <i class="uil uil-external-link-alt"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div>
+        {% include 'paginator.html' %}
+    </div>
+</div>
+{% endblock %}

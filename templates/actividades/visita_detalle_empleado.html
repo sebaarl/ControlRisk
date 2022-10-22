@@ -18,15 +18,20 @@
             <i class="uil uil-file-check-alt"></i> 
             Generar CheckList
         </a>
+        <a href="{% url 'base:visita-checklist'  item.0%}">
+            <i class="uil uil-file-edit-alt"></i>
+            Informe Visita
+        </a>
     </div>
     <p>{{ item.1 }}</p>
+    <p>Estado actual: {{ item.3 }}</p>
     <form action="#" method="POST">
         {% csrf_token %}
         <div class="form first">
             <div class="details personal">
                 <div class="fields acci">
                     <div class="input-field" id="input-field">
-                        <label>Estado de Visita</label>
+                        <label>Modificar Estado</label>
                         {{ visitaForm.estado }}
                         </p>
                     </div>

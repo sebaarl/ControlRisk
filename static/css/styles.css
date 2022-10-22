@@ -1284,6 +1284,10 @@ code {
     margin-bottom: 25px;
 }
 
+.especial a {
+    margin-right: 20px;
+}
+
 @media screen and (max-width: 600px) {
     thead {
         display: none;

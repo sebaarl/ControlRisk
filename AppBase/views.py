@@ -1,6 +1,7 @@
 from multiprocessing import connection, context
 from re import I
 import re
+from unittest import result
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -805,18 +806,20 @@ def DetalleVisitaEmpleadoView(request, pk):
         return render(request, 'error/auth.html')
 
 
+@login_required
 def ChecklistView(request, pk):
     datos = request.user
 
     if datos.is_profesional == 1:
         items = Itemschecklist.objects.all().filter(visitaid=pk)
         results = items
+        c = items.count()
 
         data = {
             'id': pk,
             'entity': results,
             'form': ChecklistItem(),
-            'c': len(items)
+            'c': c
         }
 
         if 'btnitem' in request.POST:
@@ -866,3 +869,75 @@ def ChecklistView(request, pk):
             return render(request, 'checklist/checklist.html', data)
     else:
         return render(request, 'error/auth.html')
+
+
+@login_required
+def ClientesEmpleadoView(request):
+    datos = request.user
+
+    if datos.is_profesional == 1:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_LISTAR_CLIENTES_EMP] {}'.format(str(datos.username)))
+        result = cursor.fetchall()
+
+        data = {
+            'clientes': result,
+            'rut': formatRut(datos.username)
+        }
+
+        return render(request, 'cliente/listar_clientes_emp.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+@login_required
+def ClienteDetalle(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 1:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_DETALLE_CLIENTE] {}'.format(str(pk)))
+        result = cursor.fetchall()
+
+        contrato = Contrato.objects.filter(rutcliente=str(pk)).filter(estado=1)
+
+        cursor.execute('EXEC [dbo].[SP_ID_CONTRATO_ACTIVO] {}'.format(str(pk)))
+        activo = cursor.fetchall()
+
+        data = {
+            'rut': formatRut(pk),
+            'entity': result,
+            'activo': contrato.count(),
+            'contrato': activo
+        }
+
+        return render(request, 'cliente/detalle_cliente.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+@login_required
+def PerfilUsuario(request, pk):
+    datos = request.user 
+
+    if datos.is_profesional == 1:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_DETALLE_CUENTA_EMPLEADO] {}'.format(str(datos.username)))
+        result = cursor.fetchall()
+
+        data = {
+            'entity': result,
+            'rut': formatRut(datos.username)
+        }
+
+    if datos.is_profesional == 0 and datos.is_staff == 0 and datos.is_superuser == 0:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_DETALLE_CUENTA_CLIENTE] {}'.format(str(datos.username)))
+        result = cursor.fetchall()
+
+        data = {
+            'entity': result,
+            'rut': formatRut(datos.username)
+        }
+
+    return render(request, 'perfil/perfil.html', data)

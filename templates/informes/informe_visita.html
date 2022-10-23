@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Informe Visita - ControlRisk</title>
+{% endblock %}
+
+{% block link %}
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-file-check-alt"></i>
+    <span class="text">Informe, Visita : {{ id }}</span>
+</div>
+
+<div class="container">
+    <form action="#" method="POST" id="form-asesoria">
+        {% csrf_token %}
+        <div class="form first">
+            <div class="details personal">
+                <div class="fields">
+                    <div class="input-field direc" id="input-field-fecha">
+                        <label>Situación de la Empresa a la que se le realizó la visita</label>
+                        <textarea name="situacion" id="" cols="100" rows="10"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details ID">
+                <button class="nextBtn" type="submit" id="btn">
+                    <span class="btnText">Guardar</span>
+                    <i class="uil uil-navigator"></i>
+                </button>
+            </div> 
+        </div>
+    </form>
+
+    {% if messages %}
+    {% for m in messages %}
+    {% if m.tags == 'success' %}
+    <script>
+        Swal.fire({
+            'tittle': 'Exito',
+            'icon': 'success',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    {% if messages %}
+    {% for m in messages %}
+    {% if m.tags == 'error' %}
+    <script>
+        Swal.fire({
+            'tittle': 'Exito',
+            'icon': 'error',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

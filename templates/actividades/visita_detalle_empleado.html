@@ -15,37 +15,70 @@
     {% for item in entity %}
     <div class="especial">
         <a href="{% url 'base:visita-checklist'  item.0%}">
-            <i class="uil uil-file-check-alt"></i> 
+            <i class="uil uil-file-check-alt"></i>
             Generar CheckList
         </a>
-        <a href="{% url 'base:visita-checklist'  item.0%}">
+        <a href="{% url 'base:visita-informe'  item.0%}">
             <i class="uil uil-file-edit-alt"></i>
-            Informe Visita
+            Generar Informe Visita
         </a>
     </div>
-    <p>{{ item.1 }}</p>
-    <p>Estado actual: {{ item.3 }}</p>
-    <form action="#" method="POST">
+    <form action="#" method="POST" style="margin-top: 20px;">
         {% csrf_token %}
-        <div class="form first">
-            <div class="details personal">
-                <div class="fields acci">
-                    <div class="input-field" id="input-field">
-                        <label>Modificar Estado</label>
-                        {{ visitaForm.estado }}
-                        </p>
-                    </div>
+        <div class="container-card">
+            <div class="card">
+                <div class="card-detail">
+                    <h3>NRO. Visita : </h3>
+                    <p>{{ item.0 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Rut Empresa Cliente : </h3>
+                    <p>{{ item.5 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Razón Social Empresa : </h3>
+                    <p>{{ item.6 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Telefono Empresa : </h3>
+                    <p>+ {{ item.8 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>RUT Representante Legal Empresa : </h3>
+                    <p>{{ item.13 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Nombre Representante Legal Empresa : </h3>
+                    <p>{{ item.12 | upper }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Dirección Empresa : </h3>
+                    <p>{{ item.7 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Fecha Visita : </h3>
+                    <p>{{ item.1 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Hora Visita : </h3>
+                    <p>{{ item.2 }}</p>
+                </div>
+                <div class="card-detail">
+                    <h3>Estado Visita : </h3>
+                    <p>{{ item.4 }}</p>
                 </div>
             </div>
-            <div class="details ID">
+            <div>
+                {{ asesoriaForm.estado }}
                 <button class="nextBtn" id="btn">
                     <span class="btnText">Guardar</span>
                     <i class="uil uil-navigator"></i>
                 </button>
             </div>
         </div>
+        {% endfor %}
     </form>
-    {% endfor %}
+
     {% if messages %}
     {% for m in messages %}
     {% if m.tags == 'success' %}

@@ -1450,6 +1450,10 @@ code {
 }
 
 @media screen and (max-width: 594px) {
+    .itemform {
+        max-width: 300px;
+    }
+
     .detail {
         flex-direction: column;
     }
@@ -1470,7 +1474,41 @@ code {
     }
 }
 
+@media screen and (min-width: 400px) {
+    .itemform {
+        max-width: 250px;
+    }
+}
+
+@media screen and (min-width: 800px) {
+    .itemform {
+        min-width: 500px;
+    }
+
+    .item-container {
+        width: 100%;
+    }
+
+    .item-add {
+        height: auto;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+}
+
+@media screen and (min-width: 450px) {
+    .itemform {
+        max-width: 300px;
+    }
+}
+
+
 @media (max-width: 400px) {
+    .itemform {
+        max-width: 300px;
+    }
+    
     nav {
         width: 0px;
     }
@@ -1519,3 +1557,64 @@ code {
         width: 100%;
     }
 }
+
+
+@media screen and (max-width: 780px) {
+    table tr {
+      display: flex;
+      flex-direction: column;
+    }
+  
+    table td[data-titulo] {
+      text-align: center;
+    }
+  
+    table td[data-titulo]::before {
+      content: attr(data-titulo);
+      width: 90px;
+      text-align: left;
+    }
+  
+    .container-status {
+      display: block;
+    }
+  
+    .status,
+    .status-no {
+      width: auto;
+    }
+  
+    td div .centrar {
+      justify-content: center;
+    }
+  
+    #fechasesoria,
+    #rutempleado,
+    #fechavencimiento {
+      margin-top: 10px;
+    }
+  
+    table thead {
+      display: none;
+    }
+  
+    table tbody tr:hover {
+      color: #000;
+    }
+  
+    td:first-child {
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+    }
+  
+    td {
+      text-align: center;
+    }
+  
+    td::before {
+      float: left;
+      margin-right: 3rem;
+      font-weight: bold;
+    }
+  }

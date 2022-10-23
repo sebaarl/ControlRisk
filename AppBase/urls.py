@@ -1,5 +1,5 @@
 from django.urls import path
-from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView,ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView,ContratoEmpleadoView, PagosDetailView, AsesoriaClienteView, AsesoriaEspecialClienteView, AsesoriaClienteView, AsesoriasEmpleadoView, CapacitacioesEmpleadoView, VisitasEmpleadoView, DetalleAsesoriaView, VisitasClienteView, DetalleVisitaView, DetalleAsesoriaClienteView, DetalleVisitaEmpleadoView, ChecklistView, ClientesEmpleadoView, ClienteDetalle, PerfilUsuario, DetalleChecklist, TasaAccidentabildiadView
+from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView,ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView,ContratoEmpleadoView, PagosDetailView, AsesoriaClienteView, AsesoriaEspecialClienteView, AsesoriaClienteView, AsesoriasEmpleadoView, CapacitacioesEmpleadoView, VisitasEmpleadoView, DetalleAsesoriaView, VisitasClienteView, DetalleVisitaView, DetalleAsesoriaClienteView, DetalleVisitaEmpleadoView, ChecklistView, ClientesEmpleadoView, ClienteDetalle, PerfilUsuario, DetalleChecklist, TasaAccidentabildiadView, InformeVisitaEmp
 
 app_name = 'base'
 
@@ -17,6 +17,7 @@ urlpatterns = [
     path('actividades/visitas/detalle/<pk>/',  DetalleVisitaEmpleadoView, name='visitas-detalle-emp'),
 
     path('actividades/visitas/<pk>/checklist/',  ChecklistView, name='visita-checklist'),
+    path('actividades/visitas/<pk>/informe/',  InformeVisitaEmp, name='visita-informe'),
 
     path('clientes/ingresar/', CreateClient, name='create-client'),
 

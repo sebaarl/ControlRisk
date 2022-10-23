@@ -1,16 +1,63 @@
-<form action="#" method="POST" id="item-form">
-    {% csrf_token %}
-    <div class="item-add">
-        <div class="fields">
-            <div class="input-field repre" id="input-field-repre">
-                <label>Nombre Item Checklist</label>
-                {{ itemForm.nombre }}
+<div class="item-container">
+    <form action="#" method="POST" id="item-form">
+        {% csrf_token %}
+        <div class="item-add d-flex flex-wrap align-items-center">
+            <div class="fields">
+                <div class="input-field" id="input-field-tel">
+                    <label>Nombre Item Checklist</label>
+                    {{ itemForm.nombre }}
+                    <p class="alert-input w-100" id="alert-input">
+                        <i class="uil uil-exclamation-circle"></i>
+                        Ingrese un Item valido
+                    </p>
+                </div>
             </div>
+            <input type="text" name="id" id="id" value="{{ id }}" style="display: none">
+            <button class="nextBtn" type="submit" id="btn" name="btnitem">
+                <span class="btnText">AGREGAR ITEM </span>
+                <i class="uil uil-plus-circle"></i>
+            </button>
+            
         </div>
-        <input type="text" name="id" id="id" value="{{ id }}" style="display: none" required>
-        <button class="nextBtn" type="submit" id="btn" name="btnitem">
-            <span class="btnText">AGREGAR ITEM </span>
-            <i class="uil uil-plus-circle"></i>
-        </button>
-    </div>
-</form>
+    </form>    
+</div>
+
+<script>
+    const form = document.getElementById("item-form");
+    const input = document.querySelectorAll("#item-form input");
+    const expresiones = {
+        nombre: /^[a-zA-Z ]{2,50}$/
+    }
+
+    const validarFormulario = (e) => {
+        switch (e.target.name) {
+            case 'nombre':
+                if (expresiones.nombre.test(e.target.value)) {
+                    document
+                        .querySelector("#input-field-tel .alert-input")
+                        .classList.remove("alert-input-active");
+
+                    const btn = document.getElementById("btn");
+                    btn.disabled = false;
+                } else {
+                    document
+                        .querySelector("#input-field-tel .alert-input")
+                        .classList.add("alert-input-active");
+
+                    const btn = document.getElementById("btn");
+                    btn.disabled = true;
+                }
+
+                inputsClient.forEach((input) => {
+                    input.addEventListener("keyup", validarFormulario);
+                    input.addEventListener("blur", validarFormulario);
+                });
+                break;
+        }
+    }
+
+    input.forEach((input) => {
+        input.addEventListener("keyup", validarFormulario);
+        input.addEventListener("blur", validarFormulario);
+    });
+</script>

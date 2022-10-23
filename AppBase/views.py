@@ -813,8 +813,8 @@ def ChecklistView(request, pk):
 
         if 'btnitem' in request.POST:
             nombre = request.POST.get('nombre')
-            existe = Itemschecklist.objects.filter(nombre=nombre).exists()
-            if existe:
+            check = Itemschecklist.objects.filter(itemcheclistid=pk)
+            if check.filter(nombre=nombre).exists():
                 messages.error(request, "Ya está ingresado")
             else:
                 cursor = connection.cursor()
@@ -1005,5 +1005,18 @@ def TasaAccidentabildiadView(request, pk):
             return render(request, 'accidentes/tasa_accidentabilidad.html', data)
 
         return render(request, 'accidentes/tasa_accidentabilidad.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+def InformeVisitaEmp(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 1:
+        data = {
+            'id': pk
+        }
+
+        return render(request, 'informes/informe_visita.html', data)
     else:
         return render(request, 'error/auth.html')

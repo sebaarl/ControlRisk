@@ -374,7 +374,7 @@ class ChecklistItem(forms.Form):
             attrs={
                 'id': 'nombre',
                 'type': 'text',
-                'class': '',
+                'class': 'itemform',
                 'placeholder': 'Ingrese item que desea agregar',
                 'name': 'nombre',
             }

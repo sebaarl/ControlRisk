@@ -1013,9 +1013,28 @@ def InformeVisitaEmp(request, pk):
     datos = request.user
 
     if datos.is_profesional == 1:
+        fecha = datetime.now()
+
+        cursor = connection.cursor()
+        cursor.execute(
+            'SELECT [RazonSocial], [Cliente].[RutCliente], [FechaVisita] FROM [Cliente] JOIN [Contrato] ON (Cliente.RutCliente = Contrato.RutCliente) JOIN [Visita] ON (Contrato.ContratoID = Visita.ContratoID) WHERE [Visita].[VisitaID] = {}'.format(pk))
+        visita = cursor.fetchall()
+
         data = {
-            'id': pk
+            'id': pk,
+            'fecha': fecha,
+            'visita': visita
         }
+
+        if request.method == 'POST':
+            situacion = request.POST.get('situacion')
+            rut = request.POST.get('rut')
+            empresa = request.POST.get('empresa')
+            fechavisita = request.POST.get('fecha')
+
+            cursor.execute('EXEC [dbo].[SP_INFORME_VISITA] %s, %s', ('Empresa: {0}, RUT : {1}, Fecha Visita {2}, Detalle Profesional Encargado : {3}'.format(empresa, rut, fechavisita, situacion), pk))
+
+            messages.success(request, 'Informe guardardo correctamente')
 
         return render(request, 'informes/informe_visita.html', data)
     else:

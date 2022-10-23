@@ -20,10 +20,26 @@
         <div class="form first">
             <div class="details personal">
                 <div class="fields">
+                    {% for i in visita %}
+                    <div class="input-field direc" id="input-field-fecha">
+                        <label>Empresa</label>
+                        <input type="text" disabled value="{{ i.0 }}" name="empresa">
+                    </div>
+                    <div class="input-field" id="input-field-fecha">
+                        <label>Fecha Visita</label>
+                        <input type="text" value="{{ i.2 }}" disabled name="fecha">
+                    </div>
+                    <div class="input-field repre" id="input-field-fecha">
+                        <label>Rut Empresa</label>
+                        
+                        <input type="text" disabled value="{{ i.1 }}" name="rut">
+                    </div>
                     <div class="input-field direc" id="input-field-fecha">
                         <label>Situación de la Empresa a la que se le realizó la visita</label>
-                        <textarea name="situacion" id="" cols="100" rows="10"></textarea>
+    
+                        <textarea name="situacion" id="" cols="100" rows="50" required></textarea>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
 

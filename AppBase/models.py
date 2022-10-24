@@ -99,7 +99,7 @@ class Capacitacion(models.Model):
                                   db_collation='Modern_Spanish_CI_AS', blank=True, null=True)
     descripcion = models.CharField(db_column='Descripcion', max_length=200,
                                    db_collation='Modern_Spanish_CI_AS', blank=True, null=True)
-    estado = models.BooleanField(db_column='Estado')
+    estado = models.CharField(db_column='Estado', max_length=20, db_collation='Modern_Spanish_CI_AS')
     contratoid = models.ForeignKey(
         'Contrato', models.DO_NOTHING, db_column='ContratoID', blank=True, null=True)
 

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Informe Visita - ControlRisk</title>
+{% endblock %}
+
+{% block link %}
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-file-check-alt"></i>
+    <span class="text">Informe, Visita : {{ id }}</span>
+</div>
+
+<div class="container">
+    <h2 class="">Detalle Infome de Visita</h2>
+    <div class="container-card" style="width: 100%">
+        <div class="card" style="width: 100%">
+            {% for item in entity %}
+            <div class="card-detail">
+                <h3>Rut Empleado Encargado : </h3>
+                <p>{{ item.0 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Nombre Empleado Encargado : </h3>
+                <p>{{ item.1 | upper }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Fecha Visita : </h3>
+                <p>{{ item.2 }} {{ item.3 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Informe Ingresado por Empleado Encargado : </h3>
+                <p>{{ item.4 }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <h2 class="">Detalle Plan Mejora</h2>
+    {% if c > 0 %}
+    <div class="container-card" style="width: 100%">
+        <div class="card" style="width: 100%">
+            {% for item in mejora %}
+            <div class="card-detail">
+                <h3>Fecha Plan Mejora : </h3>
+                <p>{{ item.1 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Detalle del Plan de Mejora : </h3>
+                <p>{{ item.0 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Estado de Aplicación del Plan de Mejora : </h3>
+                {% if item.2 == True %}
+                <p>Aplicó las mejoras propuestas por el profesional</p>
+                {% else %}
+                <p>No ha aplicado las mejoras propuestas por el profesional</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="alerta">
+        <img src="{% static 'images/task.png' %}" alt="">
+        <p>El empleado no registró un Plan de Mejora</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

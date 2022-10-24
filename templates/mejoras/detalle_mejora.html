@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Plan de Mejora - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-clipboard-notes"></i>
+    <span class="text">Plan de Mejora, Visita : {{ id }}</span>
+</div>
+
+<div class="container">
+    {% for item in entity %}
+    <div class="card-detail">
+        <h3>Detalle del Plan de Mejora Propuesto : </h3>
+        <p>{{ item.0 }}</p>
+    </div>
+
+    <div class="card-detail">
+        <h3>Fecha del Plan de Mejora Propuesto : </h3>
+        <p>{{ item.1 }}</p>
+    </div>
+
+    <div class="card-detail">
+        <h3>Estado de Aplicación del Plan de Mejora : </h3>
+        {% if item.2 == True %}
+        <p>Aplicó las mejoras propuestas por el profesional</p>
+        {% else %}
+        <p>No ha aplicado las mejoras propuestas por el profesional</p>
+        {% endif %}
+        </form>
+    </div>
+
+    <div class="card-detail estado-mejora">
+        <h3>Modificar Estado de Aplicación del Plan de Mejora : </h3>
+    </div>
+    <div class="card-detail estado-mejora">
+        <form action="#" method="POST" id="form-asesoria">
+            {% csrf_token %}
+    
+            <select name="estado" id="cars">
+                <option value="si">Aplicó las mejoras propuestas</option>
+                <option value="no">No aplicó las mejoras propuestas</option>
+            </select>
+            <button class="nextBtn" type="submit" id="btn" name="btninforme">
+                <span class="btnText">Guardar</span>
+                <i class="uil uil-navigator"></i>
+            </button>
+        </form>
+    </div>
+
+    {% endfor %}
+
+    {% if messages %}
+    {% for m in messages %}
+    {% if m.tags == 'success' %}
+    <script>
+        Swal.fire({
+            'tittle': 'Exito',
+            'icon': 'success',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    {% if messages %}
+    {% for m in messages %}
+    {% if m.tags == 'error' %}
+    <script>
+        Swal.fire({
+            'tittle': 'Exito',
+            'icon': 'error',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

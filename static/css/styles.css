@@ -500,6 +500,24 @@ select {
     color: #333;
 }
 
+.nextBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 45px;
+    max-width: 200px;
+    width: 100%;
+    border: none;
+    outline: none;
+    color: #fff;
+    border-radius: 5px;
+    margin: 25px 0;
+    background-color: #ff131d;
+    transition: all 0.3s linear;
+    cursor: pointer;
+    font-weight: bold;
+}
+
 .container form button,
 .backBtn {
     display: flex;

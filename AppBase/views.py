@@ -17,7 +17,7 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 
 from AppBase.forms import CreateAsesoriaEspecial, CreateClienteForm, CreateEmpleadoForm, CreateContratoForm, CreateAccidenteForm, EstadoAsesoria, EstadoVisita, ChecklistItem, ChecklistForm
-from AppBase.models import Asesoria, Cliente, Empleado, Contrato, Accidente, Historialactividad, Itemschecklist
+from AppBase.models import Asesoria, Capacitacion, Cliente, Empleado, Contrato, Accidente, Historialactividad, Itemschecklist, Mejora
 from AppUser.models import User
 
 from datetime import date
@@ -1009,6 +1009,7 @@ def TasaAccidentabildiadView(request, pk):
         return render(request, 'error/auth.html')
 
 
+@login_required
 def InformeVisitaEmp(request, pk):
     datos = request.user
 
@@ -1026,16 +1027,166 @@ def InformeVisitaEmp(request, pk):
             'visita': visita
         }
 
-        if request.method == 'POST':
+        if 'btninforme' in request.POST:
             situacion = request.POST.get('situacion')
             rut = request.POST.get('rut')
             empresa = request.POST.get('empresa')
             fechavisita = request.POST.get('fecha')
 
-            cursor.execute('EXEC [dbo].[SP_INFORME_VISITA] %s, %s', ('Empresa: {0}, RUT : {1}, Fecha Visita {2}, Detalle Profesional Encargado : {3}'.format(empresa, rut, fechavisita, situacion), pk))
+            cursor.execute('EXEC [dbo].[SP_INFORME_VISITA] %s, %s', (situacion, pk))
 
             messages.success(request, 'Informe guardardo correctamente')
 
+            return render(request, 'informes/informe_visita.html', data)
+
+        if 'btnmejora' in request.POST:
+            plan = request.POST.get('mejora')
+
+            cursor.execute('EXEC [dbo].[SP_CREAR_PLAN_MEJORA] %s, %s', (pk, plan))
+
+            messages.success(request, 'Plan generado Correctamente')
+
+            return render(request, 'informes/informe_visita.html', data)
+
         return render(request, 'informes/informe_visita.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+@login_required
+def InformeVisitaCliente(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 0 and datos.is_staff == 0 and datos.is_superuser == 0:
+        fecha = datetime.now()
+
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_INFORME_VISITA_CLI] {}'.format(pk))
+        result = cursor.fetchall()
+
+        plan = cursor.execute('EXEC [dbo].[SP_PLAN_MEJORA_INFO] {}'.format(pk))
+        mejora = plan.fetchall()
+
+        data = {
+            'id': pk,
+            'entity': result,
+            'mejora': mejora,
+            'c': len(mejora)
+        }
+
+        return render(request, 'informes/informe_visita_cliente.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+@login_required
+def InformeVisitaCliente(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 0 and datos.is_staff == 0 and datos.is_superuser == 0:
+        fecha = datetime.now()
+
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_INFORME_VISITA_CLI] {}'.format(pk))
+        result = cursor.fetchall()
+
+        plan = cursor.execute('EXEC [dbo].[SP_PLAN_MEJORA_INFO] {}'.format(pk))
+        mejora = plan.fetchall()
+
+        data = {
+            'id': pk,
+            'entity': result,
+            'mejora': mejora,
+            'c': len(mejora)
+        }
+
+        return render(request, 'informes/informe_visita_cliente.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+@login_required
+def DetallePlanMejora(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 1:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_DETALLE_PLAN_MEJORA_EMP] {}'.format(pk))
+        result = cursor.fetchall()
+
+        data = {
+            'id': pk,
+            'entity': result,
+        }
+
+        if request.method == 'POST':
+            estado = request.POST.get('estado')
+
+            if estado == 'si':
+                mejora = 1
+            else:
+                mejora = 0
+
+            Mejora.objects.filter(visitaid=pk).update(aplicomejora=mejora)
+
+            messages.success(request, 'Estado modificado correctamente')
+            return render(request, 'mejoras/detalle_mejora.html', data)
+
+        return render(request, 'mejoras/detalle_mejora.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+@login_required
+def DetalleCapacitacionEmp(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 1:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_DETALLE_CAPACITACION] {}'.format(pk))
+        result = cursor.fetchall()
+
+        data = {
+            'id': pk,
+            'entity': result
+        }
+
+        if request.method == 'POST':
+            estado = request.POST.get('estado')
+            Capacitacion.objects.filter(capacitacionid=pk).update(estado=estado)
+
+            messages.success(request, 'Estado modificado correctamente')
+            return render(request, 'actividades/detalle_capacitacion.html', data)
+
+        return render(request, 'actividades/detalle_capacitacion.html', data)
+
+    else:
+        return render(request, 'error/auth.html')
+
+
+@login_required
+def CrearCapacitacion(request):
+    datos = request.user
+
+    if datos.is_profesional == 1:
+
+        if request.method == 'POST':
+            rutcliente = request.POST.get('rut')
+            fecha = request.POST.get('fecha')
+            hora = request.POST.get('hora')
+            asistentes = request.POST.get('asistentes')
+            materiales = request.POST.get('materiales')
+            desc = request.POST.get('desc')
+
+            cursor = connection.cursor()
+            cursor.execute('EXEC [dbo].[SP_CREAR_CAPACITACION] %s, %s, %s, %s, %s, %s', (fecha, hora, asistentes, materiales, desc, rut(rutcliente)))
+
+            messages.success(request, 'Capacitación ingresada correctamente')
+
+            return render(request, 'actividades/crear_capacitacion.html')
+
+
+        return render(request, 'actividades/crear_capacitacion.html')
+
     else:
         return render(request, 'error/auth.html')

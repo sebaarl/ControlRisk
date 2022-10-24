@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Ingresar Capacitación - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-podium"></i>
+    <span class="text">Ingresar Capacitación</span>
+</div>
+<div class="dash-content">
+    <form action="#" method="POST" id="form-asesoria">
+        {% csrf_token %}
+        <div class="form first">
+            <div class="details personal">
+                <div class="fields">
+                    <div class="input-field repre" id="input-field-fecha">
+                        <label>Rut Empresa Cliente</label>
+                        <input type="text" name="rut" id="" required>
+                        <p class="alert-input" id="alert-input">
+                            <i class="uil uil-exclamation-circle"></i> 
+                            La fecha ingresada no puede ser inferior a 
+                        </p>
+                    </div>
+                    <div class="input-field" id="input-field-hora">
+                        <label>Fecha de la Capacitacion </label>
+                        {{ especialForm.fecha }}
+                        <p class="alert-input" id="alert-input">
+                            <i class="uil uil-exclamation-circle"></i> 
+                            La hora ingresada debe ser entre las 10:00 am y las 16:00 pm
+                        </p>
+                    </div>
+                    <div class="input-field" id="input-field-hora">
+                        <label>Hora de la Capacitacion </label>
+                        {{ especialForm.hora }}
+                        <p class="alert-input" id="alert-input">
+                            <i class="uil uil-exclamation-circle"></i> 
+                            La hora ingresada debe ser entre las 10:00 am y las 16:00 pm
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details ID">
+                <div class="fields">
+
+                    <div class="input-field" id="input-field-repre">
+                        <label>Cantidad de Asistentes a la Capacitación</label>
+                        <input type="number" name="asistentes" id="">
+                        <p class="alert-input" id="alert-input">
+                            <i class="uil uil-exclamation-circle"></i> 
+                            Ingrese nombres validos (Pedro Juan Perez Perez)
+                        </p>
+                    </div>
+                    <div class="input-field direc" id="input-field-repre">
+                        <label>Materiales a utilizar en la Capacitación</label>
+                        <textarea name="materiales" id="" cols="30" rows="10" class="direc"></textarea>
+                        <p class="alert-input" id="alert-input">
+                            <i class="uil uil-exclamation-circle"></i> 
+                            Ingrese nombres validos (Pedro Juan Perez Perez)
+                        </p>
+                    </div>
+                    <div class="input-field direc" id="input-field-repre">
+                        <label>Descripcion de la Capacitación</label>
+                        <textarea name="desc" id="" cols="30" rows="10" class="direc"></textarea>
+                        <p class="alert-input" id="alert-input">
+                            <i class="uil uil-exclamation-circle"></i> 
+                            Ingrese nombres validos (Pedro Juan Perez Perez)
+                        </p>
+                    </div>
+                </div>
+
+                <button class="nextBtn" type="submit" id="btn">
+                    <span class="btnText">Guardar</span>
+                    <i class="uil uil-navigator"></i>
+                </button>
+            </div> 
+        </div>
+    </form>
+
+    
+    {% if messages %}
+        {% for m in messages %}
+                {% if m.tags  == 'success' %}
+                <script>
+                    Swal.fire({
+                        'tittle': 'Exito',
+                        'icon': 'success',
+                        'text': '{{ m }}',
+                        'confirmButtonColor': '#ff131d',
+                        'confirmButtonText': 'Aceptar',
+                    })
+                </script>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% if messages %}
+        {% for m in messages %}
+            {% if m.tags  == 'error' %}
+                <script>
+                    Swal.fire({
+                        'tittle': 'Exito',
+                        'icon': 'error',
+                        'text': '{{ m }}',
+                        'confirmButtonColor': '#ff131d',
+                        'confirmButtonText': 'Aceptar',
+                    })
+                </script>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

@@ -80,7 +80,7 @@
 
                 {% if user.is_staff == 0 %}
                 {% if user.is_profesional == 0 %}
-                <li><a href="#">
+                <li><a href="{% url 'base:capacitacion-client' %}">
                         <i class="uil uil-podium"></i>
                         <span class="link-name">Capacitaciones</span>
                     </a></li>

@@ -1,4 +1,5 @@
 from multiprocessing import connection, context
+from pipes import Template
 from re import I
 import re
 from unittest import result
@@ -15,6 +16,7 @@ from django.contrib.auth.models import Group
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.urls import reverse_lazy
+from django.views.generic import TemplateView
 
 from AppBase.forms import CreateAsesoriaEspecial, CreateClienteForm, CreateEmpleadoForm, CreateContratoForm, CreateAccidenteForm, EstadoAsesoria, EstadoVisita, ChecklistItem, ChecklistForm
 from AppBase.models import Asesoria, Capacitacion, Cliente, Empleado, Contrato, Accidente, Historialactividad, Itemschecklist, Mejora
@@ -549,15 +551,23 @@ def AsesoriaEspecialClienteView(request):
 def AsesoriaClienteView(request):
     usuario = request.user
 
-    if usuario.is_staff == 0 and usuario.is_profesional == 0:
+    if usuario.is_staff == 0 and usuario.is_profesional == 0:   
+        activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+
         cursor = connection.cursor()
+        mesActual = cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
+        asesoriasMesuales = mesActual.fetchall()
+
         cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE] [{}]'.format(
             str(usuario.username)))
         result = cursor.fetchall()
 
         data = {
             'entity': result,
-            'rut': formatRut(usuario.username)
+            'rut': formatRut(usuario.username),
+            'mesuales': asesoriasMesuales,
+            'c': len(asesoriasMesuales),
+            'activo': activo
         }
 
         return render(request, 'asesorias/asesorias_cliente.html', data)
@@ -605,20 +615,82 @@ def DetalleAsesoriaClienteView(request, pk):
         return render(request, 'error/auth.html')
 
 
+# Capacitaciones ciente
+@login_required
+def CapacitacionesView(request):
+    usuario = request.user
+
+    if usuario.is_staff == 0 and usuario.is_profesional == 0:
+        activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+
+        cursor = connection.cursor()
+        mesActual = cursor.execute('EXEC [dbo].[SP_CAPACITACIONES_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
+        capacitacionesMensuales = mesActual.fetchall()
+
+        cursor.execute('EXEC [dbo].[SP_CAPACITACIONES_CLIENTE] [{}]'.format(str(usuario.username)))
+        result = cursor.fetchall()
+
+        data = {
+            'entity': result,
+            'cp': len(result),
+            'rut': formatRut(usuario.username),
+            'mensual': capacitacionesMensuales,
+            'c': len(capacitacionesMensuales),
+            'activo': activo
+        }
+
+        return render(request, 'capacitaciones/capacitaciones_cliente.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
+@login_required
+def DetalleCapacitacionView(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 0 and datos.is_staff == 0:
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_DETALLE_CAPACITACION] {}'.format(pk))
+        results = cursor.fetchall()
+
+        try:
+            results
+        except:
+            raise Http404
+
+        data = {
+            'entity': results,
+            'id': pk,
+            'rut': formatRut(datos.username)
+        }
+
+        return render(request, 'capacitaciones/detalle_capacitacion.html', data)
+    else:
+        return render(request, 'error/auth.html')
+
+
 # Visitas ciente
 @login_required
 def VisitasClienteView(request):
     usuario = request.user
 
     if usuario.is_staff == 0 and usuario.is_profesional == 0:
+        activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+
         cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_VISITAS_CLIENTE] [{}]'.format(
-            str(usuario.username)))
+        mesActual = cursor.execute('EXEC [dbo].[SP_VISITAS_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
+        visitasMesuales = mesActual.fetchall()
+
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_VISITAS_CLIENTE] [{}]'.format(str(usuario.username)))
         result = cursor.fetchall()
 
         data = {
             'entity': result,
-            'rut': formatRut(usuario.username)
+            'rut': formatRut(usuario.username),
+            'mensual': visitasMesuales,
+            'c': len(visitasMesuales),
+            'activo': activo
         }
 
         return render(request, 'visitas/visitas_cliente.html', data)
@@ -913,7 +985,7 @@ def PerfilUsuario(request, pk):
     if datos.is_profesional == 1:
         cursor = connection.cursor()
         cursor.execute(
-            'EXEC [dbo].[SP_DETALLE_CUENTA_EMPLEADO] {}'.format(str(datos.username)))
+            'EXEC [dbo].[SP_DETALLE_CUENTA_EMPLEADO] {0}'.format(datos.username[:-1]))
         result = cursor.fetchall()
 
         data = {
@@ -924,9 +996,9 @@ def PerfilUsuario(request, pk):
     if datos.is_profesional == 0 and datos.is_staff == 0 and datos.is_superuser == 0:
         cursor = connection.cursor()
         cursor.execute(
-            'EXEC [dbo].[SP_DETALLE_CUENTA_CLIENTE] {}'.format(str(datos.username)))
+            'EXEC [dbo].[SP_DETALLE_CUENTA_CLIENTE] {0}'.format(datos.username[:-1]))
         result = cursor.fetchall()
-
+        
         data = {
             'entity': result,
             'rut': formatRut(datos.username)
@@ -1190,3 +1262,22 @@ def CrearCapacitacion(request):
 
     else:
         return render(request, 'error/auth.html')
+
+
+class Error404View(TemplateView):
+    template_name = 'error/404.html'
+
+
+class Error500View(TemplateView):
+    template_name = 'error/500.html'
+
+    @classmethod
+    def as_error_view(cls):
+        v = cls.as_view()
+        def view(request):
+            r = v(request)
+            r.render()
+
+            return r
+
+        return view

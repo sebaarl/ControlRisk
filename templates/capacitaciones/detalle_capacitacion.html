@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Detalle Capacitación : {{ id }} - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-podium"></i>
+    <span class="text">Detalle Capacitación : {{ id }}</span>
+</div>
+
+<div class="container">
+    <div class="container-card">
+        <div class="card">
+            {% for item in entity %}
+            <div class="card-detail">
+                <h3>NRO. Capacitación : </h3>
+                <p>{{ item.0 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Rut Empresa Cliente : </h3>
+                <p>{{ item.6 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Razón Social Empresa : </h3>
+                <p>{{ item.7 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Telefono Empresa : </h3>
+                <p>+ {{ item.9 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>RUT Representante Legal Empresa : </h3>
+                <p>{{ item.15 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Nombre Representante Legal Empresa : </h3>
+                <p>{{ item.14 | upper }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Dirección Empresa : </h3>
+                <p>{{ item.8 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Fecha Capacitacion : </h3>
+                <p>{{ item.1 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Hora Capacitación : </h3>
+                <p>{{ item.2 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Estado Capacitación : </h3>
+                <p>{{ item.4 }}</p>
+            </div>
+            <div class="card-detail">
+                <h3>Cantidad de Asistentes a la Capacitación : </h3>
+                <p>{{ item.17 }} ASISTENTES</p>
+            </div>
+            <div class="card-detail">
+                <h3>Materiales a Utilizar en la Capacitación : </h3>
+                <p>{{ item.16 }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

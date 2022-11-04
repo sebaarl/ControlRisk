@@ -1,5 +1,8 @@
 from django.urls import path
-from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView,ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView,ContratoEmpleadoView, PagosDetailView, AsesoriaClienteView, AsesoriaEspecialClienteView, AsesoriaClienteView, AsesoriasEmpleadoView, CapacitacioesEmpleadoView, VisitasEmpleadoView, DetalleAsesoriaView, VisitasClienteView, DetalleVisitaView, DetalleAsesoriaClienteView, DetalleVisitaEmpleadoView, ChecklistView, ClientesEmpleadoView, ClienteDetalle, PerfilUsuario, DetalleChecklist, TasaAccidentabildiadView, InformeVisitaEmp, InformeVisitaCliente, DetallePlanMejora, DetalleCapacitacionEmp, CrearCapacitacion
+from django.conf.urls import handler404, handler500
+
+
+from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView,ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView,ContratoEmpleadoView, PagosDetailView, AsesoriaClienteView, AsesoriaEspecialClienteView, AsesoriaClienteView, AsesoriasEmpleadoView, CapacitacioesEmpleadoView, VisitasEmpleadoView, DetalleAsesoriaView, VisitasClienteView, DetalleVisitaView, DetalleAsesoriaClienteView, DetalleVisitaEmpleadoView, ChecklistView, ClientesEmpleadoView, ClienteDetalle, PerfilUsuario, DetalleChecklist, TasaAccidentabildiadView, InformeVisitaEmp, InformeVisitaCliente, DetallePlanMejora, DetalleCapacitacionEmp, CrearCapacitacion, CapacitacionesView, DetalleCapacitacionView, Error404View, Error500View
 
 app_name = 'base'
 
@@ -41,6 +44,9 @@ urlpatterns = [
     path('clientes/visitas/detalle/<pk>/informe/', InformeVisitaCliente, name='visita-informe-cliente'),
     path('clientes/visitas/detalle/<pk>/plandemejora/', DetallePlanMejora, name='visita-mejora'),
 
+    path('clientes/capacitaciones/', CapacitacionesView, name='capacitacion-client'),
+    path('clientes/capacitaciones/detalle/<pk>/', DetalleCapacitacionView, name='capacitacion-detalle'),
+
     path('clientes/accidentes/ingresar/', CreateAccidentView, name='create-accident'),
     path('clientes/accidentes/tasa/<pk>', TasaAccidentabildiadView, name='tasa-accident'),
 
@@ -55,3 +61,5 @@ urlpatterns = [
     path('pagos/detalle/<pk>/', PagosDetailView, name='pago-detail'),
 ]
 
+handler404 = Error404View.as_view()
+handler500 = Error500View.as_view()

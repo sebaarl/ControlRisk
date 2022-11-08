@@ -56,14 +56,66 @@ def formatRut(rut):
     return formato
 
 
+def pagoVenc(rut):
+    cursor = connection.cursor()
+    now = datetime.now()
+    pagoActual = cursor.execute(
+        'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(rut))
+
+    for i in pagoActual:
+        estadoPago = i[0]
+
+    if estadoPago == False:
+        estado = 0
+    else:
+        estado = 1
+
+    return estado
+
+
+def contratoActivo(rut):
+    activo = Contrato.objects.filter(rutcliente=rut).filter(estado=1)
+    return activo
+
+
 @login_required
 def HomeView(request):
-    datos = request.session
+    user = request.user
 
-    data = {
-        'c': datos
-    }
-    return render(request, 'home.html', data)
+    if user.is_profesional == 0 and user.is_staff == 0:
+        activo = Contrato.objects.filter(
+            rutcliente=user.username).filter(estado=1)
+        if activo == False:
+            return render(request, 'error/500.html', data)
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(user.username))
+
+            for i in pagoActual:
+                estadoPago = i[0]
+
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(user.username))
+
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
+
+            data = {
+                'user': user, 'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == False:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                return render(request, 'home.html', data)
+    else:
+        return render(request, 'home.html', data)
 
 
 @login_required
@@ -235,32 +287,54 @@ def CreateAccidentView(request):
     if datos.is_staff == 1 or datos.is_profesional == 1:
         return render(request, 'error/auth.html')
     else:
-        if request.method == "POST":
+        if contratoActivo(datos.username) == False:
+            return render(request, 'pagos/pago_venc.html', data)
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
 
-            formulario = CreateAccidenteForm(request.POST)
-            if formulario.is_valid():
+            for i in pagoActual:
+                estadoPago = i[0]
 
-                accidentesave = Accidente()
-                accidentesave.fecha = request.POST['fecha']
-                accidentesave.descripcion = request.POST['descripcion']
-                accidentesave.medidas = request.POST['medidas']
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
 
-                print(accidentesave.fecha, accidentesave.descripcion,
-                      accidentesave.medidas)
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
 
-                from django.db import connection
-                with connection.cursor() as cursor:
-                    cursor.execute('EXEC [dbo].[SP_CREATE_ACCIDENTE]  %s, %s, %s, %s', (accidentesave.fecha,
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == False:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                if request.method == "POST":
+                    formulario = CreateAccidenteForm(request.POST)
+                    if formulario.is_valid():
+                        accidentesave = Accidente()
+                        accidentesave.fecha = request.POST['fecha']
+                        accidentesave.descripcion = request.POST['descripcion']
+                        accidentesave.medidas = request.POST['medidas']
+
+                        cursor.execute('EXEC [dbo].[SP_CREATE_ACCIDENTE]  %s, %s, %s, %s', (accidentesave.fecha,
                                                                                         accidentesave.descripcion,
                                                                                         accidentesave.medidas,
                                                                                         str(datos.username)))
 
-                    messages.success(
-                        request, "Accidente registrado correctamente")
+                        messages.success(
+                            request, "Accidente registrado correctamente")
 
-                    return render(request, 'accidentes/create_accident.html', data)
-            else:
-                messages.error(request, "Formulario no valido")
+                        return render(request, 'accidentes/create_accident.html', data)
+                    else:
+                        messages.error(request, "Formulario no valido")
+                return render(request, 'accidentes/create_accident.html', data)
 
         return render(request, 'accidentes/create_accident.html', data)
 
@@ -377,20 +451,43 @@ def ContratoClientView(request):
     datos = request.user
 
     if datos.is_staff == 0 and datos.is_profesional == 0:
-        cursor = connection.cursor()
-        cursor.execute(
-            'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
-        results = cursor.fetchall()
+        if contratoActivo(datos.username) == False:
+            return render(request, 'pagos/pago_venc.html', data)
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
 
-        cantidad = Contrato.objects.filter(rutcliente=datos.username).count()
+            for i in pagoActual:
+                estadoPago = i[0]
 
-        data = {
-            # 'user': formatRut(str(datos.username)),
-            'entity': results,
-            'cantidad': cantidad
-        }
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
 
-        return render(request, 'contrato/contratos_client.html', data)
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
+
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == False:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                cursor = connection.cursor()
+                cursor.execute('EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
+                results = cursor.fetchall()
+
+                cantidad = Contrato.objects.filter(rutcliente=datos.username).count()
+
+                data = {'entity': results,'cantidad': cantidad}
+
+                return render(request, 'contrato/contratos_client.html', data)
     else:
         return render(request, 'error/auth.html')
 

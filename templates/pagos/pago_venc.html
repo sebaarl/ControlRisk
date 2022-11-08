@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Pago Atrasado - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+
+{% if user.is_authenticated %}
+
+<div class="home-title">
+    <div id="demo-modal" class="modal">
+        <div class="modal__content">
+            <h1>Pago Atrasado!</h1>
+
+            <p>
+                Por favor, dirigete a la sección de Pagos, para poner al día su contrato!
+            </p>
+
+            <p>
+                Nro Pago: {{ id }}
+                <br>
+                Fecha Vencimiento del Pago: {{ fechaVenc }}
+            </p>
+
+            <div class="modal__footer">
+                <a href='{% url "base:pago-detail" id %}'>Ir a pago atrasado</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

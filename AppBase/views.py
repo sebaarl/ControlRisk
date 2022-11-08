@@ -312,7 +312,7 @@ def CreateAccidentView(request):
                 'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
                 'mes': mesPago, 'id': pagoId}
 
-            if estadoPago == False:
+            if estadoPago == 0:
                 return render(request, 'pagos/pago_venc.html', data)
             else:
                 if request.method == "POST":
@@ -476,7 +476,7 @@ def ContratoClientView(request):
                 'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
                 'mes': mesPago, 'id': pagoId}
 
-            if estadoPago == False:
+            if estadoPago == 0:
                 return render(request, 'pagos/pago_venc.html', data)
             else:
                 cursor = connection.cursor()
@@ -610,33 +610,56 @@ class ContractDetailPdf(View):
 @login_required
 def AsesoriaEspecialClienteView(request):
     usuario = request.user
+
     data = {
         'form': CreateAsesoriaEspecial()
     }
 
     if usuario.is_staff == 0 and usuario.is_profesional == 0:
-        if request.method == "POST":
-            formulario = CreateAsesoriaEspecial(request.POST)
-            if formulario.is_valid():
-                asesoria = Asesoria()
-                asesoria.fechaasesoria = request.POST.get('fecha')
-                asesoria.hora = request.POST.get('hora')
-                asesoria.descripcionasesoria = request.POST.get('descripcion')
+        if contratoActivo(usuario.username) == False:
+            return render(request, 'pagos/pago_venc.html', data)
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username))
 
-                from django.db import connection
-                with connection.cursor() as cursor:
+            for i in pagoActual:
+                estadoPago = i[0]
 
-                    cursor = connection.cursor()
-                    cursor.execute('EXEC [dbo].[SP_ASESORIA_ESPECIAL] %s, %s, %s, %s',
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username))
+
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
+
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == 0:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                if request.method == "POST":
+                    formulario = CreateAsesoriaEspecial(request.POST)
+                    if formulario.is_valid():
+                        asesoria = Asesoria()
+                        asesoria.fechaasesoria = request.POST.get('fecha')
+                        asesoria.hora = request.POST.get('hora')
+                        asesoria.descripcionasesoria = request.POST.get('descripcion')
+
+                        cursor = connection.cursor()
+                        cursor.execute('EXEC [dbo].[SP_ASESORIA_ESPECIAL] %s, %s, %s, %s',
                                    (asesoria.fechaasesoria, asesoria.descripcionasesoria, asesoria.hora, usuario.username))
 
-                    messages.success(
-                        request, "Solicitud de asesoria ingresada correctamente")
-
-                return render(request, 'asesorias/asesoria_especial.html', data)
-            else:
-                messages.error(
-                    request, "Error al ingresar solicitud")
+                        messages.success(request, "Solicitud de asesoria ingresada correctamente")
+                        return render(request, 'asesorias/asesoria_especial.html', data)
+                    else:
+                        messages.error(request, "Error al ingresar solicitud")
 
         return render(request, 'asesorias/asesoria_especial.html', data)
     else:
@@ -648,24 +671,49 @@ def AsesoriaEspecialClienteView(request):
 def AsesoriaClienteView(request):
     usuario = request.user
 
-    if usuario.is_staff == 0 and usuario.is_profesional == 0:   
-        activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+    if usuario.is_staff == 0 and usuario.is_profesional == 0:
+        if contratoActivo(usuario.username) == False:
+            return render(request, 'pagos/pago_venc.html', data)
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username))
 
-        cursor = connection.cursor()
-        mesActual = cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
-        asesoriasMesuales = mesActual.fetchall()
+            for i in pagoActual:
+                estadoPago = i[0]
 
-        cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE] [{}]'.format(
-            str(usuario.username)))
-        result = cursor.fetchall()
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username))
 
-        data = {
-            'entity': result,
-            'rut': formatRut(usuario.username),
-            'mesuales': asesoriasMesuales,
-            'c': len(asesoriasMesuales),
-            'activo': activo
-        }
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
+
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == 0:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+                cursor = connection.cursor()
+                mesActual = cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
+                asesoriasMesuales = mesActual.fetchall()
+
+                cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE] [{}]'.format(str(usuario.username)))
+                result = cursor.fetchall()
+
+                data = {
+                    'entity': result,
+                    'rut': formatRut(usuario.username),
+                    'mesuales': asesoriasMesuales,
+                    'c': len(asesoriasMesuales),
+                    'activo': activo }
 
         return render(request, 'asesorias/asesorias_cliente.html', data)
     else:
@@ -677,37 +725,50 @@ def DetalleAsesoriaClienteView(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_DETALLE_ASESORIA] {}'.format(pk))
-        results = cursor.fetchall()
+        if contratoActivo(datos.username) == False:
+            return render(request, 'pagos/pago_venc.html', data)
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
 
-        try:
-            results
-        except:
-            raise Http404
+            for i in pagoActual:
+                estadoPago = i[0]
 
-        data = {
-            'entity': results,
-            'id': pk,
-            'rut': formatRut(datos.username)
-        }
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
 
-        # if request.method == "POST":
-        #     formulario = EstadoAsesoria(request.POST)
-        #     if formulario.is_valid():
-        #         estado = request.POST.get('estado')
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
 
-        #         cursor.execute(
-        #             'EXEC [dbo].[SP_CAMBIAR_ESTADO_ASESORIA] %s, %s', (estado, pk))
-        #         messages.success(
-        #             request, "Se ha modificado el estado correctamente")
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
 
-        #         return render(request, 'asesorias/asesoria_detalle.html', data)
-        #     else:
-        #         messages.error(
-        #             request, "Error al modificar estado")
+            if estadoPago == 0:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                cursor = connection.cursor()
+                cursor.execute('EXEC [dbo].[SP_DETALLE_ASESORIA] {}'.format(pk))
+                results = cursor.fetchall()
 
-        return render(request, 'asesorias/detalle_asesoria_cliente.html', data)
+                try:
+                    results
+                except:
+                    raise Http404
+
+                data = {
+                    'entity': results,
+                    'id': pk,
+                    'rut': formatRut(datos.username)
+                }
+
+                return render(request, 'asesorias/detalle_asesoria_cliente.html', data)
     else:
         return render(request, 'error/auth.html')
 
@@ -718,25 +779,53 @@ def CapacitacionesView(request):
     usuario = request.user
 
     if usuario.is_staff == 0 and usuario.is_profesional == 0:
-        activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+        if contratoActivo(usuario.username) == False:
+            return render(request, 'pagos/pago_venc.html', data)
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username))
 
-        cursor = connection.cursor()
-        mesActual = cursor.execute('EXEC [dbo].[SP_CAPACITACIONES_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
-        capacitacionesMensuales = mesActual.fetchall()
+            for i in pagoActual:
+                estadoPago = i[0]
 
-        cursor.execute('EXEC [dbo].[SP_CAPACITACIONES_CLIENTE] [{}]'.format(str(usuario.username)))
-        result = cursor.fetchall()
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username))
 
-        data = {
-            'entity': result,
-            'cp': len(result),
-            'rut': formatRut(usuario.username),
-            'mensual': capacitacionesMensuales,
-            'c': len(capacitacionesMensuales),
-            'activo': activo
-        }
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
 
-        return render(request, 'capacitaciones/capacitaciones_cliente.html', data)
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == 0:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+
+                cursor = connection.cursor()
+                mesActual = cursor.execute('EXEC [dbo].[SP_CAPACITACIONES_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
+                capacitacionesMensuales = mesActual.fetchall()
+
+                cursor.execute('EXEC [dbo].[SP_CAPACITACIONES_CLIENTE] [{}]'.format(str(usuario.username)))
+                result = cursor.fetchall()
+
+                data = {
+                    'entity': result,
+                    'cp': len(result),
+                    'rut': formatRut(usuario.username),
+                    'mensual': capacitacionesMensuales,
+                    'c': len(capacitacionesMensuales),
+                    'activo': activo
+                }
+
+                return render(request, 'capacitaciones/capacitaciones_cliente.html', data)
     else:
         return render(request, 'error/auth.html')
 
@@ -746,22 +835,50 @@ def DetalleCapacitacionView(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_DETALLE_CAPACITACION] {}'.format(pk))
-        results = cursor.fetchall()
+        if contratoActivo(datos.username) == False:
+            return render(request, 'pagos/pago_venc.html', data)
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
 
-        try:
-            results
-        except:
-            raise Http404
+            for i in pagoActual:
+                estadoPago = i[0]
 
-        data = {
-            'entity': results,
-            'id': pk,
-            'rut': formatRut(datos.username)
-        }
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
 
-        return render(request, 'capacitaciones/detalle_capacitacion.html', data)
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
+
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == 0:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                cursor = connection.cursor()
+                cursor.execute('EXEC [dbo].[SP_DETALLE_CAPACITACION] {}'.format(pk))
+                results = cursor.fetchall()
+
+                try:
+                    results
+                except:
+                    raise Http404
+
+                data = {
+                    'entity': results,
+                    'id': pk,
+                    'rut': formatRut(datos.username)
+                }
+
+                return render(request, 'capacitaciones/detalle_capacitacion.html', data)
     else:
         return render(request, 'error/auth.html')
 
@@ -772,25 +889,53 @@ def VisitasClienteView(request):
     usuario = request.user
 
     if usuario.is_staff == 0 and usuario.is_profesional == 0:
-        activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+        if contratoActivo(usuario.username) == False:
+            return render(request, 'pagos/pago_venc.html', data)
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username))
 
-        cursor = connection.cursor()
-        mesActual = cursor.execute('EXEC [dbo].[SP_VISITAS_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
-        visitasMesuales = mesActual.fetchall()
+            for i in pagoActual:
+                estadoPago = i[0]
 
-        cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_VISITAS_CLIENTE] [{}]'.format(str(usuario.username)))
-        result = cursor.fetchall()
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username))
 
-        data = {
-            'entity': result,
-            'rut': formatRut(usuario.username),
-            'mensual': visitasMesuales,
-            'c': len(visitasMesuales),
-            'activo': activo
-        }
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
 
-        return render(request, 'visitas/visitas_cliente.html', data)
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == 0:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+
+                cursor = connection.cursor()
+                mesActual = cursor.execute('EXEC [dbo].[SP_VISITAS_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
+                visitasMesuales = mesActual.fetchall()
+
+                cursor = connection.cursor()
+                cursor.execute('EXEC [dbo].[SP_VISITAS_CLIENTE] [{}]'.format(str(usuario.username)))
+                result = cursor.fetchall()
+
+                data = {
+                    'entity': result,
+                    'rut': formatRut(usuario.username),
+                    'mensual': visitasMesuales,
+                    'c': len(visitasMesuales),
+                    'activo': activo
+                }
+
+                return render(request, 'visitas/visitas_cliente.html', data)
     else:
         return render(request, 'error/auth.html')
 
@@ -800,22 +945,50 @@ def DetalleVisitaView(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_DETALLE_VISITA] {}'.format(pk))
-        results = cursor.fetchall()
+        if contratoActivo(datos.username) == False:
+            return render(request, 'pagos/pago_venc.html', data)
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
 
-        try:
-            results
-        except:
-            raise Http404
+            for i in pagoActual:
+                estadoPago = i[0]
 
-        data = {
-            'entity': results,
-            'id': pk,
-            'rut': formatRut(datos.username)
-        }
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
 
-        return render(request, 'visitas/detalle_visita.html', data)
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
+
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == 0:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                cursor = connection.cursor()
+                cursor.execute('EXEC [dbo].[SP_DETALLE_VISITA] {}'.format(pk))
+                results = cursor.fetchall()
+
+                try:
+                    results
+                except:
+                    raise Http404
+
+                data = {
+                    'entity': results,
+                    'id': pk,
+                    'rut': formatRut(datos.username)
+                }
+
+                return render(request, 'visitas/detalle_visita.html', data)
     else:
         return render(request, 'error/auth.html')
 
@@ -1091,15 +1264,43 @@ def PerfilUsuario(request, pk):
         }
 
     if datos.is_profesional == 0 and datos.is_staff == 0 and datos.is_superuser == 0:
-        cursor = connection.cursor()
-        cursor.execute(
-            'EXEC [dbo].[SP_DETALLE_CUENTA_CLIENTE] {0}'.format(datos.username[:-1]))
-        result = cursor.fetchall()
-        
-        data = {
-            'entity': result,
-            'rut': formatRut(datos.username)
-        }
+        if contratoActivo(datos.username) == False:
+            return render(request, 'pagos/pago_venc.html', data)
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+
+            for i in pagoActual:
+                estadoPago = i[0]
+
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
+
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == 0:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                cursor = connection.cursor()
+                cursor.execute(
+                    'EXEC [dbo].[SP_DETALLE_CUENTA_CLIENTE] {0}'.format(datos.username[:-1]))
+                result = cursor.fetchall()
+                
+                data = {
+                    'entity': result,
+                    'rut': formatRut(datos.username)
+                }
 
     return render(request, 'perfil/perfil.html', data)
 
@@ -1109,16 +1310,44 @@ def DetalleChecklist(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_DETALLE_CHECKLIST] {}'.format(pk))
-        result = cursor.fetchall()
+        if contratoActivo(datos.username) == False:
+            return render(request, 'pagos/pago_venc.html', data)
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
 
-        data = {
-            'entity': result,
-            'id': pk
-        }
+            for i in pagoActual:
+                estadoPago = i[0]
 
-        return render(request, 'checklist/detalle_checklist.html', data)
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
+
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == 0:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                cursor = connection.cursor()
+                cursor.execute('EXEC [dbo].[SP_DETALLE_CHECKLIST] {}'.format(pk))
+                result = cursor.fetchall()
+
+                data = {
+                    'entity': result,
+                    'id': pk
+                }
+
+                return render(request, 'checklist/detalle_checklist.html', data)
     else:
         return render(request, 'error/auth.html')
 
@@ -1227,49 +1456,51 @@ def InformeVisitaCliente(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0 and datos.is_superuser == 0:
-        fecha = datetime.now()
+        if contratoActivo(datos.username) == False:
+            return render(request, 'pagos/pago_venc.html', data)
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
 
-        cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_INFORME_VISITA_CLI] {}'.format(pk))
-        result = cursor.fetchall()
+            for i in pagoActual:
+                estadoPago = i[0]
 
-        plan = cursor.execute('EXEC [dbo].[SP_PLAN_MEJORA_INFO] {}'.format(pk))
-        mejora = plan.fetchall()
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
 
-        data = {
-            'id': pk,
-            'entity': result,
-            'mejora': mejora,
-            'c': len(mejora)
-        }
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
 
-        return render(request, 'informes/informe_visita_cliente.html', data)
-    else:
-        return render(request, 'error/auth.html')
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
 
+            if estadoPago == 0:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                fecha = datetime.now()
 
-@login_required
-def InformeVisitaCliente(request, pk):
-    datos = request.user
+                cursor = connection.cursor()
+                cursor.execute('EXEC [dbo].[SP_INFORME_VISITA_CLI] {}'.format(pk))
+                result = cursor.fetchall()
 
-    if datos.is_profesional == 0 and datos.is_staff == 0 and datos.is_superuser == 0:
-        fecha = datetime.now()
+                plan = cursor.execute('EXEC [dbo].[SP_PLAN_MEJORA_INFO] {}'.format(pk))
+                mejora = plan.fetchall()
 
-        cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_INFORME_VISITA_CLI] {}'.format(pk))
-        result = cursor.fetchall()
+                data = {
+                    'id': pk,
+                    'entity': result,
+                    'mejora': mejora,
+                    'c': len(mejora)
+                }
 
-        plan = cursor.execute('EXEC [dbo].[SP_PLAN_MEJORA_INFO] {}'.format(pk))
-        mejora = plan.fetchall()
-
-        data = {
-            'id': pk,
-            'entity': result,
-            'mejora': mejora,
-            'c': len(mejora)
-        }
-
-        return render(request, 'informes/informe_visita_cliente.html', data)
+                return render(request, 'informes/informe_visita_cliente.html', data)
     else:
         return render(request, 'error/auth.html')
 

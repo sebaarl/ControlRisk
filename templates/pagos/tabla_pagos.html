@@ -12,6 +12,47 @@
 </div>
 
 <div class="dash-content">
+    <h2 style="text-align: center" class="act">ESTOS SON TUS PAGOS DEL MES ACTUAL</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="text-transform: uppercase">Fecha Pago</th>
+                <th style="text-transform: uppercase">Fecha Vencimiento</th>
+                <th style="text-transform: uppercase">Valor Cuota</th>
+                <th style="text-transform: uppercase">Monto Extra</th>
+                <th style="text-transform: uppercase">Estado</th>
+                <th style="text-transform: uppercase">Detalle</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in pagosMes %}
+            <tr>
+                <td>{{ item.1 }}</td>
+                <td>{{ item.2 }}</td>
+                <td>{{ item.4 }}</td>
+                <td>{{ item.9 }}</td>
+                {% if item.5 == False %}
+                <td class="container-status">
+                    <div class="status-no">
+                        <p>NO PAGADO</p>
+                    </div>
+                </td>
+                {% else %}
+                <td class="container-status">
+                    <div class="status">
+                        <p>PAGADO</p>
+                    </div>
+                </td>
+                {% endif %}
+                <td><a href='{% url "base:pago-detail" item.0 %}' class="detail"><i class="uil uil-external-link-alt"></i></a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br> <br> <br>
+
+    <h2 style="text-align: center" class="act">ESTOS SON TUS PAGOS</h2>
     <table>
         <thead>
             <tr>

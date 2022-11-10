@@ -56,37 +56,14 @@ def formatRut(rut):
     return formato
 
 
-def pagoVenc(rut):
-    cursor = connection.cursor()
-    now = datetime.now()
-    pagoActual = cursor.execute(
-        'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(rut))
-
-    for i in pagoActual:
-        estadoPago = i[0]
-
-    if estadoPago == False:
-        estado = 0
-    else:
-        estado = 1
-
-    return estado
-
-
-def contratoActivo(rut):
-    activo = Contrato.objects.filter(rutcliente=rut).filter(estado=1)
-    return activo
-
-
 @login_required
 def HomeView(request):
     user = request.user
 
     if user.is_profesional == 0 and user.is_staff == 0:
-        activo = Contrato.objects.filter(
-            rutcliente=user.username).filter(estado=1)
-        if activo == False:
-            return render(request, 'error/500.html', data)
+        activo = Contrato.objects.filter(rutcliente=user.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
             now = datetime.now()
@@ -106,16 +83,21 @@ def HomeView(request):
                 pagoId = a[3]
 
             data = {
-                'user': user, 'pago': estadoPago,
-                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
-                'mes': mesPago, 'id': pagoId}
-
+                'user': user, 
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 
+                'fechaVenc': fechaVenc,
+                'mes': mesPago, 
+                'id': pagoId,
+                'activo': activo
+            }
+            
             if estadoPago == False:
                 return render(request, 'pagos/pago_venc.html', data)
             else:
                 return render(request, 'home.html', data)
-    else:
-        return render(request, 'home.html', data)
+                
+    return render(request, 'home.html', data)
 
 
 @login_required
@@ -280,15 +262,10 @@ def ListClienteView(request):
 def CreateAccidentView(request):
     datos = request.user
 
-    data = {
-        'accidente': CreateAccidenteForm()
-    }
-
-    if datos.is_staff == 1 or datos.is_profesional == 1:
-        return render(request, 'error/auth.html')
-    else:
-        if contratoActivo(datos.username) == False:
-            return render(request, 'pagos/pago_venc.html', data)
+    if datos.is_staff == 0 and datos.is_profesional == 0:
+        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html',)
         else:
             cursor = connection.cursor()
             now = datetime.now()
@@ -298,8 +275,7 @@ def CreateAccidentView(request):
             for i in pagoActual:
                 estadoPago = i[0]
 
-            pago = cursor.execute(
-                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+            pago = cursor.execute('EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
 
             for a in pago:
                 fechaPago = a[0]
@@ -309,8 +285,11 @@ def CreateAccidentView(request):
 
             data = {
                 'pago': estadoPago,
-                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
-                'mes': mesPago, 'id': pagoId}
+                'fechaPago': fechaPago, 
+                'fechaVenc': fechaVenc,
+                'mes': mesPago, 
+                'id': pagoId
+            }
 
             if estadoPago == 0:
                 return render(request, 'pagos/pago_venc.html', data)
@@ -335,8 +314,8 @@ def CreateAccidentView(request):
                     else:
                         messages.error(request, "Formulario no valido")
                 return render(request, 'accidentes/create_accident.html', data)
-
-        return render(request, 'accidentes/create_accident.html', data)
+    else:
+        return render(request, 'error/auth.html')
 
 
 # Vistas Contrato
@@ -451,8 +430,9 @@ def ContratoClientView(request):
     datos = request.user
 
     if datos.is_staff == 0 and datos.is_profesional == 0:
-        if contratoActivo(datos.username) == False:
-            return render(request, 'pagos/pago_venc.html', data)
+        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
             now = datetime.now()
@@ -546,6 +526,10 @@ def PagosContractView(request, pk):
         cursor.execute('EXEC [dbo].[SP_PAGOS_CONTRATO] {}'.format(str(pk)))
         results = cursor.fetchall()
 
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_PAGOS_CONTRATO_MES_ACTUAL] {}'.format(str(pk)))
+        pagosMesActual = cursor.fetchall()
+
         try:
             results
         except:
@@ -554,6 +538,7 @@ def PagosContractView(request, pk):
         data = {
             "entity": results,
             'c': pk,
+            'pagosMes': pagosMesActual
         }
 
         return render(request, 'pagos/tabla_pagos.html', data)
@@ -616,8 +601,9 @@ def AsesoriaEspecialClienteView(request):
     }
 
     if usuario.is_staff == 0 and usuario.is_profesional == 0:
-        if contratoActivo(usuario.username) == False:
-            return render(request, 'pagos/pago_venc.html', data)
+        activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
             now = datetime.now()
@@ -672,8 +658,9 @@ def AsesoriaClienteView(request):
     usuario = request.user
 
     if usuario.is_staff == 0 and usuario.is_profesional == 0:
-        if contratoActivo(usuario.username) == False:
-            return render(request, 'pagos/pago_venc.html', data)
+        activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
             now = datetime.now()
@@ -725,8 +712,9 @@ def DetalleAsesoriaClienteView(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        if contratoActivo(datos.username) == False:
-            return render(request, 'pagos/pago_venc.html', data)
+        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
             now = datetime.now()
@@ -779,8 +767,9 @@ def CapacitacionesView(request):
     usuario = request.user
 
     if usuario.is_staff == 0 and usuario.is_profesional == 0:
-        if contratoActivo(usuario.username) == False:
-            return render(request, 'pagos/pago_venc.html', data)
+        activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
             now = datetime.now()
@@ -835,8 +824,9 @@ def DetalleCapacitacionView(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        if contratoActivo(datos.username) == False:
-            return render(request, 'pagos/pago_venc.html', data)
+        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
             now = datetime.now()
@@ -889,8 +879,9 @@ def VisitasClienteView(request):
     usuario = request.user
 
     if usuario.is_staff == 0 and usuario.is_profesional == 0:
-        if contratoActivo(usuario.username) == False:
-            return render(request, 'pagos/pago_venc.html', data)
+        activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
             now = datetime.now()
@@ -945,8 +936,9 @@ def DetalleVisitaView(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        if contratoActivo(datos.username) == False:
-            return render(request, 'pagos/pago_venc.html', data)
+        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
             now = datetime.now()
@@ -1264,8 +1256,9 @@ def PerfilUsuario(request, pk):
         }
 
     if datos.is_profesional == 0 and datos.is_staff == 0 and datos.is_superuser == 0:
-        if contratoActivo(datos.username) == False:
-            return render(request, 'pagos/pago_venc.html', data)
+        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
             now = datetime.now()
@@ -1310,8 +1303,9 @@ def DetalleChecklist(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        if contratoActivo(datos.username) == False:
-            return render(request, 'pagos/pago_venc.html', data)
+        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
             now = datetime.now()
@@ -1456,8 +1450,9 @@ def InformeVisitaCliente(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0 and datos.is_superuser == 0:
-        if contratoActivo(datos.username) == False:
-            return render(request, 'pagos/pago_venc.html', data)
+        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
             now = datetime.now()

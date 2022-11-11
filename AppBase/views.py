@@ -1,8 +1,5 @@
 from multiprocessing import connection, context
-from pipes import Template
 from re import I
-import re
-from unittest import result
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -31,8 +28,6 @@ from dateutil.rrule import *
 from dateutil.parser import *
 from django.views import View
 
-import os
-from django.conf import settings
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
@@ -67,7 +62,7 @@ def HomeView(request):
         else:
             cursor = connection.cursor()
             now = datetime.now()
-            pagoActual = cursor.execute(
+            pagoActual = cursor.execute( 
                 'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(user.username))
 
             for i in pagoActual:
@@ -91,7 +86,7 @@ def HomeView(request):
                 'id': pagoId,
                 'activo': activo
             }
-            
+
             if estadoPago == False:
                 return render(request, 'pagos/pago_venc.html', data)
             else:
@@ -1464,7 +1459,6 @@ def InformeVisitaCliente(request, pk):
 
             pago = cursor.execute(
                 'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
-
             for a in pago:
                 fechaPago = a[0]
                 fechaVenc = a[1]

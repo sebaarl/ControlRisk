@@ -14,6 +14,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         auto_now_add=True, db_column='FechaCreacion')
     last_login = models.DateTimeField(
         auto_now=True, db_column='Last_login')
+    email = models.EmailField(max_length=254, null=True, db_column="CorreoElectronico")
     is_staff = models.BooleanField(default=False, db_column="Is_staff")
     is_active = models.BooleanField(default=True, db_column='Estado')
     is_profesional = models.BooleanField(default=False, db_column="Is_Profesional")

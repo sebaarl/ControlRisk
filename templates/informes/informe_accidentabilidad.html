@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Reporte Tasa Anual - ControlRisk</title>
+{% endblock %}
+
+{% block link %}
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-file-check-alt"></i>
+    <span class="text">Informe, Visita : {{ id }}</span>
+</div>
+
+<div class="container">
+    {{ plt }}
+</div>
+{% endblock %}

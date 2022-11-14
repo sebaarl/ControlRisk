@@ -13,11 +13,11 @@
   <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
   <link rel="icon" href="{% static 'images/prevencion.png'%}">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
-  integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
-<body style="width: 100% !important;" class="bg-danger">
+<body style="width: 100% !important; overflow: hidden;" class="bg-danger">
   <section class="container forms" style="width: 100% !important;">
     <div class="form login">
       <div class="form-content">
@@ -27,17 +27,9 @@
         {% block content %}
         <header>Inicio de sesión</header>
         <form action='' method="POST">
+          {% load crispy_forms_tags %}
           {% csrf_token %}
-          <div class="field input-field">
-            <!-- <input type="email" placeholder="Nombre de usuario" class="input"> -->
-            {{ loginForm.username }}
-          </div>
-
-          <div class="field input-field">
-            <!-- <input id="pass" type="password" placeholder="Contraseña" class="password"> -->
-            {{ loginForm.password }}
-          </div>
-
+          {{ form | crispy }}
           <div class="forget">
             <a href='{% url "password_reset" %}'>Olvidaste tu contraseña?</a>
           </div>
@@ -47,24 +39,23 @@
           </div>
         </form>
         {% endblock %}
-        {% if messages %}
-        {% for m in messages %}
-        <script>
-          Swal.fire({
-            'tittle': 'Exito',
-            'text': '{{ m }}',
-            'icon': 'success',
-            'confirmButtonColor': '#ff131d',
-            'confirmButtonText': 'Aceptar',
-          })
-        </script>
-        {% endfor %}
-        {% endif %}
-
-
       </div>
+    </div>
   </section>
   <script src='{% static "js/main.js" %}'></script>
+  {% if messages %}
+  {% for m in messages %}
+  <script>
+    Swal.fire({
+      'tittle': 'Exito',
+      'text': '{{ m }}',
+      'icon': 'success',
+      'confirmButtonColor': '#ff131d',
+      'confirmButtonText': 'Aceptar',
+    })
+  </script>
+  {% endfor %}
+  {% endif %}
 </body>
 
 </html>

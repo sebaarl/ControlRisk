@@ -33,6 +33,15 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from rut_chile import rut_chile
 
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import warnings
+warnings.filterwarnings('ignore')
+
+plt.rcParams["figure.figsize"] = (12,5)
+
 
 def rut(rut):
     puntos = rut.replace('.', '')
@@ -54,6 +63,10 @@ def formatRut(rut):
 @login_required
 def HomeView(request):
     user = request.user
+
+    data = {
+        'user': user, 
+    }
 
     if user.is_profesional == 0 and user.is_staff == 0:
         activo = Contrato.objects.filter(rutcliente=user.username).filter(estado=1).count()
@@ -1360,12 +1373,13 @@ def TasaAccidentabildiadView(request, pk):
         cursor.execute('EXEC [dbo].[SP_LISTAR_TASA_CONTRATO_ANUAL] {}'.format(pk))
         anual = cursor.fetchall()
 
-        cursor.execute(
-            'SELECT [dbo].[FN_ACCIDENTES_PERIODO](%s, %s)', (pk, '10-2022'))
-        accidentes = cursor.fetchall()
 
         date = datetime.now()
         periodo = date.strftime('%Y-%m')
+
+        cursor.execute(
+            'SELECT [dbo].[FN_ACCIDENTES_PERIODO](%s, %s)', (pk, periodo))
+        accidentes = cursor.fetchall()
 
         data = {
             'id': pk,
@@ -1373,7 +1387,7 @@ def TasaAccidentabildiadView(request, pk):
             'annio': annio,
             'entity': result,
             'accidente': accidentes,
-            'anual': anual
+            'anual': anual,
         }
 
         if 'btnmensual' in request.POST:
@@ -1598,3 +1612,37 @@ class Error500View(TemplateView):
             return r
 
         return view
+
+
+# Graficos :D
+def ReporteAccidentabilidad(request):
+    datos = request.user
+
+    if datos.is_profesional == 1 and datos.is_staff == 1 and datos.is_superuser == 1:
+        return render(request, 'error/auth.html')
+    else:
+        sql_query = pd.read_sql_query(''' 
+                                    SELECT Tasa, Periodo, CantidadAccidentes, Cliente.RutCliente, TasaAccidente.ContratoID, CantidadTrabajadores 
+                                    FROM TasaAccidente JOIN Contrato ON (TasaAccidente.ContratoID = Contrato.ContratoID)
+	                                JOIN Cliente ON (Contrato.RutCliente = Cliente.RutCliente)
+                                    WHERE Contrato.ContratoID = 49 AND LEN(Periodo) = 7
+                                    ''', connection)
+
+        df_accident = pd.DataFrame(sql_query, columns=['TasaID', 'Tasa', 'Periodo', 'Accidentes', 'Cliente', 'Contrato', 'CantidadTrabajadores'])
+        
+        a = df_accident['Periodo']
+        b = df_accident['Tasa']
+
+        f, ax = plt.subplots(1, 1, figsize=(25, 10))
+        ax = sns.lineplot(data=b,markers=True, dashes=False, palette="flare")
+        plt.title("Variación de promedio notas respecto al consumo de alcohol en los estudiantes", fontsize=20)
+        plt.xlabel("Nivel de consumo los fines de semana",fontsize=18)
+        plt.ylabel("Nota",fontsize=18)
+
+
+        data = {
+            'plt': plt.show()
+        }
+
+        return render(request, 'informes/informe_accidentabilidad.html', data)
+        

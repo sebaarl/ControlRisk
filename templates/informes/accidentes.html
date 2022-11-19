@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Reporte Tasa Anual - ControlRisk</title>
+{% endblock %}
+
+{% block link %}
+<script src="{% static 'lib/highcharts/highcharts.js' %}"></script>
+<script src="{% static 'lib/highcharts/modules/series-label.js' %}"></script>
+<script src="{% static 'lib/highcharts//modules/exporting.js' %}"></script>
+<script src="{% static 'lib/highcharts/modules/export-data.js' %}"></script>
+<script src="{% static 'lib/highcharts/modules/accessibility.js' %}"></script>
+{% endblock %}
+
+<style>
+    .highcharts-figure,
+    .highcharts-data-table table {
+        min-width: 360px;
+        max-width: 800px;
+        margin: 1em auto;
+    }
+
+    .highcharts-data-table table {
+        font-family: Verdana, sans-serif;
+        border-collapse: collapse;
+        border: 1px solid #ebebeb;
+        margin: 10px auto;
+        text-align: center;
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .highcharts-data-table caption {
+        padding: 1em 0;
+        font-size: 1.2em;
+        color: #555;
+    }
+
+    .highcharts-data-table th {
+        font-weight: 600;
+        padding: 0.5em;
+    }
+
+    .highcharts-data-table td,
+    .highcharts-data-table th,
+    .highcharts-data-table caption {
+        padding: 0.5em;
+    }
+
+    .highcharts-data-table thead tr,
+    .highcharts-data-table tr:nth-child(even) {
+        background: #f8f8f8;
+    }
+
+    .highcharts-data-table tr:hover {
+        background: #f1f7ff;
+    }
+
+    .parent {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(7, 1fr);
+        grid-column-gap: 12px;
+        grid-row-gap: 14px;
+    }
+
+    .div1 {
+        grid-area: 1 / 1 / 2 / 2;
+    }
+
+    .div2 {
+        grid-area: 1 / 2 / 2 / 4;
+    }
+
+    .div2 p {
+        font-size: 2rem;
+    }
+
+    .div3 {
+        grid-area: 2 / 1 / 4 / 4;
+    }
+
+    .reporte-content {
+        font-size: 20px;
+    }
+
+    .div4 {
+        grid-area: 4 / 1 / 7 / 3;
+    }
+
+    .div5 {
+        grid-area: 7 / 1 / 8 / 4;
+    }
+
+    .div6 {
+        grid-area: 4 / 3 / 7 / 4;
+    }
+</style>
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-file-check-alt"></i>
+    <span class="text">Informe Accidentes, Contrato : {{ rut }}-{{ year }}-{{ id }}</span>
+</div>
+
+<div class="parent">
+    <div class="div1"></div>
+    <div class="div2" style="margin-bottom: 20px">
+        <h3 style="font-size: 2rem; ">Reporte de Accidentes : {{ inicio }} - {{ final }}</h3>
+    </div>
+    <div class="div3" style="margin-bottom: 20px;">
+        <div>
+            <h3 style="font-size: 20px">Datos Reporte</h3>
+            <div class="reporte-content">
+                <br>
+                <p style="font-size: 13px; padding: 10px;">Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum sapiente placeat beatae illo iusto
+                    quidem nulla, facere labore eveniet necessitatibus quam, debitis perferendis ad nostrum veritatis
+                    aspernatur delectus. Tempore, quos! Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam
+                    fugit cumque nobis tempora ipsam omnis libero, incidunt vitae nam sed molestias, unde dolore
+                    recusandae doloremque, modi sit vero obcaecati? A.
+                    <br> <br>
+                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. A nihil ad repellendus exercitationem laudantium praesentium quod beatae, mollitia, eum fugit veritatis repudiandae omnis eos iusto quo deleniti ex maxime nulla. Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis et hic qui nostrum adipisci! Qui vel quibusdam provident eligendi aspernatur, accusamus recusandae similique facere doloribus eos, cumque architecto, molestiae dolor! Lorem ipsum dolor sit amet consectetur, adipisicing elit. Distinctio earum recusandae veritatis, quas ipsa dolores, delectus ut quasi magnam sequi rem! Repellendus, consequuntur quis. Quisquam doloremque vitae nostrum placeat et?
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="div4">
+        <figure class="highcharts-figure">
+            <div id="container"></div>
+
+        </figure>
+    </div>
+    <div class="div5"> </div>
+    <div class="div6" style="margin-bottom: 20px;">
+        <div>
+            <div class="reporte-content">
+                <br>
+                <p style="font-size: 13px; padding: 10px;">Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum sapiente placeat beatae illo iusto
+                    quidem nulla, facere labore eveniet necessitatibus quam, debitis perferendis ad nostrum veritatis
+                    aspernatur delectus. Tempore, quos! Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam
+                    fugit cumque nobis tempora ipsam omnis libero, incidunt vitae nam sed molestias, unde dolore
+                    recusandae doloremque, modi sit vero obcaecati? A.
+                    <br> <br>
+                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. A nihil ad repellendus exercitationem laudantium praesentium quod beatae, mollitia, eum fugit veritatis repudiandae omnis eos iusto quo deleniti ex maxime nulla. Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis et hic qui nostrum adipisci! Qui vel quibusdam provident eligendi aspernatur, accusamus recusandae similique facere doloribus eos, cumque architecto, molestiae dolor! Lorem ipsum dolor sit amet consectetur, adipisicing elit. Distinctio earum recusandae veritatis, quas ipsa dolores, delectus ut quasi magnam sequi rem! Repellendus, consequuntur quis. Quisquam doloremque vitae nostrum placeat et?
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="boton">
+        <div class="button-c pdf">
+            <a class="btn" href="" target="_blank">Generar pdf de informe</a>
+        </div>
+    </div>
+    <script type=text/javascript>
+        Highcharts.chart('container', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Cantidad de Accidentes Periodo Contrato' 
+            },
+            subtitle: {
+                text: ''
+            },
+            xAxis: {
+                categories: [
+                    'Enero',
+                    'Febrero',
+                    'Marzo',
+                    'Abril',
+                    'Mayo',
+                    'Junio',
+                    'Julio',
+                    'Agosto',
+                    'Septiembre',
+                    'Octubre',
+                    'Noviembre',
+                    'Diciembre'
+                ],
+                crosshair: true
+            },
+            yAxis: {
+                title: {
+                    useHTML: true,
+                    text: 'Cantidad de accidentes'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: [{
+                name: 'Accidentes',
+                showInLegnd: false,
+                colorByPoint: true,
+                data: {{ graph_accident_month }}
+
+            }]
+        });
+    </script>
+</div>
+{% endblock %}

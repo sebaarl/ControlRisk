@@ -2,7 +2,7 @@ from django.urls import path
 from django.conf.urls import handler404, handler500
 
 
-from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView,ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView,ContratoEmpleadoView, PagosDetailView, AsesoriaClienteView, AsesoriaEspecialClienteView, AsesoriaClienteView, AsesoriasEmpleadoView, CapacitacioesEmpleadoView, VisitasEmpleadoView, DetalleAsesoriaView, VisitasClienteView, DetalleVisitaView, DetalleAsesoriaClienteView, DetalleVisitaEmpleadoView, ChecklistView, ClientesEmpleadoView, ClienteDetalle, PerfilUsuario, DetalleChecklist, TasaAccidentabildiadView, InformeVisitaEmp, InformeVisitaCliente, DetallePlanMejora, DetalleCapacitacionEmp, CrearCapacitacion, CapacitacionesView, DetalleCapacitacionView, Error404View, Error500View, ReporteAccidentabilidad
+from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView,ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView,ContratoEmpleadoView, PagosDetailView, AsesoriaClienteView, AsesoriaEspecialClienteView, AsesoriaClienteView, AsesoriasEmpleadoView, CapacitacioesEmpleadoView, VisitasEmpleadoView, DetalleAsesoriaView, VisitasClienteView, DetalleVisitaView, DetalleAsesoriaClienteView, DetalleVisitaEmpleadoView, ChecklistView, ClientesEmpleadoView, ClienteDetalle, PerfilUsuario, DetalleChecklist, TasaAccidentabildiadView, InformeVisitaEmp, InformeVisitaCliente, DetallePlanMejora, DetalleCapacitacionEmp, CrearCapacitacion, CapacitacionesView, DetalleCapacitacionView, Error404View, Error500View, ReporteAccidentabilidad, InformesClienteView
 
 app_name = 'base'
 
@@ -60,7 +60,8 @@ urlpatterns = [
     path('pagos/contrato/<pk>/', PagosContractView, name='pago-contract'),
     path('pagos/detalle/<pk>/', PagosDetailView, name='pago-detail'),
 
-    path('reportes/', ReporteAccidentabilidad, name='reporte-tasa'),
+    path('informes/', InformesClienteView, name='reportes'),
+    path('informes/<pk>/accidentes', ReporteAccidentabilidad, name='reporte-tasa'),
 ]
 
 handler404 = Error404View.as_view()

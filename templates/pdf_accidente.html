@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>
+    .img-invoice {
+        width: 80px;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .head {
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    #invoice thead tr th {
+        width: 100%;
+        text-align: left;
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+        padding-top: 4px;
+    }
+
+    #invoice thead tr {
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    #invoice tbody tr {
+        padding: 0;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .td-table {
+        padding: 8px;
+        margin-bottom: 20px;
+    }
+    .container p,
+    b,
+    th {
+        font-size: 13px;
+    }
+
+    td {
+        font-size: 12px;
+    }
+
+    .aviso {
+        margin-top: 10px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    div > h1 {
+        text-align: center;
+        margin: 30px;
+    }
+
+    img {
+        width: 150px;
+    }
+
+    .info {
+        font-size: 13px !important;
+    }
+
+    .firmas {
+        width: 100px;
+        margin-top: 50px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .firmass {
+        width: 100px;
+        margin-top: 50px;
+        position: absolute;
+    }
+
+    .container-firmas {
+        margin: 0 auto !important;
+        text-align: center;
+        margin-top: 100px !important;
+    }
+    
+
+</style>
+
+<body>
+    <img src="../static/images/ControlRisk_Logo.png" class="img-invoice">
+    <p class="head">
+        {{ comp.name|upper }}<br>
+        {{ comp.rut}}<br>
+        {{ comp.direccion|upper }}
+    </p>
+    <div style="margin: 50px;">
+        <h1>****REPORTE ACCIDENTES PERIODO  - CONTROLRISK****</h1>
+    </div>
+    <div class="container">
+        <p>
+            <b>NRO CONTRATO:</b> {{ contrato.0 }}<br><br>
+        </p>
+        <table id="invoice">
+            <b>RUT EMPRESA CLIENTE :</b><span class="info">  {{ contrato.1 }}</span><br><br>
+            <b>RAZÓN SOCIAL EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.11 }}</span><br><br>
+            <b>REPRESENTANTE LEGAL EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.13 }}</span><br><br>
+            <b>RUBRO EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.15 }}</span><br><br>
+            <b>DIRECCIÓN EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.12 }}</span><br><br>
+            <b>TELÉFONO EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.14 }}</span><br><br><br>
+            <b>RUT EMPLEADO ENCARGADO : <span class="info">  {{ contrato.2 }}</span></b> <br><br>
+            <b>NOMBRE EMPELADO ENCARGADO : <span class="info">  {{ contrato.16 }}</span></b> <br><br><br>
+            <thead>
+                <tr>
+                    <th style="width: 33%;">VALOR MENSUAL CONTRATO</th>
+                    <th style="width: 34%;">NRO DE CUOTAS</th>
+                    <th style="width: 33%;">VALOR TOTAL CONTRATO</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr {% if forloop.first %}style="padding-top: 3px;" {% endif %} class="table" style="width: 100%">
+                    <td class="td-table">{{ contrato.17 }}</td>
+                    <td class="td-table">{{ contrato.7 }} CUOTAS</td>
+                    <td class="td-table">{{ contrato.5 }}</td>
+                </tr>
+            </tbody>
+        </table><br><br><br>
+        <div>
+            <b>CANTIDAD DE ASESORIAS MENSUALES INCLUIDAS EN EL CONTRATO:</b><span class="info">  {{ contrato.3 }} ASESORIAS</span><br><br>
+            <b>CANTIDAD DE CAPACITACIONES MENSUALES INCLUIDAS EN EL CONTRATO :</b> <span class="info">  {{ contrato.4 }} CAPACITACIONES</span><br><br>
+            <b>CANTIDAD DE VISITAS A TERRENO MENSUALES INCLUIDAS EN EL CONTRATO :</b> <span class="info">  2 VISITAS</span><br><br>
+        </div>
+        <div class="aviso">
+            <span style="margin-top: 5px">**TODA ACTIVDAD (ASESORIAS, CAPACITACIONES O VISITAS) QUE HAYA SUPERADO EL LIMITE MENSUAL ASIGNADO EN EL CONTRATO SERÁ CARGADO EN SU BOLETA MENSUAL COMO COBROS EXTRAS**</span>
+        </div>
+        <div>
+            <b>CONTRATO VALIDO DESDE :</b><span class="info">  {{ contrato.8 }}</span><br><br>
+            <b>CONTRATO VALIDO HASTA :</b> <span class="info">  {{ contrato.10 }}</span><br><br>
+            <b>FECHA PAGO DE PRIMERA CUOTA :</b> <span class="info">  {{ contrato.9 }}</span><br><br>
+        </div>
+    </div><br><br><br><br><br><br><br><br><br><br><br><br>
+    <div>
+        {% if contrato.18 == '0' %}
+            <b>ESTADO DEL CONTRATO : <span class="info"> FINALIZADO</span></b><br><br>
+        {% else %}
+            <b>ESTADO DEL CONTRATO : <span class="info"> CONTRATO VIGENTE</span></b><br><br>
+        {% endif %}
+    </div>
+    <div>
+        {% if contrato.6 == '1' %}
+            <b>ESTADO DE PAGO DEL CONTRATO : <span class="info"> CONTRATO PAGADO</span></b><br><br>
+        {% else %}
+            <b>ESTADO DE PAGO DEL CONTRATO : <span class="info"> PAGANDO</span></b><br><br>
+        {% endif %}
+    </div>
+    <div class="container-firmas" style="margin-top: 100px">     
+        <div class="firmas">
+            <div class="firma-container">
+                <img src="../static/images/firma2.png" alt="">
+                <div>
+                    <p >FIRMA VICEPRESIDENTE JUNIOR</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-firmas" style="margin-top: 100px">     
+        <div class="firmas">
+            <div class="firma-container">
+                <img src="../static/images/firma2.png" alt="">
+                <div>
+                    <p >FIRMA VICEPRESIDENTE JUNIOR</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-firmas" style="margin-top: 100px">     
+        <div class="firmas">
+            <div class="firma-container">
+                <img src="../static/images/firma2.png" alt="">
+                <div>
+                    <p >FIRMA VICEPRESIDENTE JUNIOR</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

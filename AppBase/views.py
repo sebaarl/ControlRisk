@@ -14,6 +14,11 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
+from django.db.models.functions import Coalesce
+from django.db.models import Count, Sum
+
+from django.core.mail import EmailMessage
+from django.template import RequestContext, context
 
 from AppBase.forms import CreateAsesoriaEspecial, CreateClienteForm, CreateEmpleadoForm, CreateContratoForm, CreateAccidenteForm, EstadoAsesoria, EstadoVisita, ChecklistItem, ChecklistForm
 from AppBase.models import Asesoria, Capacitacion, Cliente, Empleado, Contrato, Accidente, Historialactividad, Itemschecklist, Mejora
@@ -1614,35 +1619,89 @@ class Error500View(TemplateView):
         return view
 
 
-# Graficos :D
-def ReporteAccidentabilidad(request):
+# Informes Cliente
+def InformesClienteView(request):
     datos = request.user
 
     if datos.is_profesional == 1 and datos.is_staff == 1 and datos.is_superuser == 1:
         return render(request, 'error/auth.html')
     else:
-        sql_query = pd.read_sql_query(''' 
-                                    SELECT Tasa, Periodo, CantidadAccidentes, Cliente.RutCliente, TasaAccidente.ContratoID, CantidadTrabajadores 
-                                    FROM TasaAccidente JOIN Contrato ON (TasaAccidente.ContratoID = Contrato.ContratoID)
-	                                JOIN Cliente ON (Contrato.RutCliente = Cliente.RutCliente)
-                                    WHERE Contrato.ContratoID = 49 AND LEN(Periodo) = 7
-                                    ''', connection)
-
-        df_accident = pd.DataFrame(sql_query, columns=['TasaID', 'Tasa', 'Periodo', 'Accidentes', 'Cliente', 'Contrato', 'CantidadTrabajadores'])
-        
-        a = df_accident['Periodo']
-        b = df_accident['Tasa']
-
-        f, ax = plt.subplots(1, 1, figsize=(25, 10))
-        ax = sns.lineplot(data=b,markers=True, dashes=False, palette="flare")
-        plt.title("Variación de promedio notas respecto al consumo de alcohol en los estudiantes", fontsize=20)
-        plt.xlabel("Nivel de consumo los fines de semana",fontsize=18)
-        plt.ylabel("Nota",fontsize=18)
-
+        cantidad = Contrato.objects.all().filter(rutcliente=datos.username).count()
+        cursor = connection.cursor()
+        cursor.execute(
+            'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
+        results = cursor.fetchall()
 
         data = {
-            'plt': plt.show()
+            'entity': results,
+            'c': cantidad
         }
 
-        return render(request, 'informes/informe_accidentabilidad.html', data)
-        
+        return render(request, 'informes/informes.html', data)
+
+
+# Graficos :D
+def ReporteAccidentabilidad(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 1 and datos.is_staff == 1 and datos.is_superuser == 1:
+        return render(request, 'error/auth.html')
+    else:
+        cursor = connection.cursor()
+        cursor.execute('SELECT dbo.FN_GET_ID({})'.format(datos.username))
+        contrato = cursor.fetchall()
+
+        for i in contrato:
+            cid = i[0]
+
+        valores = []
+
+        for m in range(1, 13):
+            acc = Accidente.objects.filter(contratoid=pk, fecha__month=m).aggregate(r=Coalesce(Count('accidenteid'), 0)).get('r')
+            valores.append(acc)
+
+        cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino),RazonSocial FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) WHERE ContratoID = {}'.format(pk))
+        contrato = cursor.fetchall()
+
+        for i in contrato:
+            rut = i[0]
+            yearInicio = i[1]
+            contratoid = i[2]
+            monthInicio = i[3]
+            yearFinal = i[4]
+            monthFinal = i[5]
+            empresa = i[6]
+
+        data = {
+            'c': cid,
+            'id': contratoid,
+            'year': yearInicio,
+            'rut': rut,
+            'inicio': str(monthInicio) + '/' + str(yearInicio),
+            'final': str(monthFinal) + '/' + str(yearFinal),
+            'empresa': empresa,
+            'graph_accident_month': valores
+        }
+
+        return render(request, 'informes/accidentes.html', data)
+
+
+# PDF Reporte Accidentes
+class AccidentesPdf(View):
+    def get(self, request, *args, **kwargs):
+        pk = self.kwargs['pk']
+        cursor = connection.cursor()
+        cursor.execute('EXEC [dbo].[SP_CONTRACT_DETAIL] {}'.format(str(pk)))
+        results = cursor.fetchone()
+
+        template = get_template('pdf_accidente.html')
+        response = HttpResponse(content_type='application/pdf')
+        # response['Content-Disposition'] = 'attachment; filename="detalle_contrato.pdf"'
+        context = {
+            'comp': {'name': 'ControlRisk', 'rut': '99.999.999-k', 'direccion': 'Avenida Siempreviva 742'},
+            'contrato': results
+        }
+        html = template.render(context)
+        pisa_status = pisa.CreatePDF(html, dest=response)
+
+        return response        

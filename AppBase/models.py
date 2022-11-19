@@ -24,7 +24,7 @@ class RubroEmpresa(models.Model):
 
 
 class Accidente(models.Model):
-    accidenteid = models.AutoField(
+    accidenteid = models.IntegerField(
         db_column='AccidenteID', primary_key=True)
     fecha = models.DateTimeField(db_column='Fecha')
     descripcion = models.CharField(

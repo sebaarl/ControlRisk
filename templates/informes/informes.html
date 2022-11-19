@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Informes - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-invoice"></i>
+    <span class="text">Informes</span>
+</div>
+
+<div class="dash-content">
+    {% if c > 0 %}
+    {% for c in entity %}
+    <div class="acordion-pagos">
+        <details class="detail">
+            <summary>
+                <a href='{% url "base:reporte-tasa" c.0 %}'>
+                    <i class="uil uil-external-link-alt"></i> Informe de Accidentes Asociados al Contrato {{ c.20 }}-{{ c.19 }}-{{ c.0 }}
+                </a>
+            </summary>
+        </details>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="alerta">
+        <img src="{% static 'images/pay.png' %}" alt="">
+        <p>Tus pagos aparecerán aquí</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

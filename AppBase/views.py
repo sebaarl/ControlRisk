@@ -45,7 +45,7 @@ import seaborn as sns
 import warnings
 warnings.filterwarnings('ignore')
 
-plt.rcParams["figure.figsize"] = (12,5)
+plt.rcParams["figure.figsize"] = (12, 5)
 
 
 def rut(rut):
@@ -70,17 +70,18 @@ def HomeView(request):
     user = request.user
 
     data = {
-        'user': user, 
+        'user': user,
     }
 
     if user.is_profesional == 0 and user.is_staff == 0:
-        activo = Contrato.objects.filter(rutcliente=user.username).filter(estado=1).count()
+        activo = Contrato.objects.filter(
+            rutcliente=user.username).filter(estado=1).count()
         if activo == 0:
             return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
             now = datetime.now()
-            pagoActual = cursor.execute( 
+            pagoActual = cursor.execute(
                 'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(user.username))
 
             for i in pagoActual:
@@ -96,11 +97,11 @@ def HomeView(request):
                 pagoId = a[3]
 
             data = {
-                'user': user, 
+                'user': user,
                 'pago': estadoPago,
-                'fechaPago': fechaPago, 
+                'fechaPago': fechaPago,
                 'fechaVenc': fechaVenc,
-                'mes': mesPago, 
+                'mes': mesPago,
                 'id': pagoId,
                 'activo': activo
             }
@@ -109,7 +110,7 @@ def HomeView(request):
                 return render(request, 'pagos/pago_venc.html', data)
             else:
                 return render(request, 'home.html', data)
-                
+
     return render(request, 'home.html', data)
 
 
@@ -276,7 +277,8 @@ def CreateAccidentView(request):
     datos = request.user
 
     if datos.is_staff == 0 and datos.is_profesional == 0:
-        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        activo = Contrato.objects.filter(
+            rutcliente=datos.username).filter(estado=1).count()
         if activo == 0:
             return render(request, 'contrato/contrato_inactivo.html',)
         else:
@@ -288,7 +290,8 @@ def CreateAccidentView(request):
             for i in pagoActual:
                 estadoPago = i[0]
 
-            pago = cursor.execute('EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
 
             for a in pago:
                 fechaPago = a[0]
@@ -298,9 +301,9 @@ def CreateAccidentView(request):
 
             data = {
                 'pago': estadoPago,
-                'fechaPago': fechaPago, 
+                'fechaPago': fechaPago,
                 'fechaVenc': fechaVenc,
-                'mes': mesPago, 
+                'mes': mesPago,
                 'id': pagoId
             }
 
@@ -316,9 +319,9 @@ def CreateAccidentView(request):
                         accidentesave.medidas = request.POST['medidas']
 
                         cursor.execute('EXEC [dbo].[SP_CREATE_ACCIDENTE]  %s, %s, %s, %s', (accidentesave.fecha,
-                                                                                        accidentesave.descripcion,
-                                                                                        accidentesave.medidas,
-                                                                                        str(datos.username)))
+                                                                                            accidentesave.descripcion,
+                                                                                            accidentesave.medidas,
+                                                                                            str(datos.username)))
 
                         messages.success(
                             request, "Accidente registrado correctamente")
@@ -443,7 +446,8 @@ def ContratoClientView(request):
     datos = request.user
 
     if datos.is_staff == 0 and datos.is_profesional == 0:
-        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        activo = Contrato.objects.filter(
+            rutcliente=datos.username).filter(estado=1).count()
         if activo == 0:
             return render(request, 'contrato/contrato_inactivo.html')
         else:
@@ -473,12 +477,14 @@ def ContratoClientView(request):
                 return render(request, 'pagos/pago_venc.html', data)
             else:
                 cursor = connection.cursor()
-                cursor.execute('EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
+                cursor.execute(
+                    'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
                 results = cursor.fetchall()
 
-                cantidad = Contrato.objects.filter(rutcliente=datos.username).count()
+                cantidad = Contrato.objects.filter(
+                    rutcliente=datos.username).count()
 
-                data = {'entity': results,'cantidad': cantidad}
+                data = {'entity': results, 'cantidad': cantidad}
 
                 return render(request, 'contrato/contratos_client.html', data)
     else:
@@ -515,13 +521,19 @@ def ListPagosView(request):
     if datos.is_profesional == 0 and datos.is_staff == 0:
         cantidad = Contrato.objects.all().filter(rutcliente=datos.username).count()
         cursor = connection.cursor()
+
+        cursor.execute(
+            'EXEC [dbo].[SP_CONTRATO_ACTIVO] [{}]'.format(str(datos.username)))
+        results = cursor.fetchall()
+
         cursor.execute(
             'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
-        results = cursor.fetchall()
+        contratos = cursor.fetchall()
 
         data = {
             # 'user': formatRut(datos.username),
             'entity': results,
+            'contratos': contratos,
             'c': cantidad
         }
 
@@ -540,7 +552,8 @@ def PagosContractView(request, pk):
         results = cursor.fetchall()
 
         cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_PAGOS_CONTRATO_MES_ACTUAL] {}'.format(str(pk)))
+        cursor.execute(
+            'EXEC [dbo].[SP_PAGOS_CONTRATO_MES_ACTUAL] {}'.format(str(pk)))
         pagosMesActual = cursor.fetchall()
 
         try:
@@ -614,7 +627,8 @@ def AsesoriaEspecialClienteView(request):
     }
 
     if usuario.is_staff == 0 and usuario.is_profesional == 0:
-        activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+        activo = Contrato.objects.filter(
+            rutcliente=usuario.username).filter(estado=1).count()
         if activo == 0:
             return render(request, 'contrato/contrato_inactivo.html')
         else:
@@ -649,13 +663,15 @@ def AsesoriaEspecialClienteView(request):
                         asesoria = Asesoria()
                         asesoria.fechaasesoria = request.POST.get('fecha')
                         asesoria.hora = request.POST.get('hora')
-                        asesoria.descripcionasesoria = request.POST.get('descripcion')
+                        asesoria.descripcionasesoria = request.POST.get(
+                            'descripcion')
 
                         cursor = connection.cursor()
                         cursor.execute('EXEC [dbo].[SP_ASESORIA_ESPECIAL] %s, %s, %s, %s',
-                                   (asesoria.fechaasesoria, asesoria.descripcionasesoria, asesoria.hora, usuario.username))
+                                       (asesoria.fechaasesoria, asesoria.descripcionasesoria, asesoria.hora, usuario.username))
 
-                        messages.success(request, "Solicitud de asesoria ingresada correctamente")
+                        messages.success(
+                            request, "Solicitud de asesoria ingresada correctamente")
                         return render(request, 'asesorias/asesoria_especial.html', data)
                     else:
                         messages.error(request, "Error al ingresar solicitud")
@@ -671,7 +687,8 @@ def AsesoriaClienteView(request):
     usuario = request.user
 
     if usuario.is_staff == 0 and usuario.is_profesional == 0:
-        activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+        activo = Contrato.objects.filter(
+            rutcliente=usuario.username).filter(estado=1).count()
         if activo == 0:
             return render(request, 'contrato/contrato_inactivo.html')
         else:
@@ -700,12 +717,15 @@ def AsesoriaClienteView(request):
             if estadoPago == 0:
                 return render(request, 'pagos/pago_venc.html', data)
             else:
-                activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+                activo = Contrato.objects.filter(
+                    rutcliente=usuario.username).filter(estado=1).count()
                 cursor = connection.cursor()
-                mesActual = cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
+                mesActual = cursor.execute(
+                    'EXEC [dbo].[SP_ASESORIAS_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
                 asesoriasMesuales = mesActual.fetchall()
 
-                cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE] [{}]'.format(str(usuario.username)))
+                cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE] [{}]'.format(
+                    str(usuario.username)))
                 result = cursor.fetchall()
 
                 data = {
@@ -713,7 +733,7 @@ def AsesoriaClienteView(request):
                     'rut': formatRut(usuario.username),
                     'mesuales': asesoriasMesuales,
                     'c': len(asesoriasMesuales),
-                    'activo': activo }
+                    'activo': activo}
 
         return render(request, 'asesorias/asesorias_cliente.html', data)
     else:
@@ -725,7 +745,8 @@ def DetalleAsesoriaClienteView(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        activo = Contrato.objects.filter(
+            rutcliente=datos.username).filter(estado=1).count()
         if activo == 0:
             return render(request, 'contrato/contrato_inactivo.html')
         else:
@@ -755,7 +776,8 @@ def DetalleAsesoriaClienteView(request, pk):
                 return render(request, 'pagos/pago_venc.html', data)
             else:
                 cursor = connection.cursor()
-                cursor.execute('EXEC [dbo].[SP_DETALLE_ASESORIA] {}'.format(pk))
+                cursor.execute(
+                    'EXEC [dbo].[SP_DETALLE_ASESORIA] {}'.format(pk))
                 results = cursor.fetchall()
 
                 try:
@@ -780,7 +802,8 @@ def CapacitacionesView(request):
     usuario = request.user
 
     if usuario.is_staff == 0 and usuario.is_profesional == 0:
-        activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+        activo = Contrato.objects.filter(
+            rutcliente=usuario.username).filter(estado=1).count()
         if activo == 0:
             return render(request, 'contrato/contrato_inactivo.html')
         else:
@@ -809,13 +832,16 @@ def CapacitacionesView(request):
             if estadoPago == 0:
                 return render(request, 'pagos/pago_venc.html', data)
             else:
-                activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+                activo = Contrato.objects.filter(
+                    rutcliente=usuario.username).filter(estado=1).count()
 
                 cursor = connection.cursor()
-                mesActual = cursor.execute('EXEC [dbo].[SP_CAPACITACIONES_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
+                mesActual = cursor.execute(
+                    'EXEC [dbo].[SP_CAPACITACIONES_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
                 capacitacionesMensuales = mesActual.fetchall()
 
-                cursor.execute('EXEC [dbo].[SP_CAPACITACIONES_CLIENTE] [{}]'.format(str(usuario.username)))
+                cursor.execute('EXEC [dbo].[SP_CAPACITACIONES_CLIENTE] [{}]'.format(
+                    str(usuario.username)))
                 result = cursor.fetchall()
 
                 data = {
@@ -837,7 +863,8 @@ def DetalleCapacitacionView(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        activo = Contrato.objects.filter(
+            rutcliente=datos.username).filter(estado=1).count()
         if activo == 0:
             return render(request, 'contrato/contrato_inactivo.html')
         else:
@@ -867,7 +894,8 @@ def DetalleCapacitacionView(request, pk):
                 return render(request, 'pagos/pago_venc.html', data)
             else:
                 cursor = connection.cursor()
-                cursor.execute('EXEC [dbo].[SP_DETALLE_CAPACITACION] {}'.format(pk))
+                cursor.execute(
+                    'EXEC [dbo].[SP_DETALLE_CAPACITACION] {}'.format(pk))
                 results = cursor.fetchall()
 
                 try:
@@ -892,7 +920,8 @@ def VisitasClienteView(request):
     usuario = request.user
 
     if usuario.is_staff == 0 and usuario.is_profesional == 0:
-        activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+        activo = Contrato.objects.filter(
+            rutcliente=usuario.username).filter(estado=1).count()
         if activo == 0:
             return render(request, 'contrato/contrato_inactivo.html')
         else:
@@ -921,14 +950,17 @@ def VisitasClienteView(request):
             if estadoPago == 0:
                 return render(request, 'pagos/pago_venc.html', data)
             else:
-                activo = Contrato.objects.filter(rutcliente=usuario.username).filter(estado=1).count()
+                activo = Contrato.objects.filter(
+                    rutcliente=usuario.username).filter(estado=1).count()
 
                 cursor = connection.cursor()
-                mesActual = cursor.execute('EXEC [dbo].[SP_VISITAS_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
+                mesActual = cursor.execute(
+                    'EXEC [dbo].[SP_VISITAS_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
                 visitasMesuales = mesActual.fetchall()
 
                 cursor = connection.cursor()
-                cursor.execute('EXEC [dbo].[SP_VISITAS_CLIENTE] [{}]'.format(str(usuario.username)))
+                cursor.execute('EXEC [dbo].[SP_VISITAS_CLIENTE] [{}]'.format(
+                    str(usuario.username)))
                 result = cursor.fetchall()
 
                 data = {
@@ -949,7 +981,8 @@ def DetalleVisitaView(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        activo = Contrato.objects.filter(
+            rutcliente=datos.username).filter(estado=1).count()
         if activo == 0:
             return render(request, 'contrato/contrato_inactivo.html')
         else:
@@ -1269,7 +1302,8 @@ def PerfilUsuario(request, pk):
         }
 
     if datos.is_profesional == 0 and datos.is_staff == 0 and datos.is_superuser == 0:
-        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        activo = Contrato.objects.filter(
+            rutcliente=datos.username).filter(estado=1).count()
         if activo == 0:
             return render(request, 'contrato/contrato_inactivo.html')
         else:
@@ -1302,7 +1336,7 @@ def PerfilUsuario(request, pk):
                 cursor.execute(
                     'EXEC [dbo].[SP_DETALLE_CUENTA_CLIENTE] {0}'.format(datos.username[:-1]))
                 result = cursor.fetchall()
-                
+
                 data = {
                     'entity': result,
                     'rut': formatRut(datos.username)
@@ -1316,7 +1350,8 @@ def DetalleChecklist(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        activo = Contrato.objects.filter(
+            rutcliente=datos.username).filter(estado=1).count()
         if activo == 0:
             return render(request, 'contrato/contrato_inactivo.html')
         else:
@@ -1346,7 +1381,8 @@ def DetalleChecklist(request, pk):
                 return render(request, 'pagos/pago_venc.html', data)
             else:
                 cursor = connection.cursor()
-                cursor.execute('EXEC [dbo].[SP_DETALLE_CHECKLIST] {}'.format(pk))
+                cursor.execute(
+                    'EXEC [dbo].[SP_DETALLE_CHECKLIST] {}'.format(pk))
                 result = cursor.fetchall()
 
                 data = {
@@ -1375,9 +1411,9 @@ def TasaAccidentabildiadView(request, pk):
         result = cursor.fetchall()
 
         cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_LISTAR_TASA_CONTRATO_ANUAL] {}'.format(pk))
+        cursor.execute(
+            'EXEC [dbo].[SP_LISTAR_TASA_CONTRATO_ANUAL] {}'.format(pk))
         anual = cursor.fetchall()
-
 
         date = datetime.now()
         periodo = date.strftime('%Y-%m')
@@ -1406,7 +1442,6 @@ def TasaAccidentabildiadView(request, pk):
             cursor = connection.cursor()
             cursor.execute(
                 'EXEC [dbo].[SP_TASA_ACCIDENTE_ANUAL] {}'.format(pk))
-
 
             return render(request, 'accidentes/tasa_accidentabilidad.html', data)
 
@@ -1439,7 +1474,8 @@ def InformeVisitaEmp(request, pk):
             empresa = request.POST.get('empresa')
             fechavisita = request.POST.get('fecha')
 
-            cursor.execute('EXEC [dbo].[SP_INFORME_VISITA] %s, %s', (situacion, pk))
+            cursor.execute(
+                'EXEC [dbo].[SP_INFORME_VISITA] %s, %s', (situacion, pk))
 
             messages.success(request, 'Informe guardardo correctamente')
 
@@ -1448,7 +1484,8 @@ def InformeVisitaEmp(request, pk):
         if 'btnmejora' in request.POST:
             plan = request.POST.get('mejora')
 
-            cursor.execute('EXEC [dbo].[SP_CREAR_PLAN_MEJORA] %s, %s', (pk, plan))
+            cursor.execute(
+                'EXEC [dbo].[SP_CREAR_PLAN_MEJORA] %s, %s', (pk, plan))
 
             messages.success(request, 'Plan generado Correctamente')
 
@@ -1464,7 +1501,8 @@ def InformeVisitaCliente(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0 and datos.is_superuser == 0:
-        activo = Contrato.objects.filter(rutcliente=datos.username).filter(estado=1).count()
+        activo = Contrato.objects.filter(
+            rutcliente=datos.username).filter(estado=1).count()
         if activo == 0:
             return render(request, 'contrato/contrato_inactivo.html')
         else:
@@ -1495,10 +1533,12 @@ def InformeVisitaCliente(request, pk):
                 fecha = datetime.now()
 
                 cursor = connection.cursor()
-                cursor.execute('EXEC [dbo].[SP_INFORME_VISITA_CLI] {}'.format(pk))
+                cursor.execute(
+                    'EXEC [dbo].[SP_INFORME_VISITA_CLI] {}'.format(pk))
                 result = cursor.fetchall()
 
-                plan = cursor.execute('EXEC [dbo].[SP_PLAN_MEJORA_INFO] {}'.format(pk))
+                plan = cursor.execute(
+                    'EXEC [dbo].[SP_PLAN_MEJORA_INFO] {}'.format(pk))
                 mejora = plan.fetchall()
 
                 data = {
@@ -1561,7 +1601,8 @@ def DetalleCapacitacionEmp(request, pk):
 
         if request.method == 'POST':
             estado = request.POST.get('estado')
-            Capacitacion.objects.filter(capacitacionid=pk).update(estado=estado)
+            Capacitacion.objects.filter(
+                capacitacionid=pk).update(estado=estado)
 
             messages.success(request, 'Estado modificado correctamente')
             return render(request, 'actividades/detalle_capacitacion.html', data)
@@ -1587,12 +1628,12 @@ def CrearCapacitacion(request):
             desc = request.POST.get('desc')
 
             cursor = connection.cursor()
-            cursor.execute('EXEC [dbo].[SP_CREAR_CAPACITACION] %s, %s, %s, %s, %s, %s', (fecha, hora, asistentes, materiales, desc, rut(rutcliente)))
+            cursor.execute('EXEC [dbo].[SP_CREAR_CAPACITACION] %s, %s, %s, %s, %s, %s', (
+                fecha, hora, asistentes, materiales, desc, rut(rutcliente)))
 
             messages.success(request, 'Capacitación ingresada correctamente')
 
             return render(request, 'actividades/crear_capacitacion.html')
-
 
         return render(request, 'actividades/crear_capacitacion.html')
 
@@ -1610,6 +1651,7 @@ class Error500View(TemplateView):
     @classmethod
     def as_error_view(cls):
         v = cls.as_view()
+
         def view(request):
             r = v(request)
             r.render()
@@ -1620,6 +1662,7 @@ class Error500View(TemplateView):
 
 
 # Informes Cliente
+@login_required
 def InformesClienteView(request):
     datos = request.user
 
@@ -1629,31 +1672,192 @@ def InformesClienteView(request):
         cantidad = Contrato.objects.all().filter(rutcliente=datos.username).count()
         cursor = connection.cursor()
         cursor.execute(
-            'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
+            'EXEC [dbo].[SP_CONTRATO_ACTIVO] [{}]'.format(str(datos.username)))
         results = cursor.fetchall()
+
+        cursor.execute(
+            'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
+        contratos = cursor.fetchall()
+
+        cursor.execute('SP_VISITAS_CLIENTE_REPORT [{}]'.format(datos.username))
+        visitas = cursor.fetchall()
 
         data = {
             'entity': results,
-            'c': cantidad
+            'contratos': contratos,
+            'c': cantidad,
+            'visitas': visitas
         }
 
         return render(request, 'informes/informes.html', data)
 
 
 # Graficos :D
+@login_required
 def ReporteAccidentabilidad(request, pk):
     datos = request.user
 
     if datos.is_profesional == 1 and datos.is_staff == 1 and datos.is_superuser == 1:
         return render(request, 'error/auth.html')
     else:
+        activo = Contrato.objects.filter(
+            rutcliente=datos.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+
+            for i in pagoActual:
+                estadoPago = i[0]
+
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
+
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == 0:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                cursor = connection.cursor()
+                cursor.execute('SELECT dbo.FN_GET_ID({})'.format(datos.username))
+                contrato = cursor.fetchall()
+
+                for i in contrato:
+                    cid = i[0]
+
+                cursor.execute('SELECT RutCliente FROM Contrato WHERE ContratoID = {} '.format(pk))
+                rutcli = cursor.fetchall()
+
+                for i in rutcli:
+                    cliente = i[0]
+
+                if datos.username == cliente:
+                    valores = []
+
+                    for m in range(1, 13):
+                        acc = Accidente.objects.filter(contratoid=pk, fecha__month=m).aggregate(r=Coalesce(Count('accidenteid'), 0)).get('r')
+                        valores.append(acc)
+
+                    cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino),RazonSocial FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) WHERE ContratoID = {}'.format(pk))
+                    contrato = cursor.fetchall()
+
+                    for i in contrato:
+                        rut = i[0]
+                        yearInicio = i[1]
+                        contratoid = i[2]
+                        monthInicio = i[3]
+                        yearFinal = i[4]
+                        monthFinal = i[5]
+                        razonSocial = i[6]
+
+                    data = {
+                        'c': cid,
+                        'id': contratoid,
+                        'year': yearInicio,
+                        'rut': rut,
+                        'inicio': str(monthInicio) + '/' + str(yearInicio),
+                        'final': str(monthFinal) + '/' + str(yearFinal),
+                        'empresa': razonSocial,
+                        'graph_accident_month': valores
+                    }
+
+                    return render(request, 'informes/accidentes.html', data)
+                else:
+                    return render(request, 'error/auth.html')
+
+
+@login_required
+def ReporteVisita(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 1 and datos.is_staff == 1 and datos.is_superuser == 1:
+        return render(request, 'error/auth.html')
+    else:
+        activo = Contrato.objects.filter(
+            rutcliente=datos.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
+        else:
+            cursor = connection.cursor()
+            now = datetime.now()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+
+            for i in pagoActual:
+                estadoPago = i[0]
+
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
+
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == 0:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                cursor = connection.cursor()
+                cursor.execute('SELECT dbo.FN_GET_ID({})'.format(datos.username))
+                contrato = cursor.fetchall()
+
+                for i in contrato:
+                    cid = i[0]
+
+                cursor.execute('SELECT RutCliente FROM Contrato WHERE ContratoID = {} '.format(cid))
+                rutcli = cursor.fetchall()
+
+                for i in rutcli:
+                    cliente = i[0]
+
+                if datos.username == cliente:
+                    itemAprob = []
+
+                    aprobado = Itemschecklist.objects.filter(visitaid=pk).aggregate(r=Coalesce(Count('aprobado'), 0)).get('r')
+                    itemAprob.append(aprobado)
+
+                    cursor.execute('EXEC [SP_DETALLE_VISITA] {}'.format(pk))
+                    visita = cursor.fetchall()
+
+                    cursor.execute('EXEC [SP_DETALLE_CHECKLIST] {}'.format(pk))
+                    checkList = cursor.fetchall()
+
+                    for i in visita:
+                        fechaVisita = i[1]
+
+                    data = {
+                        'c': cid,
+                        'fechaVisita': fechaVisita,
+                        'itemAprob': itemAprob,
+                        'checkList': checkList
+                    }
+
+                    return render(request, 'informes/visita.html', data)
+                else:
+                    return render(request, 'error/auth.html')
+
+
+# PDF Reporte Accidentes
+class AccidentesPdf(View):
+    def get(self, request, *args, **kwargs):
+        pk = self.kwargs['pk']
         cursor = connection.cursor()
-        cursor.execute('SELECT dbo.FN_GET_ID({})'.format(datos.username))
-        contrato = cursor.fetchall()
-
-        for i in contrato:
-            cid = i[0]
-
         valores = []
 
         for m in range(1, 13):
@@ -1672,8 +1876,11 @@ def ReporteAccidentabilidad(request, pk):
             monthFinal = i[5]
             empresa = i[6]
 
-        data = {
-            'c': cid,
+        template = get_template('pdf_accidente.html')
+        response = HttpResponse(content_type='application/pdf')
+        # response['Content-Disposition'] = 'attachment; filename="detalle_contrato.pdf"'
+        context = {
+            'comp': {'name': 'ControlRisk', 'rut': '99.999.999-k', 'direccion': 'Avenida Siempreviva 742'},
             'id': contratoid,
             'year': yearInicio,
             'rut': rut,
@@ -1682,26 +1889,7 @@ def ReporteAccidentabilidad(request, pk):
             'empresa': empresa,
             'graph_accident_month': valores
         }
-
-        return render(request, 'informes/accidentes.html', data)
-
-
-# PDF Reporte Accidentes
-class AccidentesPdf(View):
-    def get(self, request, *args, **kwargs):
-        pk = self.kwargs['pk']
-        cursor = connection.cursor()
-        cursor.execute('EXEC [dbo].[SP_CONTRACT_DETAIL] {}'.format(str(pk)))
-        results = cursor.fetchone()
-
-        template = get_template('pdf_accidente.html')
-        response = HttpResponse(content_type='application/pdf')
-        # response['Content-Disposition'] = 'attachment; filename="detalle_contrato.pdf"'
-        context = {
-            'comp': {'name': 'ControlRisk', 'rut': '99.999.999-k', 'direccion': 'Avenida Siempreviva 742'},
-            'contrato': results
-        }
         html = template.render(context)
         pisa_status = pisa.CreatePDF(html, dest=response)
 
-        return response        
+        return response

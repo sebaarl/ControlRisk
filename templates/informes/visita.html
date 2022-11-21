@@ -96,18 +96,23 @@
     .div6 {
         grid-area: 4 / 3 / 7 / 4;
     }
+
+    .check {
+        display: flex;
+        justify-content: centers;
+    }
 </style>
 
 {% block contenido %}
 <div class="title">
     <i class="uil uil-file-check-alt"></i>
-    <span class="text">Informe Accidentes, Contrato : {{ rut }}-{{ year }}-{{ id }}</span>
+    <span class="text">Informe Visita, Fecha : {{ fechaVisita }} </span>
 </div>
 
 <div class="parent">
     <div class="div1"></div>
     <div class="div2" style="margin-bottom: 20px">
-        <h3 style="font-size: 2rem; ">Reporte de Accidentes : {{ inicio }} - {{ final }}</h3>
+        <h3 style="font-size: 2rem; ">Reporte Visita Realizada en la Fecha : {{ fechaVisita }}</h3>
     </div>
     <div class="div3" style="margin-bottom: 20px;">
         <div>
@@ -141,89 +146,95 @@
     </div>
     <div class="div5"> </div>
     <div class="div6" style="margin-bottom: 20px;">
-        <div>
-            <div class="reporte-content">
-                <br>
-                <p style="font-size: 13px; padding: 10px;">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Laborum sapiente placeat beatae illo iusto
-                    quidem nulla, facere labore eveniet necessitatibus quam, debitis perferendis ad nostrum veritatis
-                    aspernatur delectus. Tempore, quos! Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam
-                    fugit cumque nobis tempora ipsam omnis libero, incidunt vitae nam sed molestias, unde dolore
-                    recusandae doloremque, modi sit vero obcaecati? A.
-                    <br> <br>
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. A nihil ad repellendus exercitationem
-                    laudantium praesentium quod beatae, mollitia, eum fugit veritatis repudiandae omnis eos iusto quo
-                    deleniti ex maxime nulla. Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis et hic
-                    qui nostrum adipisci! Qui vel quibusdam provident eligendi aspernatur, accusamus recusandae
-                    similique facere doloribus eos, cumque architecto, molestiae dolor! Lorem ipsum dolor sit amet
-                    consectetur, adipisicing elit. Distinctio earum recusandae veritatis, quas ipsa dolores, delectus ut
-                    quasi magnam sequi rem! Repellendus, consequuntur quis. Quisquam doloremque vitae nostrum placeat
-                    et?
-                </p>
+        <div class="check">
+            <h2 style="text-align: center; margin: 30px;">ESTADO DE CHECKLIST REALIZADA EN LA VISITA</h2>
+            <div class="reporte-content" style="margin: 0 auto; width: 100%; text-align: center;">
+                <table class="table-rwd">
+                    <thead class="item">
+                        <tr>
+                            <th style="text-transform: uppercase; text-align: center;">Nombre item</th>
+                            <th style="text-transform: uppercase;">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in checkList %}
+                        <tr class="estado">
+                            <td data-titulo="Item" class="name-item" style="text-align: center;">{{ item.0 | upper }}</td>
+                            <td data-titulo="Estado" style="text-align: center;">
+                                {% if item.3 == True %}
+                                <p class="ap" style="text-align: center;">APROBADO</p>
+                                {% endif %}
+                                {% if item.2 == True %}
+                                <p class="sa" style="text-align: center;">SEMI APROBADO</p>
+                                {% endif %}
+                                {% if item.1 == True %}
+                                <p class="re" style="text-align: center;">REPROBADO</p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
     <div class="boton">
         <div class="button-c pdf">
-            <a class="btn" href="{% url 'base:tasa-pdf' id  %}" target="_blank">Generar pdf de informe</a>
+            <a class="btn" href="" target="_blank">Generar pdf de informe</a>
         </div>
     </div>
     <script type=text/javascript>
         Highcharts.chart('container', {
+
             chart: {
                 type: 'column'
             },
+
             title: {
-                text: 'Cantidad de Accidentes Periodo {{ inicio }} - {{ final }} '
+                text: 'Olympic Games all-time medal table, grouped by continent'
             },
-            subtitle: {
-                text: 'Empresa : {{ empresa }}'
-            },
+
             xAxis: {
-                categories: [
-                    'Enero',
-                    'Febrero',
-                    'Marzo',
-                    'Abril',
-                    'Mayo',
-                    'Junio',
-                    'Julio',
-                    'Agosto',
-                    'Septiembre',
-                    'Octubre',
-                    'Noviembre',
-                    'Diciembre'
-                ],
-                crosshair: true
+                categories: ['Reprobado', 'Semi Aprobado', 'Aprobado']
             },
+
             yAxis: {
+                allowDecimals: false,
+                min: 0,
                 title: {
-                    useHTML: true,
-                    text: 'Cantidad de accidentes'
+                    text: 'Count medals'
                 }
             },
+
             tooltip: {
-                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                    '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
-                footerFormat: '</table>',
-                shared: true,
-                useHTML: true
+                formatter: function () {
+                    return '<b>' + this.x + '</b><br/>' +
+                        this.series.name + ': ' + this.y + '<br/>' +
+                        'Total: ' + this.point.stackTotal;
+                }
             },
+
             plotOptions: {
                 column: {
-                    pointPadding: 0.2,
-                    borderWidth: 0
+                    stacking: 'normal'
                 }
             },
-            series: [{
-                name: 'Accidentes',
-                showInLegnd: false,
-                colorByPoint: true,
-                data: {{ graph_accident_month }}
 
+            series: [{
+                name: 'Norway',
+                data: {{ itemAprob }},
+                stack: 'Europe'
+            }, {
+                name: 'Germany',
+                data: [102, 98, 65],
+                stack: 'Europe'
+            }, {
+                name: 'United States',
+                data: {{ itemAprob }},
+                stack: 'North America'
             }]
         });
+
     </script>
 </div>
 {% endblock %}

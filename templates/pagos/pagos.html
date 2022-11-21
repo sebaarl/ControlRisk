@@ -14,6 +14,7 @@
 <div class="dash-content">
     {% if c > 0 %}
     {% for c in entity %}
+    <h2>Contrato Activo</h2>
     <div class="acordion-pagos">
         <details class="detail">
             <summary>
@@ -30,5 +31,17 @@
         <p>Tus pagos aparecerán aquí</p>
     </div>
     {% endif %}
+    {% for c in contratos %}
+    <h2>Contrato Inactivos</h2>
+    <div class="acordion-pagos">
+        <details class="detail">
+            <summary>
+                <a href='{% url "base:reporte-tasa" c.0 %}'>
+                    <i class="uil uil-external-link-alt"></i> Informe de Accidentes Asociados al Contrato {{ c.20 }}-{{ c.19 }}-{{ c.0 }}
+                </a>
+            </summary>
+        </details>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}

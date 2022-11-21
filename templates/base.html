@@ -75,11 +75,11 @@
                 <li><a href="{% url 'base:asesorias-emp' %}">
                         <i class="uil uil-thumbs-up"></i>
                         <span class="link-name">Asesorias</span>
-                {% endif %}
-                {% endif %}
+                        {% endif %}
+                        {% endif %}
 
-                {% if user.is_staff == 0 %}
-                {% if user.is_profesional == 0 %}
+                        {% if user.is_staff == 0 %}
+                        {% if user.is_profesional == 0 %}
                 <li><a href="{% url 'base:capacitacion-client' %}">
                         <i class="uil uil-podium"></i>
                         <span class="link-name">Capacitaciones</span>
@@ -132,37 +132,6 @@
                 <i class="uil uil-search"></i>
                 <input type="text" placeholder="Busca aquí...">
             </div>
-
-            <!-- <div class="noti-menu">
-                <div class="noti-btn">
-                    <i class="uil uil-bell sBtn-text-noti"></i>
-                </div>
-
-                <ul class="noti-options">
-                    <div class="noti-ver">
-                        <p href="">Notificaciones</>
-                    </div>
-                    <li class="noti-option"><a href="#">
-                            <span class="option-text-noti">Tu boleta Nro #12342 está por vencer, realiza tu pago lo
-                                antes posible!</span>
-                        </a></li>
-                    <li class="noti-option"><a href="#">
-                            <span class="option-text-noti">Tu boleta Nro #12342 está por vencer, realiza tu pago lo
-                                antes posible!</span>
-                        </a></li>
-                    <li class="noti-option"><a href="#">
-                            <span class="option-text-noti">Tu boleta Nro #12342 está por vencer, realiza tu pago lo
-                                antes posible!</span>
-                        </a></li>
-                    <li class="noti-option"><a href="#">
-                            <span class="option-text-noti">Tu boleta Nro #12342 está por vencer, realiza tu pago lo
-                                antes posible!</span>
-                        </a></li>
-                    <div class="noti-ver">
-                        <a href="">Ver más</a>
-                    </div>
-                </ul>
-            </div> -->
             <div class="select-menu">
                 <div class="select-btn">
                     {% if user.is_authenticated %}

@@ -1310,6 +1310,58 @@ summary {
   list-style: none;
   color: var(--text-color);
   font-size: 1.4rem;
+  border: 2px solid #000;
+	padding: .75em 1em;
+	cursor: pointer;
+	position: relative;
+	padding-left: calc(1.75rem + .75rem + .75rem);
+}
+
+summary:before {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	left: .75rem;
+	width: 1.75rem;
+	height: 1.75rem;
+	background-color: #000;
+	color: #FFF;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	flex-shrink: 0;
+}
+
+.secundary {
+  width: 50%;
+  margin: 10px;
+}
+
+.visit {
+  margin-left: 25px;
+  display: flex;
+  flex-direction: column;
+}
+
+.visit a {
+  list-style: none;
+  text-decoration: none;
+}
+
+details {
+  font-size: 1.5rem;
+}
+
+
+details[open] summary {
+	background-color: #eee;
+}
+
+details[open] summary:before {
+}
+
+summary:hover {
+	background-color: #eee;
 }
 
 summary::-webkit-details-marker {

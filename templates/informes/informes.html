@@ -14,21 +14,77 @@
 <div class="dash-content">
     {% if c > 0 %}
     {% for c in entity %}
+    <h2>Contrato Activo</h2>
     <div class="acordion-pagos">
-        <details class="detail">
-            <summary>
-                <a href='{% url "base:reporte-tasa" c.0 %}'>
-                    <i class="uil uil-external-link-alt"></i> Informe de Accidentes Asociados al Contrato {{ c.20 }}-{{ c.19 }}-{{ c.0 }}
-                </a>
-            </summary>
-        </details>
+        <div style="margin-top: 20px">
+            <details close>
+                <summary>
+                    <p><i class="uil uil-document-layout-left"></i> Informes Asociados al Contrato
+                        {{c.20}}-{{c.19}}-{{c.0}}</p>
+                </summary>
+                <div>
+                    <details class="secundary">
+                        <summary>
+                            <a href='{% url "base:reporte-tasa" c.0 %}'>
+                                <i class="uil uil-accessible-icon-alt"></i> Informe de Accidentes
+                            </a>
+                        </summary>
+                    </details>
+                    <details close>
+                        <summary class="secundary">
+                            <p><i class="uil uil-check-circle"></i> Informe de Visitas</p>
+                        </summary>
+                        <div class="visit">
+                            {% for i in visitas %}
+                            <a href="{% url 'base:reporte-visita' i.0 %}"><i class="uil uil-car"></i> Visita - Fecha : {{i.1}}</a><br>
+                            {% endfor %}
+                        </div>
+                    </details>
+                </div>
+            </details>
+        </div>
     </div>
     {% endfor %}
     {% else %}
     <div class="alerta">
         <img src="{% static 'images/pay.png' %}" alt="">
-        <p>Tus pagos aparecerán aquí</p>
+        <p>Tus informes aparecerán aquí</p>
     </div>
     {% endif %}
+
+    {% for c in contratos %}
+    <h2>Contrato Inactivos</h2>
+    <div class="acordion-pagos">
+        <div style="margin-top: 20px">
+            <details close>
+                <summary>
+                    <p><i class="uil uil-document-layout-left"></i> Informes Asociados al Contrato
+                        {{c.20}}-{{c.19}}-{{c.0}}</p>
+                </summary>
+                <div>
+                    <details class="secundary">
+                        <summary>
+                            <a href='{% url "base:reporte-tasa" c.0 %}'>
+                                <i class="uil uil-accessible-icon-alt"></i> Informe de Accidentes
+                            </a>
+                        </summary>
+                    </details>
+                    <details close>
+                        <summary class="secundary">
+                            <p><i class="uil uil-check-circle"></i> Informe de Visitas</p>
+                        </summary>
+                        <div">
+                            {% for i in visitas %}
+                            <summary class="visit">
+                                <a href="{% url 'base:reporte-visita' i.0 %}"><i class="uil uil-car"></i> Visita - Fecha : {{i.1}}</a>
+                            </summary>
+                            {% endfor %}
+                        </div>
+                    </details>
+                </div>
+            </details>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}

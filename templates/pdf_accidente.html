@@ -1,191 +1,241 @@
 <!DOCTYPE html>
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script src="../static/lib/highcharts/highcharts.js"></script>
+<script src="../static/lib/highcharts/modules/series-label.js"></script>
+<script src="../static/lib/highcharts//modules/exporting.js"></script>
+<script src="../static/lib/highcharts/modules/export-data.js"></script>
+<script src="../static/lib/highcharts/modules/accessibility.js"></script>
+<script src="../static/lib/jquery/dist/jquery.min.js"></script>
 <style>
-    .img-invoice {
-        width: 80px;
-        text-align: center;
-        margin: 0 auto;
+    .highcharts-figure,
+    .highcharts-data-table table {
+        min-width: 360px;
+        max-width: 800px;
+        margin: 1em auto;
     }
 
-    .head {
+    .highcharts-data-table table {
+        font-family: Verdana, sans-serif;
+        border-collapse: collapse;
+        border: 1px solid #ebebeb;
+        margin: 10px auto;
         text-align: center;
-        text-transform: uppercase;
-    }
-
-    #invoice thead tr th {
         width: 100%;
-        text-align: left;
-        border-bottom: 1px solid black;
-        border-top: 1px solid black;
-        padding-top: 4px;
+        max-width: 500px;
     }
 
-    #invoice thead tr {
-        margin-bottom: 0;
-        padding-bottom: 0;
+    .highcharts-data-table caption {
+        padding: 1em 0;
+        font-size: 1.2em;
+        color: #555;
     }
 
-    #invoice tbody tr {
-        padding: 0;
+    .highcharts-data-table th {
+        font-weight: 600;
+        padding: 0.5em;
     }
 
-    .text-center {
-        text-align: center;
+    .highcharts-data-table td,
+    .highcharts-data-table th,
+    .highcharts-data-table caption {
+        padding: 0.5em;
     }
 
-    .td-table {
-        padding: 8px;
-        margin-bottom: 20px;
-    }
-    .container p,
-    b,
-    th {
-        font-size: 13px;
+    .highcharts-data-table thead tr,
+    .highcharts-data-table tr:nth-child(even) {
+        background: #f8f8f8;
     }
 
-    td {
-        font-size: 12px;
+    .highcharts-data-table tr:hover {
+        background: #f1f7ff;
     }
 
-    .aviso {
-        margin-top: 10px;
-        text-align: center;
-        margin-bottom: 20px;
+    .parent {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(7, 1fr);
+        grid-column-gap: 12px;
+        grid-row-gap: 14px;
     }
 
-    div > h1 {
-        text-align: center;
-        margin: 30px;
+    .div1 {
+        grid-area: 1 / 1 / 2 / 2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     img {
-        width: 150px;
-    }
-
-    .info {
-        font-size: 13px !important;
-    }
-
-    .firmas {
         width: 100px;
-        margin-top: 50px;
+    }
+
+    .div2 {
+        grid-area: 1 / 2 / 2 / 4;
         display: flex;
-        flex-direction: row;
-        justify-content: center;
+        align-items: center;
     }
 
-    .firmass {
-        width: 100px;
-        margin-top: 50px;
-        position: absolute;
+    .div2 p {
+        font-size: 2rem;
     }
 
-    .container-firmas {
-        margin: 0 auto !important;
-        text-align: center;
-        margin-top: 100px !important;
+    .div3 {
+        grid-area: 2 / 1 / 4 / 4;
     }
-    
 
+    .reporte-content {
+        font-size: 20px;
+    }
+
+    .div4 {
+        grid-area: 4 / 1 / 7 / 3;
+    }
+
+    .div5 {
+        grid-area: 7 / 1 / 8 / 4;
+    }
+
+    .div6 {
+        grid-area: 4 / 3 / 7 / 4;
+    }
 </style>
 
 <body>
-    <img src="../static/images/ControlRisk_Logo.png" class="img-invoice">
-    <p class="head">
-        {{ comp.name|upper }}<br>
-        {{ comp.rut}}<br>
-        {{ comp.direccion|upper }}
-    </p>
-    <div style="margin: 50px;">
-        <h1>****REPORTE ACCIDENTES PERIODO  - CONTROLRISK****</h1>
-    </div>
-    <div class="container">
-        <p>
-            <b>NRO CONTRATO:</b> {{ contrato.0 }}<br><br>
-        </p>
-        <table id="invoice">
-            <b>RUT EMPRESA CLIENTE :</b><span class="info">  {{ contrato.1 }}</span><br><br>
-            <b>RAZÓN SOCIAL EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.11 }}</span><br><br>
-            <b>REPRESENTANTE LEGAL EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.13 }}</span><br><br>
-            <b>RUBRO EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.15 }}</span><br><br>
-            <b>DIRECCIÓN EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.12 }}</span><br><br>
-            <b>TELÉFONO EMPRESA CLIENTE :</b> <span class="info">  {{ contrato.14 }}</span><br><br><br>
-            <b>RUT EMPLEADO ENCARGADO : <span class="info">  {{ contrato.2 }}</span></b> <br><br>
-            <b>NOMBRE EMPELADO ENCARGADO : <span class="info">  {{ contrato.16 }}</span></b> <br><br><br>
-            <thead>
-                <tr>
-                    <th style="width: 33%;">VALOR MENSUAL CONTRATO</th>
-                    <th style="width: 34%;">NRO DE CUOTAS</th>
-                    <th style="width: 33%;">VALOR TOTAL CONTRATO</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr {% if forloop.first %}style="padding-top: 3px;" {% endif %} class="table" style="width: 100%">
-                    <td class="td-table">{{ contrato.17 }}</td>
-                    <td class="td-table">{{ contrato.7 }} CUOTAS</td>
-                    <td class="td-table">{{ contrato.5 }}</td>
-                </tr>
-            </tbody>
-        </table><br><br><br>
-        <div>
-            <b>CANTIDAD DE ASESORIAS MENSUALES INCLUIDAS EN EL CONTRATO:</b><span class="info">  {{ contrato.3 }} ASESORIAS</span><br><br>
-            <b>CANTIDAD DE CAPACITACIONES MENSUALES INCLUIDAS EN EL CONTRATO :</b> <span class="info">  {{ contrato.4 }} CAPACITACIONES</span><br><br>
-            <b>CANTIDAD DE VISITAS A TERRENO MENSUALES INCLUIDAS EN EL CONTRATO :</b> <span class="info">  2 VISITAS</span><br><br>
+    <div class="parent">
+        <div class="div1">
+            <img src="../static/images/ControlRisk_Logo.png" class="img-invoice">
+            <h3 style="font-size: 2rem; ">Reporte de Accidentes : {{ inicio }} - {{ final }}</h3>
         </div>
-        <div class="aviso">
-            <span style="margin-top: 5px">**TODA ACTIVDAD (ASESORIAS, CAPACITACIONES O VISITAS) QUE HAYA SUPERADO EL LIMITE MENSUAL ASIGNADO EN EL CONTRATO SERÁ CARGADO EN SU BOLETA MENSUAL COMO COBROS EXTRAS**</span>
+        <div class="div3" style="margin-bottom: 20px;">
+            <div>
+                <h3 style="font-size: 20px">Datos Reporte</h3>
+                <div class="reporte-content">
+                    <p style="font-size: 13px; padding: 10px;">Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Laborum sapiente placeat beatae illo iusto
+                        quidem nulla, facere labore eveniet necessitatibus quam, debitis perferendis ad nostrum
+                        veritatis
+                        aspernatur delectus. Tempore, quos! Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Veniam
+                        fugit cumque nobis tempora ipsam omnis libero, incidunt vitae nam sed molestias, unde dolore
+                        recusandae doloremque, modi sit vero obcaecati? A.
+                        <br> <br>
+                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. A nihil ad repellendus exercitationem
+                        laudantium praesentium quod beatae, mollitia, eum fugit veritatis repudiandae omnis eos iusto
+                        quo deleniti ex maxime nulla. Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis
+                        et hic qui nostrum adipisci! Qui vel quibusdam provident eligendi aspernatur, accusamus
+                        recusandae similique facere doloribus eos, cumque architecto, molestiae dolor! Lorem ipsum dolor
+                        sit amet consectetur, adipisicing elit. Distinctio earum recusandae veritatis, quas ipsa
+                        dolores, delectus ut quasi magnam sequi rem! Repellendus, consequuntur quis. Quisquam doloremque
+                        vitae nostrum placeat et?
+                    </p>
+                </div>
+            </div>
         </div>
-        <div>
-            <b>CONTRATO VALIDO DESDE :</b><span class="info">  {{ contrato.8 }}</span><br><br>
-            <b>CONTRATO VALIDO HASTA :</b> <span class="info">  {{ contrato.10 }}</span><br><br>
-            <b>FECHA PAGO DE PRIMERA CUOTA :</b> <span class="info">  {{ contrato.9 }}</span><br><br>
+        <div class="div4">
+            <figure class="highcharts-figure">
+                <div id="container">
+
+                </div>
+            </figure>
         </div>
-    </div><br><br><br><br><br><br><br><br><br><br><br><br>
-    <div>
-        {% if contrato.18 == '0' %}
-            <b>ESTADO DEL CONTRATO : <span class="info"> FINALIZADO</span></b><br><br>
-        {% else %}
-            <b>ESTADO DEL CONTRATO : <span class="info"> CONTRATO VIGENTE</span></b><br><br>
-        {% endif %}
-    </div>
-    <div>
-        {% if contrato.6 == '1' %}
-            <b>ESTADO DE PAGO DEL CONTRATO : <span class="info"> CONTRATO PAGADO</span></b><br><br>
-        {% else %}
-            <b>ESTADO DE PAGO DEL CONTRATO : <span class="info"> PAGANDO</span></b><br><br>
-        {% endif %}
-    </div>
-    <div class="container-firmas" style="margin-top: 100px">     
-        <div class="firmas">
-            <div class="firma-container">
-                <img src="../static/images/firma2.png" alt="">
-                <div>
-                    <p >FIRMA VICEPRESIDENTE JUNIOR</p>
+        <div class="div5"> </div>
+        <div class="div6" style="margin-bottom: 20px;">
+            <div>
+                <div class="reporte-content">
+                    <br>
+                    <p style="font-size: 13px; padding: 10px;">Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Laborum sapiente placeat beatae illo iusto
+                        quidem nulla, facere labore eveniet necessitatibus quam, debitis perferendis ad nostrum
+                        veritatis
+                        aspernatur delectus. Tempore, quos! Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Veniam
+                        fugit cumque nobis tempora ipsam omnis libero, incidunt vitae nam sed molestias, unde dolore
+                        recusandae doloremque, modi sit vero obcaecati? A.
+                        <br> <br>
+                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. A nihil ad repellendus exercitationem
+                        laudantium praesentium quod beatae, mollitia, eum fugit veritatis repudiandae omnis eos iusto
+                        quo deleniti ex maxime nulla. Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis
+                        et hic qui nostrum adipisci! Qui vel quibusdam provident eligendi aspernatur, accusamus
+                        recusandae similique facere doloribus eos, cumque architecto, molestiae dolor! Lorem ipsum dolor
+                        sit amet consectetur, adipisicing elit. Distinctio earum recusandae veritatis, quas ipsa
+                        dolores, delectus ut quasi magnam sequi rem! Repellendus, consequuntur quis. Quisquam doloremque
+                        vitae nostrum placeat et?
+                    </p>
                 </div>
             </div>
         </div>
     </div>
-    <div class="container-firmas" style="margin-top: 100px">     
+    <div class="container-firmas" style="margin-top: 100px">
         <div class="firmas">
             <div class="firma-container">
                 <img src="../static/images/firma2.png" alt="">
                 <div>
-                    <p >FIRMA VICEPRESIDENTE JUNIOR</p>
+                    <p>FIRMA VICEPRESIDENTE JUNIOR</p>
                 </div>
             </div>
         </div>
     </div>
-    <div class="container-firmas" style="margin-top: 100px">     
-        <div class="firmas">
-            <div class="firma-container">
-                <img src="../static/images/firma2.png" alt="">
-                <div>
-                    <p >FIRMA VICEPRESIDENTE JUNIOR</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <script type=text/javascript>
+
+        Highcharts.chart('container', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Cantidad de Accidentes Periodo Contrato' 
+            },
+            subtitle: {
+                text: ''
+            },
+            xAxis: {
+                categories: [
+                    'Enero',
+                    'Febrero',
+                    'Marzo',
+                    'Abril',
+                    'Mayo',
+                    'Junio',
+                    'Julio',
+                    'Agosto',
+                    'Septiembre',
+                    'Octubre',
+                    'Noviembre',
+                    'Diciembre'
+                ],
+                crosshair: true
+            },
+            yAxis: {
+                title: {
+                    useHTML: true,
+                    text: 'Cantidad de accidentes'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    animation: false
+                }
+            },
+            series: [{
+                name: 'Accidentes',
+                showInLegnd: false,
+                colorByPoint: true,
+                data: {{ graph_accident_month }},
+                animation: false,
+                page-break-inside:avoid
+            }]
+        });
+    </script>
 </body>
 
 </html>

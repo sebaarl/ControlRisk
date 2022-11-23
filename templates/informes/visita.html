@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block name %}
-<title>Reporte Tasa Anual - ControlRisk</title>
+<title>Reporte de Visita - ControlRisk</title>
 {% endblock %}
 
 {% block link %}
@@ -116,7 +116,7 @@
     </div>
     <div class="div3" style="margin-bottom: 20px;">
         <div>
-            <h3 style="font-size: 20px">Datos Reporte</h3>
+            <h3 style="font-size: 20px">Información General de la Visita</h3>
             <div class="reporte-content">
                 <br>
                 <p style="font-size: 13px; padding: 10px;">Lorem ipsum dolor sit amet consectetur adipisicing elit.
@@ -139,15 +139,23 @@
         </div>
     </div>
     <div class="div4">
-        <figure class="highcharts-figure">
-            <div id="container"></div>
+        <figure class="highcharts-figure" style="margin-top: 40px">
+            <div id="container" style="margin-top: 40px"></div>
+
+        </figure>
+        <br>
+        <br>
+        <br>
+        <figure class="highcharts-figure-pie">
+            <div id="container-pie"></div>
 
         </figure>
     </div>
     <div class="div5"> </div>
     <div class="div6" style="margin-bottom: 20px;">
         <div class="check">
-            <h2 style="text-align: center; margin: 30px;">ESTADO DE CHECKLIST REALIZADA EN LA VISITA</h2>
+            <h2 style="text-align: center; margin: 30px;">ESTADO DE CHECKLIST REALIZADA EN LA VISITA {{ reprobado }}
+            </h2>
             <div class="reporte-content" style="margin: 0 auto; width: 100%; text-align: center;">
                 <table class="table-rwd">
                     <thead class="item">
@@ -159,7 +167,8 @@
                     <tbody>
                         {% for item in checkList %}
                         <tr class="estado">
-                            <td data-titulo="Item" class="name-item" style="text-align: center;">{{ item.0 | upper }}</td>
+                            <td data-titulo="Item" class="name-item" style="text-align: center;">{{ item.0 | upper }}
+                            </td>
                             <td data-titulo="Estado" style="text-align: center;">
                                 {% if item.3 == True %}
                                 <p class="ap" style="text-align: center;">APROBADO</p>
@@ -180,60 +189,111 @@
     </div>
     <div class="boton">
         <div class="button-c pdf">
-            <a class="btn" href="" target="_blank">Generar pdf de informe</a>
+            <a class="btn" href="{% url 'base:visita-pdf' id %}" target="_blank">Generar pdf de informe</a>
         </div>
     </div>
     <script type=text/javascript>
         Highcharts.chart('container', {
-
             chart: {
                 type: 'column'
             },
-
             title: {
-                text: 'Olympic Games all-time medal table, grouped by continent'
+                text: 'Cantidad de item de la visita {{ fechaVisita }}'
             },
-
+            subtitle: {
+                text: 'Empresa : {{ empresa }}'
+            },
             xAxis: {
-                categories: ['Reprobado', 'Semi Aprobado', 'Aprobado']
+                type: 'category',
+                labels: {
+                    rotation: 0,
+                    style: {
+                        fontSize: '13px',
+                        fontFamily: 'Verdana, sans-serif'
+                    }
+                }
             },
-
             yAxis: {
-                allowDecimals: false,
                 min: 0,
                 title: {
-                    text: 'Count medals'
+                    text: 'Cantidad de items'
                 }
             },
-
+            legend: {
+                enabled: false
+            },
             tooltip: {
-                formatter: function () {
-                    return '<b>' + this.x + '</b><br/>' +
-                        this.series.name + ': ' + this.y + '<br/>' +
-                        'Total: ' + this.point.stackTotal;
-                }
+                pointFormat: ''
             },
-
-            plotOptions: {
-                column: {
-                    stacking: 'normal'
-                }
-            },
-
             series: [{
-                name: 'Norway',
-                data: {{ itemAprob }},
-                stack: 'Europe'
-            }, {
-                name: 'Germany',
-                data: [102, 98, 65],
-                stack: 'Europe'
-            }, {
-                name: 'United States',
-                data: {{ itemAprob }},
-                stack: 'North America'
+                name: 'Population',
+                data: [
+                    ['Reprobado', {{ itemRepro }}],
+                    ['Semi Aprobado', {{ itemSemi }}],
+                    ['Aprobado', {{ itemAprob }}],
+                ],
+                dataLabels: {
+                    enabled: true,
+                    rotation: 0,
+                    color: '#FFFFFF',
+                    align: 'center',
+                    y: 10, // 10 pixels down from the top
+                    style: {
+                        fontSize: '20px',
+                    }
+                }
             }]
         });
+
+
+
+
+        Highcharts.chart('container-pie', {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'Porcentaje de checklist de la visita {{ fechaVisita }}'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    }
+                }
+            },
+            series: [{
+                name: 'Porcentaje',
+                colorByPoint: true,
+                data: [{
+                    name: 'Reprobado',
+                    y: {{ reprobado }},
+                sliced: true,
+                selected: true
+                }, {
+            name: 'Semi Aprobado',
+            y: {{ semiaprobado }}
+                }, {
+                name: 'Aprobado',
+                y: {{ aprobado }},
+                }]
+            }]
+        });
+
 
     </script>
 </div>

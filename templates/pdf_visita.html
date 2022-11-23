@@ -104,6 +104,7 @@
         width: 100%;
         height: 1000px;
     }
+
     .container-firmas {
         display: flex;
         justify-content: center;
@@ -111,9 +112,46 @@
         text-align: center;
         margin-top: 200px;
     }
+
     .firma-container {
         display: flex;
         justify-content: center;
+    }
+
+    .ap {
+        background-color: rgb(40, 181, 52);
+        width: 130px;
+        padding: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50px;
+        color: white;
+        font-weight: bold;
+    }
+
+    .sa {
+        background-color: rgb(203, 156, 45);
+        width: 130px;
+        padding: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50px;
+        color: white;
+        font-weight: bold;
+    }
+
+    .re {
+        background-color: rgb(186, 9, 9);
+        width: 130px;
+        padding: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50px;
+        color: white;
+        font-weight: bold;
     }
 </style>
 
@@ -121,7 +159,7 @@
     <div class="parent">
         <div class="div1">
             <img src="../static/images/ControlRisk_Logo.png" class="img-invoice">
-            <h3 style="font-size: 2rem; ">Reporte de Accidentes : {{ inicio }} - {{ final }}</h3>
+            <h3 style="font-size: 2rem; ">Reporte de Visita : {{ fechaVisita }}</h3>
         </div>
         <div class="div3" style="margin-bottom: 20px;">
             <div>
@@ -151,39 +189,63 @@
         <div class="div4">
             <figure class="highcharts-figure">
                 <div id="container">
-                    {% if chart %}
-                    <img src="data:image/png;base64, {{ chart | safe }}" alt="" class="chart">
+                    {% if chart_bar %}
+                    <img src="data:image/png;base64, {{ chart_bar | safe }}" alt="" class="chart">
+                    {% endif %}
+                </div>
+            </figure>
+            <br>
+            <br>
+            <br>
+            <figure class="highcharts-figure">
+                <div id="container">
+                    {% if chart_pie %}
+                    <img src="data:image/png;base64, {{ chart_pie | safe }}" alt="" class="chart">
                     {% endif %}
                 </div>
             </figure>
         </div>
         <div class="div5"> </div>
         <div class="div6" style="margin-bottom: 20px;">
-            <div>
-                <div class="reporte-content">
-                    <br>
-                    <p style="font-size: 13px; padding: 10px;">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Laborum sapiente placeat beatae illo iusto
-                        quidem nulla, facere labore eveniet necessitatibus quam, debitis perferendis ad nostrum
-                        veritatis
-                        aspernatur delectus. Tempore, quos! Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Veniam
-                        fugit cumque nobis tempora ipsam omnis libero, incidunt vitae nam sed molestias, unde dolore
-                        recusandae doloremque, modi sit vero obcaecati? A.
-                        <br> <br>
-                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. A nihil ad repellendus exercitationem
-                        laudantium praesentium quod beatae, mollitia, eum fugit veritatis repudiandae omnis eos iusto
-                        quo deleniti ex maxime nulla. Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis
-                        et hic qui nostrum adipisci! Qui vel quibusdam provident eligendi aspernatur, accusamus
-                        recusandae similique facere doloribus eos, cumque architecto, molestiae dolor! Lorem ipsum dolor
-                        sit amet consectetur, adipisicing elit. Distinctio earum recusandae veritatis, quas ipsa
-                        dolores, delectus ut quasi magnam sequi rem! Repellendus, consequuntur quis. Quisquam doloremque
-                        vitae nostrum placeat et?
-                    </p>
+            <div class="check">
+                <h2 style="text-align: center; margin: 30px; font-size: 20px;">ESTADO DE CHECKLIST REALIZADA EN LA
+                    VISITA {{ reprobado }}
+                </h2>
+                <div class="reporte-content" style="margin: 0 auto; width: 100%; text-align: center;">
+                    <table class="table-rwd">
+                        <thead class="item">
+                            <tr>
+                                <th style="text-transform: uppercase; text-align: center;">Nombre item</th>
+                                <th style="text-transform: uppercase;">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in checkList %}
+                            <tr class="estado">
+                                <td data-titulo="Item" class="name-item" style="text-align: center; font-size: 12px;">{{item.0 | upper }}
+                                </td>
+                                <td data-titulo="Estado" style="text-align: center;">
+                                    {% if item.3 == True %}
+                                    <p class="ap" style="text-align: center; font-size: 12px;">APROBADO</p>
+                                    {% endif %}
+                                    {% if item.2 == True %}
+                                    <p class="sa" style="text-align: center; font-size: 12px;">SEMI APROBADO</p>
+                                    {% endif %}
+                                    {% if item.1 == True %}
+                                    <p class="re" style="text-align: center; font-size: 12px;">REPROBADO</p>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+    <br>
+    <br>
+    <br>
     <div class="container-firmas">
         <div class="firmas">
             <div class="firma-container">

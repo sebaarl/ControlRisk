@@ -102,6 +102,7 @@ class Capacitacion(models.Model):
     estado = models.CharField(db_column='Estado', max_length=20, db_collation='Modern_Spanish_CI_AS')
     contratoid = models.ForeignKey(
         'Contrato', models.DO_NOTHING, db_column='ContratoID', blank=True, null=True)
+    extra = models.BooleanField(db_column='Extra')
 
     class Meta:
         managed = False
@@ -359,7 +360,7 @@ class Valorextra(models.Model):
         db_column='Nombre', max_length=50, db_collation='Modern_Spanish_CI_AS')
     # Field name made lowercase.
     valor = models.DecimalField(
-        db_column='Valor', max_digits=19, decimal_places=4)
+        db_column='Valor', max_digits=19, decimal_places=2)
 
     class Meta:
         managed = False

@@ -163,26 +163,57 @@
         </div>
         <div class="div3" style="margin-bottom: 20px;">
             <div>
-                <h3 style="font-size: 20px">Datos Reporte</h3>
+                <h3 style="font-size: 20px">Información General de la Visita</h3>
                 <div class="reporte-content">
-                    <p style="font-size: 13px; padding: 10px;">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Laborum sapiente placeat beatae illo iusto
-                        quidem nulla, facere labore eveniet necessitatibus quam, debitis perferendis ad nostrum
-                        veritatis
-                        aspernatur delectus. Tempore, quos! Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Veniam
-                        fugit cumque nobis tempora ipsam omnis libero, incidunt vitae nam sed molestias, unde dolore
-                        recusandae doloremque, modi sit vero obcaecati? A.
-                        <br> <br>
-                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. A nihil ad repellendus exercitationem
-                        laudantium praesentium quod beatae, mollitia, eum fugit veritatis repudiandae omnis eos iusto
-                        quo deleniti ex maxime nulla. Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis
-                        et hic qui nostrum adipisci! Qui vel quibusdam provident eligendi aspernatur, accusamus
-                        recusandae similique facere doloribus eos, cumque architecto, molestiae dolor! Lorem ipsum dolor
-                        sit amet consectetur, adipisicing elit. Distinctio earum recusandae veritatis, quas ipsa
-                        dolores, delectus ut quasi magnam sequi rem! Repellendus, consequuntur quis. Quisquam doloremque
-                        vitae nostrum placeat et?
+                    {% for i in detalle %}
+                    <p style="font-size: 13px; padding: 10px;">En el presente informe se da a conocer las observaciones
+                        realizadas por el profesional {{ i.0 | upper }} RUT: {{ i.1 }}, encargado al realizar la visita
+                        en la fecha {{ i.2 }}, asociada al contrato {{ i.6 }} en la empresa {{ i.3 | upper }} rut {{i.4}}
+                        perteneciente al rubro {{ i.7 | upper }}.
+                        <br><br>
+                        Además se da a conocer los resultados de la lista de chequeo realizada por el profesional al
+                        momento de la visita a la empresa. La lista de chequeo incluyó un total de {{ total }} items
+
                     </p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <h3 style="font-size: 20px">Informe Entregado por Profesional y Plan de Mejora</h3>
+                <div class="reporte-content">
+                    {% for i in plan %}
+                    <p style="font-size: 13px; padding: 10px;">
+                        El profesional encargado da a conocer las siguientes
+                        observaciones de la visita realziada: {{ i.0 | upper }}.
+                    </p>
+                    {% if i.1 == None %}
+                    <p style="font-size: 13px; padding: 10px;">
+                        El Plan de Mejora propuesto por el profesional encargado
+                        es el siguiente: NO SE REGISTRÓ PLAN DE MEJORA,
+                    </p>
+                    {% else %}
+                    <p style="font-size: 13px; padding: 10px;">
+                        El Plan de Mejora propuesto por el profesional encargado
+                        es el siguiente: {{ i.1 | upper }}.
+                    </p>
+                    {% endif %}
+                    {% if i.2 == None %}
+                    <p style="font-size: 13px; padding: 10px;">
+                        Dado a concoer el Plan de Mejora al cliente, el profesional da a concoer que : NO SE REGISTRÓ
+                        PLAN DE MEJORA.
+                    </p>
+                    {% else %}
+                    <p style="font-size: 13px; padding: 10px;">
+                        {% if i.2 == True %}
+                        Dado a concoer el Plan de Mejora al cliente, el profesional da a concoer que : APLICÓ LAS
+                        MEJORAS PROPUESTAS POR EL PROFESIONAL.
+                        {% else %}
+                        Dado a concoer el Plan de Mejora al cliente, el profesional da a concoer que : NO APLICÓ LAS
+                        MEJORAS PROPUESTAS POR EL PROFESIONAL.
+                        {% endif %}
+                    </p>
+                    {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -204,6 +235,22 @@
                     {% endif %}
                 </div>
             </figure>
+            <br>
+            <br>
+            <br>
+            <div>
+                <h3 style="font-size: 20px">Información Obtenida de las Graficas</h3>
+                <div class="reporte-content">
+                    {% for i in detalle %}
+                    <p style="font-size: 13px; padding: 10px;">
+                        De acuerdo a las graficas visualziadas anteriormente, se observa que la empresa {{ i.3 | upper
+                        }} rut {{ i.4}} ha obtenido un total de {{ reprobado }} ITEMS REPROBADOS ({{repro}}%), {{ semi
+                        }} ITEMS SEMI APROBADOS ({{semiapro}}%) y {{ aprobado }} ITEMS APROBADOS ({{aprob}}%), de
+                        acuerdo a la lista de chequeo realziada por el profesional {{ i.0 | upper }}
+                    </p>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
         <div class="div5"> </div>
         <div class="div6" style="margin-bottom: 20px;">
@@ -222,7 +269,8 @@
                         <tbody>
                             {% for item in checkList %}
                             <tr class="estado">
-                                <td data-titulo="Item" class="name-item" style="text-align: center; font-size: 12px;">{{item.0 | upper }}
+                                <td data-titulo="Item" class="name-item" style="text-align: center; font-size: 12px;">
+                                    {{item.0 | upper }}
                                 </td>
                                 <td data-titulo="Estado" style="text-align: center;">
                                     {% if item.3 == True %}
@@ -243,6 +291,19 @@
             </div>
         </div>
     </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
     <br>
     <br>
     <br>

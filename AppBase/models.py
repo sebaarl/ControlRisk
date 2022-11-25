@@ -286,9 +286,9 @@ class Itemschecklist(models.Model):
     semiaprobado = models.SmallIntegerField(
         db_column='SemiAprobado', blank=True, null=True)
     checklistid = models.ForeignKey(
-        Checklist, models.DO_NOTHING, db_column='ChecklistID',  related_name='check_check')
+        Checklist, db_column='ChecklistID', related_name='check_check', on_delete=models.CASCADE)
     visitaid = models.ForeignKey(
-        Checklist, models.DO_NOTHING, db_column='VisitaID', related_name='check_visita')
+        Checklist, db_column='VisitaID', related_name='check_visita', on_delete=models.CASCADE)
 
     class Meta:
         managed = False

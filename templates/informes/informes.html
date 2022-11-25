@@ -30,13 +30,21 @@
                             </a>
                         </summary>
                     </details>
+                    <details class="secundary">
+                        <summary>
+                            <a href='{% url "base:reporte-visita-general" c.0 %}'>
+                                <i class="uil uil-check-circle"></i> Informe General de Visitas
+                            </a>
+                        </summary>
+                    </details>
                     <details close>
                         <summary class="secundary">
                             <p><i class="uil uil-check-circle"></i> Informe de Visitas</p>
                         </summary>
                         <div class="visit">
                             {% for i in visitas %}
-                            <a href="{% url 'base:reporte-visita' i.0 %}"><i class="uil uil-car"></i> Visita - Fecha : {{i.1}}</a><br>
+                            <a href="{% url 'base:reporte-visita' i.0 %}"><i class="uil uil-car"></i> Visita - Fecha :
+                                {{i.1}}</a><br>
                             {% endfor %}
                         </div>
                     </details>
@@ -73,10 +81,11 @@
                         <summary class="secundary">
                             <p><i class="uil uil-check-circle"></i> Informe de Visitas</p>
                         </summary>
-                        <div">
+                        <div>
                             {% for i in visitas %}
                             <summary class="visit">
-                                <a href="{% url 'base:reporte-visita' i.0 %}"><i class="uil uil-car"></i> Visita - Fecha : {{i.1}}</a>
+                                <a href="{% url 'base:reporte-visita' i.0 %}"><i class="uil uil-car"></i> Visita - Fecha
+                                    : {{i.1}}</a>
                             </summary>
                             {% endfor %}
                         </div>
@@ -85,6 +94,7 @@
             </details>
         </div>
     </div>
-    {% endfor %}
+</div>
+{% endfor %}
 </div>
 {% endblock %}

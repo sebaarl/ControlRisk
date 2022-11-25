@@ -1,3 +1,4 @@
+from .utils import get_graph, get_barplot, get_pieplot
 from multiprocessing import connection, context
 from re import I
 
@@ -21,7 +22,7 @@ from django.core.mail import EmailMessage
 from django.template import RequestContext, context
 
 from AppBase.forms import CreateAsesoriaEspecial, CreateClienteForm, CreateEmpleadoForm, CreateContratoForm, CreateAccidenteForm, EstadoAsesoria, EstadoVisita, ChecklistItem, ChecklistForm
-from AppBase.models import Asesoria, Capacitacion, Cliente, Empleado, Contrato, Accidente, Historialactividad, Itemschecklist, Mejora,Valorextra, Pagos, Visita
+from AppBase.models import Asesoria, Capacitacion, Cliente, Empleado, Contrato, Accidente, Historialactividad, Itemschecklist, Mejora, Valorextra, Pagos, Visita
 from AppUser.models import User
 
 from datetime import date
@@ -46,11 +47,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
 warnings.filterwarnings('ignore')
-from .utils import get_graph, get_barplot, get_pieplot
-
-from django.core.mail import EmailMessage
-from django.template import RequestContext, context
-
 
 
 def rut(rut):
@@ -81,22 +77,36 @@ def HomeView(request):
     if user.is_profesional == 0 and user.is_staff == 0:
         activo = Contrato.objects.filter(
             rutcliente=user.username).filter(estado=1).count()
+
+        try:
+            activo
+        except:
+            raise Http404
+
         if activo == 0:
             return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
-            pagoActual = cursor.execute('SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(user.username))
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(user.username))
 
             for i in pagoActual:
                 estadoPago = i[0]
 
-            pago = cursor.execute('EXEC [dbo].[SP_FECHA_PAGO] {}'.format(user.username))
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(user.username))
 
             for a in pago:
                 fechaPago = a[0]
                 fechaVenc = a[1]
                 mesPago = a[2]
                 pagoId = a[3]
+
+            try:
+                pagoActual,
+                pago
+            except:
+                raise Http404
 
             data = {
                 'user': user,
@@ -456,11 +466,21 @@ def ContratoClientView(request):
             pagoActual = cursor.execute(
                 'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
 
+            try:
+                pagoActual
+            except:
+                raise Http404
+
             for i in pagoActual:
                 estadoPago = i[0]
 
             pago = cursor.execute(
                 'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+
+            try:
+                pago
+            except:
+                raise Http404
 
             for a in pago:
                 fechaPago = a[0]
@@ -484,6 +504,12 @@ def ContratoClientView(request):
                 cantidad = Contrato.objects.filter(
                     rutcliente=datos.username).count()
 
+                try:
+                    cantidad,
+                    results
+                except:
+                    raise Http404
+
                 data = {'entity': results, 'cantidad': cantidad}
 
                 return render(request, 'contrato/contratos_client.html', data)
@@ -501,6 +527,11 @@ def ContratoEmpleadoView(request):
         cursor.execute('EXEC [dbo].[SP_LISTAR_CONTRATOS_PROFESIONAL] [{}]'.format(
             str(datos.username)))
         results = cursor.fetchall()
+
+        try:
+            results, cantidad
+        except:
+            raise Http404
 
         data = {
             'rut': formatRut(str(datos.username)),
@@ -530,6 +561,11 @@ def ListPagosView(request):
             'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
         contratos = cursor.fetchall()
 
+        try:
+            cantidad, results, contratos
+        except:
+            raise Http404
+
         data = {
             # 'user': formatRut(datos.username),
             'entity': results,
@@ -548,8 +584,14 @@ def PagosContractView(request, pk):
     cursor = connection.cursor()
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        cursor.execute('SELECT RutCliente FROM Contrato WHERE ContratoID = {} '.format(pk))
+        cursor.execute(
+            'SELECT RutCliente FROM Contrato WHERE ContratoID = {} '.format(pk))
         rutcli = cursor.fetchall()
+
+        try:
+            rutcli
+        except:
+            raise Http404
 
         for i in rutcli:
             cliente = i[0]
@@ -558,11 +600,12 @@ def PagosContractView(request, pk):
             cursor.execute('EXEC [dbo].[SP_PAGOS_CONTRATO] {}'.format(str(pk)))
             results = cursor.fetchall()
 
-            cursor.execute('EXEC [dbo].[SP_PAGOS_CONTRATO_MES_ACTUAL] {}'.format(str(pk)))
+            cursor.execute(
+                'EXEC [dbo].[SP_PAGOS_CONTRATO_MES_ACTUAL] {}'.format(str(pk)))
             pagosMesActual = cursor.fetchall()
 
             try:
-                results
+                results, pagosMesActual
             except:
                 raise Http404
 
@@ -585,8 +628,14 @@ def PagosDetailView(request, pk):
 
     if datos.is_staff == 0 and datos.is_profesional == 0:
         cursor = connection.cursor()
-        cursor.execute('SELECT RutCliente, Contrato.ContratoID FROM Contrato JOIN Pagos ON (Contrato.ContratoID = Pagos.ContratoID) WHERE PagosID = {} '.format(pk))
+        cursor.execute(
+            'SELECT RutCliente, Contrato.ContratoID FROM Contrato JOIN Pagos ON (Contrato.ContratoID = Pagos.ContratoID) WHERE PagosID = {} '.format(pk))
         rutcli = cursor.fetchall()
+
+        try:
+            rutcli
+        except:
+            raise Http404
 
         for i in rutcli:
             cliente = i[0]
@@ -600,16 +649,18 @@ def PagosDetailView(request, pk):
             asesoriaExtras = cursor.fetchall()
             valorAsesoria = Valorextra.objects.filter(nombre='Asesoria').get()
 
-            cursor.execute('EXEC SP_CAPACITACION_EXTRAS {}, {}'.format(pk, cid))
+            cursor.execute(
+                'EXEC SP_CAPACITACION_EXTRAS {}, {}'.format(pk, cid))
             capacitacionExtras = cursor.fetchall()
-            valorCapacitacion = Valorextra.objects.filter(nombre='Capacitacion').get()
-            
+            valorCapacitacion = Valorextra.objects.filter(
+                nombre='Capacitacion').get()
+
             cursor.execute('EXEC SP_VISITA_EXTRAS {}, {}'.format(pk, cid))
             visitaExtras = cursor.fetchall()
             valorVisita = Valorextra.objects.filter(nombre='Visita').get()
 
             try:
-                results
+                results, asesoriaExtras, valorAsesoria, capacitacionExtras, valorCapacitacion, visitaExtras, valorVisita
             except:
                 raise Http404
 
@@ -643,6 +694,11 @@ class ContractDetailPdf(View):
         cursor.execute('EXEC [dbo].[SP_CONTRACT_DETAIL] {}'.format(str(pk)))
         results = cursor.fetchone()
 
+        try:
+            results
+        except:
+            raise Http404
+
         template = get_template('pdf.html')
         response = HttpResponse(content_type='application/pdf')
         # response['Content-Disposition'] = 'attachment; filename="detalle_contrato.pdf"'
@@ -672,15 +728,24 @@ def AsesoriaEspecialClienteView(request):
             return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
-            now = datetime.now()
             pagoActual = cursor.execute(
                 'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username))
+
+            try:
+                pagoActual
+            except:
+                raise Http404
 
             for i in pagoActual:
                 estadoPago = i[0]
 
             pago = cursor.execute(
                 'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username))
+
+            try:
+                pago
+            except:
+                raise Http404
 
             for a in pago:
                 fechaPago = a[0]
@@ -732,11 +797,22 @@ def AsesoriaClienteView(request):
         cursor.execute('SELECT dbo.FN_GET_ID({})'.format(usuario.username))
         contrato = cursor.fetchall()
 
+        try:
+            activo, contrato
+        except:
+            raise Http404
+
         for i in contrato:
             cid = i[0]
 
-        cursor.execute('SELECT RutCliente FROM Contrato WHERE ContratoID = {} '.format(cid))
+        cursor.execute(
+            'SELECT RutCliente FROM Contrato WHERE ContratoID = {} '.format(cid))
         rutcli = cursor.fetchall()
+
+        try:
+            rutcli
+        except:
+            raise Http404
 
         for i in rutcli:
             cliente = i[0]
@@ -746,15 +822,24 @@ def AsesoriaClienteView(request):
                 return render(request, 'contrato/contrato_inactivo.html')
             else:
                 cursor = connection.cursor()
-                now = datetime.now()
                 pagoActual = cursor.execute(
                     'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username))
+
+                try:
+                    pagoActual
+                except:
+                    raise Http404
 
                 for i in pagoActual:
                     estadoPago = i[0]
 
                 pago = cursor.execute(
                     'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username))
+
+                try:
+                    pago
+                except:
+                    raise Http404
 
                 for a in pago:
                     fechaPago = a[0]
@@ -781,6 +866,11 @@ def AsesoriaClienteView(request):
                         str(usuario.username)))
                     result = cursor.fetchall()
 
+                    try:
+                        activo, mesActual, asesoriasMesuales, result
+                    except:
+                        raise Http404
+
                     data = {
                         'entity': result,
                         'rut': formatRut(usuario.username),
@@ -801,8 +891,14 @@ def DetalleAsesoriaClienteView(request, pk):
     cursor = connection.cursor()
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        cursor.execute('SELECT RutCliente FROM Contrato JOIN Asesoria ON (Contrato.ContratoID = Asesoria.ContratoID) WHERE AsesoriaID = {}'.format(pk))
+        cursor.execute(
+            'SELECT RutCliente FROM Contrato JOIN Asesoria ON (Contrato.ContratoID = Asesoria.ContratoID) WHERE AsesoriaID = {}'.format(pk))
         rutcli = cursor.fetchall()
+
+        try:
+            rutcli
+        except:
+            raise Http404
 
         for i in rutcli:
             cliente = i[0]
@@ -813,15 +909,24 @@ def DetalleAsesoriaClienteView(request, pk):
             if activo == 0:
                 return render(request, 'contrato/contrato_inactivo.html')
             else:
-                now = datetime.now()
                 pagoActual = cursor.execute(
                     'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+
+                try:
+                    pagoActual
+                except:
+                    raise Http404
 
                 for i in pagoActual:
                     estadoPago = i[0]
 
                 pago = cursor.execute(
                     'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+
+                try:
+                    pago
+                except:
+                    raise Http404
 
                 for a in pago:
                     fechaPago = a[0]
@@ -875,11 +980,21 @@ def CapacitacionesView(request):
             pagoActual = cursor.execute(
                 'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username))
 
+            try:
+                pagoActual
+            except:
+                raise Http404
+
             for i in pagoActual:
                 estadoPago = i[0]
 
             pago = cursor.execute(
                 'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username))
+
+            try:
+                pago
+            except:
+                raise Http404
 
             for a in pago:
                 fechaPago = a[0]
@@ -907,6 +1022,11 @@ def CapacitacionesView(request):
                     str(usuario.username)))
                 result = cursor.fetchall()
 
+                try:
+                    result, mesActual, capacitacionesMensuales
+                except:
+                    raise Http404
+
                 data = {
                     'entity': result,
                     'cp': len(result),
@@ -927,8 +1047,14 @@ def DetalleCapacitacionView(request, pk):
     cursor = connection.cursor()
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        cursor.execute('SELECT RutCliente FROM Contrato JOIN Capacitacion ON (Contrato.ContratoID = Capacitacion.ContratoID) WHERE CapacitacionID = {}'.format(pk))
+        cursor.execute(
+            'SELECT RutCliente FROM Contrato JOIN Capacitacion ON (Contrato.ContratoID = Capacitacion.ContratoID) WHERE CapacitacionID = {}'.format(pk))
         rutcli = cursor.fetchall()
+
+        try:
+            rutcli
+        except:
+            raise Http404
 
         for i in rutcli:
             cliente = i[0]
@@ -942,11 +1068,21 @@ def DetalleCapacitacionView(request, pk):
                 pagoActual = cursor.execute(
                     'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
 
+                try:
+                    pagoActual
+                except:
+                    raise Http404
+
                 for i in pagoActual:
                     estadoPago = i[0]
 
                 pago = cursor.execute(
                     'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+
+                try:
+                    pago
+                except:
+                    raise Http404
 
                 for a in pago:
                     fechaPago = a[0]
@@ -1000,11 +1136,21 @@ def VisitasClienteView(request):
             pagoActual = cursor.execute(
                 'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username))
 
+            try:
+                pagoActual
+            except:
+                raise Http404
+
             for i in pagoActual:
                 estadoPago = i[0]
 
             pago = cursor.execute(
                 'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username))
+
+            try:
+                pago
+            except:
+                raise Http404
 
             for a in pago:
                 fechaPago = a[0]
@@ -1033,6 +1179,11 @@ def VisitasClienteView(request):
                     str(usuario.username)))
                 result = cursor.fetchall()
 
+                try:
+                    mesActual, visitasMesuales, result
+                except:
+                    raise Http404
+
                 data = {
                     'entity': result,
                     'rut': formatRut(usuario.username),
@@ -1052,8 +1203,14 @@ def DetalleVisitaView(request, pk):
     cursor = connection.cursor()
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        cursor.execute('SELECT RutCliente FROM Contrato JOIN Visita ON (Contrato.ContratoID = Visita.ContratoID) WHERE VisitaID = {}'.format(pk))
+        cursor.execute(
+            'SELECT RutCliente FROM Contrato JOIN Visita ON (Contrato.ContratoID = Visita.ContratoID) WHERE VisitaID = {}'.format(pk))
         rutcli = cursor.fetchall()
+
+        try:
+            rutcli
+        except:
+            raise Http404
 
         for i in rutcli:
             cliente = i[0]
@@ -1067,6 +1224,11 @@ def DetalleVisitaView(request, pk):
                 pagoActual = cursor.execute(
                     'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
 
+                try:
+                    pagoActual
+                except:
+                    raise Http404
+
                 for i in pagoActual:
                     estadoPago = i[0]
 
@@ -1079,6 +1241,11 @@ def DetalleVisitaView(request, pk):
                     mesPago = a[2]
                     pagoId = a[3]
 
+                try:
+                    pago
+                except:
+                    raise Http404
+
                 data = {
                     'pago': estadoPago,
                     'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
@@ -1088,7 +1255,8 @@ def DetalleVisitaView(request, pk):
                     return render(request, 'pagos/pago_venc.html', data)
                 else:
                     cursor = connection.cursor()
-                    cursor.execute('EXEC [dbo].[SP_DETALLE_VISITA] {}'.format(pk))
+                    cursor.execute(
+                        'EXEC [dbo].[SP_DETALLE_VISITA] {}'.format(pk))
                     results = cursor.fetchall()
 
                     try:
@@ -1119,6 +1287,11 @@ def AsesoriasEmpleadoView(request):
         cursor.execute(
             'EXEC [dbo].[SP_ACTIVIDAD_EMPLEADO] [{}]'.format(str(datos.username)))
         results = cursor.fetchall()
+
+        try:
+            results
+        except:
+            raise Http404
 
         data = {
             'entity': results,
@@ -1181,6 +1354,11 @@ def CapacitacioesEmpleadoView(request):
             str(datos.username)))
         results = cursor.fetchall()
 
+        try:
+            results
+        except:
+            raise Http404
+
         data = {
             'entity': results,
             'rut': formatRut(datos.username),
@@ -1202,6 +1380,11 @@ def VisitasEmpleadoView(request):
         cursor.execute(
             'EXEC [dbo].[SP_ACTIVIDAD_EMPLEADO_VISITA] [{}]'.format(str(datos.username)))
         results = cursor.fetchall()
+
+        try:
+            results
+        except:
+            raise Http404
 
         data = {
             'entity': results,
@@ -1328,6 +1511,11 @@ def ClientesEmpleadoView(request):
             'EXEC [dbo].[SP_LISTAR_CLIENTES_EMP] {}'.format(str(datos.username)))
         result = cursor.fetchall()
 
+        try:
+            result
+        except:
+            raise Http404
+
         data = {
             'clientes': result,
             'rut': formatRut(datos.username)
@@ -1352,6 +1540,11 @@ def ClienteDetalle(request, pk):
         cursor.execute('EXEC [dbo].[SP_ID_CONTRATO_ACTIVO] {}'.format(str(pk)))
         activo = cursor.fetchall()
 
+        try:
+            result, contrato, activo
+        except:
+            raise Http404
+
         data = {
             'rut': formatRut(pk),
             'entity': result,
@@ -1374,6 +1567,11 @@ def PerfilUsuario(request, pk):
             'EXEC [dbo].[SP_DETALLE_CUENTA_EMPLEADO] {0}'.format(datos.username))
         result = cursor.fetchall()
 
+        try:
+            result
+        except:
+            raise Http404
+
         data = {
             'entity': result,
             'rut': formatRut(datos.username)
@@ -1386,15 +1584,24 @@ def PerfilUsuario(request, pk):
             return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
-            now = datetime.now()
             pagoActual = cursor.execute(
                 'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+
+            try:
+                pagoActual
+            except:
+                raise Http404
 
             for i in pagoActual:
                 estadoPago = i[0]
 
             pago = cursor.execute(
                 'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+
+            try:
+                pago
+            except:
+                raise Http404
 
             for a in pago:
                 fechaPago = a[0]
@@ -1415,6 +1622,11 @@ def PerfilUsuario(request, pk):
                     'EXEC [dbo].[SP_DETALLE_CUENTA_CLIENTE] {0}'.format(datos.username))
                 result = cursor.fetchall()
 
+                try:
+                    result
+                except:
+                    raise Http404
+
                 data = {
                     'entity': result,
                     'rut': formatRut(datos.username)
@@ -1429,8 +1641,14 @@ def DetalleChecklist(request, pk):
     cursor = connection.cursor()
 
     if datos.is_profesional == 0 and datos.is_staff == 0:
-        cursor.execute('SELECT RutCliente FROM Contrato JOIN Visita ON (Contrato.ContratoID = Visita.ContratoID) WHERE VisitaID = {} '.format(pk))
+        cursor.execute(
+            'SELECT RutCliente FROM Contrato JOIN Visita ON (Contrato.ContratoID = Visita.ContratoID) WHERE VisitaID = {} '.format(pk))
         rutcli = cursor.fetchall()
+
+        try:
+            rutcli
+        except:
+            raise Http404
 
         for i in rutcli:
             cliente = i[0]
@@ -1444,11 +1662,21 @@ def DetalleChecklist(request, pk):
                 pagoActual = cursor.execute(
                     'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
 
+                try:
+                    pagoActual
+                except:
+                    raise Http404
+
                 for i in pagoActual:
                     estadoPago = i[0]
 
                 pago = cursor.execute(
                     'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+
+                try:
+                    pago
+                except:
+                    raise Http404
 
                 for a in pago:
                     fechaPago = a[0]
@@ -1468,6 +1696,11 @@ def DetalleChecklist(request, pk):
                     cursor.execute(
                         'EXEC [dbo].[SP_DETALLE_CHECKLIST] {}'.format(pk))
                     result = cursor.fetchall()
+
+                    try:
+                        result
+                    except:
+                        raise Http404
 
                     data = {
                         'entity': result,
@@ -1508,6 +1741,11 @@ def TasaAccidentabildiadView(request, pk):
             'SELECT [dbo].[FN_ACCIDENTES_PERIODO](%s, %s)', (pk, periodo))
         accidentes = cursor.fetchall()
 
+        try:
+            contrato, annio, result, anual, accidentes
+        except:
+            raise Http404
+
         data = {
             'id': pk,
             'contrato': contrato,
@@ -1542,11 +1780,15 @@ def InformeVisitaEmp(request, pk):
 
     if datos.is_profesional == 1:
         fecha = datetime.now()
-
         cursor = connection.cursor()
         cursor.execute(
             'SELECT [RazonSocial], [Cliente].[RutCliente], [FechaVisita] FROM [Cliente] JOIN [Contrato] ON (Cliente.RutCliente = Contrato.RutCliente) JOIN [Visita] ON (Contrato.ContratoID = Visita.ContratoID) WHERE [Visita].[VisitaID] = {}'.format(pk))
         visita = cursor.fetchall()
+
+        try:
+            visita
+        except:
+            raise Http404
 
         data = {
             'id': pk,
@@ -1587,8 +1829,14 @@ def InformeVisitaCliente(request, pk):
     datos = request.user
 
     if datos.is_profesional == 0 and datos.is_staff == 0 and datos.is_superuser == 0:
-        cursor.execute('SELECT RutCliente FROM Contrato JOIN Visita ON (Contrato.ContratoID = Visita.ContratoID) WHERE VisitaID = {} '.format(pk))
+        cursor.execute(
+            'SELECT RutCliente FROM Contrato JOIN Visita ON (Contrato.ContratoID = Visita.ContratoID) WHERE VisitaID = {} '.format(pk))
         rutcli = cursor.fetchall()
+
+        try:
+            rutcli
+        except:
+            raise Http404
 
         for i in rutcli:
             cliente = i[0]
@@ -1600,15 +1848,25 @@ def InformeVisitaCliente(request, pk):
                 return render(request, 'contrato/contrato_inactivo.html')
             else:
                 cursor = connection.cursor()
-                now = datetime.now()
                 pagoActual = cursor.execute(
                     'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+
+                try:
+                    pagoActual
+                except:
+                    raise Http404
 
                 for i in pagoActual:
                     estadoPago = i[0]
 
                 pago = cursor.execute(
                     'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+
+                try:
+                    pago
+                except:
+                    raise Http404
+
                 for a in pago:
                     fechaPago = a[0]
                     fechaVenc = a[1]
@@ -1623,8 +1881,6 @@ def InformeVisitaCliente(request, pk):
                 if estadoPago == 0:
                     return render(request, 'pagos/pago_venc.html', data)
                 else:
-                    fecha = datetime.now()
-
                     cursor = connection.cursor()
                     cursor.execute(
                         'EXEC [dbo].[SP_INFORME_VISITA_CLI] {}'.format(pk))
@@ -1633,6 +1889,11 @@ def InformeVisitaCliente(request, pk):
                     plan = cursor.execute(
                         'EXEC [dbo].[SP_PLAN_MEJORA_INFO] {}'.format(pk))
                     mejora = plan.fetchall()
+
+                    try:
+                        result, mejora, plan
+                    except:
+                        raise Http404
 
                     data = {
                         'id': pk,
@@ -1656,6 +1917,11 @@ def DetallePlanMejora(request, pk):
         cursor = connection.cursor()
         cursor.execute('EXEC [dbo].[SP_DETALLE_PLAN_MEJORA_EMP] {}'.format(pk))
         result = cursor.fetchall()
+
+        try:
+            result
+        except:
+            raise Http404
 
         data = {
             'id': pk,
@@ -1689,6 +1955,11 @@ def DetalleCapacitacionEmp(request, pk):
         cursor.execute('EXEC [dbo].[SP_DETALLE_CAPACITACION] {}'.format(pk))
         result = cursor.fetchall()
 
+        try:
+            result
+        except:
+            raise Http404
+
         data = {
             'id': pk,
             'entity': result
@@ -1713,7 +1984,6 @@ def CrearCapacitacion(request):
     datos = request.user
 
     if datos.is_profesional == 1:
-
         if request.method == 'POST':
             rutcliente = request.POST.get('rut')
             fecha = request.POST.get('fecha')
@@ -1770,11 +2040,18 @@ def InformesClienteView(request):
             'EXEC [dbo].[SP_CONTRATO_ACTIVO] [{}]'.format(str(datos.username)))
         results = cursor.fetchall()
 
-        cursor.execute('EXEC SP_VISITAS_CLIENTE_REPORT [{}]'.format(datos.username))
+        cursor.execute(
+            'EXEC SP_VISITAS_CLIENTE_REPORT [{}]'.format(datos.username))
         visitas = cursor.fetchall()
 
-        cursor.execute('EXEC SP_LISTAR_CONTRATOS_CLIENTE_INACTIVO [{}]'.format(datos.username))
+        cursor.execute(
+            'EXEC SP_LISTAR_CONTRATOS_CLIENTE_INACTIVO [{}]'.format(datos.username))
         inactivo = cursor.fetchall()
+
+        try:
+            results, visitas, inactivo
+        except:
+            raise Http404
 
         data = {
             'entity': results,
@@ -1803,11 +2080,22 @@ def ReporteAccidentabilidad(request, pk):
             pagoActual = cursor.execute(
                 'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
 
+            try:
+                pagoActual
+            except:
+                raise Http404
+
             for i in pagoActual:
                 estadoPago = i[0]
 
             pago = cursor.execute(
                 'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+
+            try:
+                pago
+            except:
+                raise Http404
+
             for a in pago:
                 fechaPago = a[0]
                 fechaVenc = a[1]
@@ -1823,14 +2111,21 @@ def ReporteAccidentabilidad(request, pk):
                 return render(request, 'pagos/pago_venc.html', data)
             else:
                 cursor = connection.cursor()
-                cursor.execute('SELECT dbo.FN_GET_ID({})'.format(datos.username))
+                cursor.execute(
+                    'SELECT dbo.FN_GET_ID({})'.format(datos.username))
                 contrato = cursor.fetchall()
 
                 for i in contrato:
                     cid = i[0]
 
-                cursor.execute('SELECT RutCliente FROM Contrato WHERE ContratoID = {} '.format(pk))
+                cursor.execute(
+                    'SELECT RutCliente FROM Contrato WHERE ContratoID = {} '.format(pk))
                 rutcli = cursor.fetchall()
+
+                try:
+                    rutcli, contrato
+                except:
+                    raise Http404
 
                 for i in rutcli:
                     cliente = i[0]
@@ -1839,7 +2134,8 @@ def ReporteAccidentabilidad(request, pk):
                     valores = []
 
                     for m in range(1, 13):
-                        acc = Accidente.objects.filter(contratoid=pk, fecha__month=m).aggregate(r=Coalesce(Count('accidenteid'), 0)).get('r')
+                        acc = Accidente.objects.filter(contratoid=pk, fecha__month=m).aggregate(
+                            r=Coalesce(Count('accidenteid'), 0)).get('r')
                         valores.append(acc)
 
                     cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino),RazonSocial FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) WHERE ContratoID = {}'.format(pk))
@@ -1853,6 +2149,11 @@ def ReporteAccidentabilidad(request, pk):
                         yearFinal = i[4]
                         monthFinal = i[5]
                         razonSocial = i[6]
+
+                    try:
+                        contrato
+                    except:
+                        raise Http404
 
                     data = {
                         'c': cid,
@@ -1883,15 +2184,25 @@ def ReporteVisita(request, pk):
             return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
-            now = datetime.now()
             pagoActual = cursor.execute(
                 'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+
+            try:
+                pagoActual
+            except:
+                raise Http404
 
             for i in pagoActual:
                 estadoPago = i[0]
 
             pago = cursor.execute(
                 'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+
+            try:
+                pago
+            except:
+                raise Http404
+
             for a in pago:
                 fechaPago = a[0]
                 fechaVenc = a[1]
@@ -1906,24 +2217,40 @@ def ReporteVisita(request, pk):
             if estadoPago == 0:
                 return render(request, 'pagos/pago_venc.html', data)
             else:
-                cursor.execute('SELECT dbo.FN_GET_ID({})'.format(datos.username))
+                cursor.execute(
+                    'SELECT dbo.FN_GET_ID({})'.format(datos.username))
                 contrato = cursor.fetchall()
+
+                try:
+                    contrato
+                except:
+                    raise Http404
 
                 for i in contrato:
                     cid = i[0]
 
-                cursor.execute('SELECT RutCliente FROM Contrato WHERE ContratoID = {} '.format(cid))
+                cursor.execute(
+                    'SELECT RutCliente FROM Contrato WHERE ContratoID = {} '.format(cid))
                 rutcli = cursor.fetchall()
+
+                try:
+                    rutcli
+                except:
+                    raise Http404
 
                 for i in rutcli:
                     cliente = i[0]
 
                 if datos.username == cliente:
-                    aprobado = Itemschecklist.objects.filter(visitaid=pk,aprobado=1,semiaprobado=0,reprobado=0).aggregate(r=Coalesce(Count('aprobado'), 0)).get('r')
-                    reprobado = Itemschecklist.objects.filter(visitaid=pk,aprobado=0,semiaprobado=0,reprobado=1).aggregate(r=Coalesce(Count('reprobado'), 0)).get('r')
-                    semiaprobado = Itemschecklist.objects.filter(visitaid=pk,aprobado=0,semiaprobado=1,reprobado=0).aggregate(r=Coalesce(Count('semiaprobado'), 0)).get('r')
+                    aprobado = Itemschecklist.objects.filter(visitaid=pk, aprobado=1, semiaprobado=0, reprobado=0).aggregate(
+                        r=Coalesce(Count('aprobado'), 0)).get('r')
+                    reprobado = Itemschecklist.objects.filter(visitaid=pk, aprobado=0, semiaprobado=0, reprobado=1).aggregate(
+                        r=Coalesce(Count('reprobado'), 0)).get('r')
+                    semiaprobado = Itemschecklist.objects.filter(visitaid=pk, aprobado=0, semiaprobado=1, reprobado=0).aggregate(
+                        r=Coalesce(Count('semiaprobado'), 0)).get('r')
 
-                    total = Itemschecklist.objects.filter(visitaid=pk).aggregate(r=Coalesce(Count('itemcheclistid'), 0)).get('r')
+                    total = Itemschecklist.objects.filter(visitaid=pk).aggregate(
+                        r=Coalesce(Count('itemcheclistid'), 0)).get('r')
 
                     aprob = aprobado*100/total
                     semi = semiaprobado*100/total
@@ -1935,17 +2262,28 @@ def ReporteVisita(request, pk):
                     cursor.execute('EXEC [SP_DETALLE_CHECKLIST] {}'.format(pk))
                     checkList = cursor.fetchall()
 
+                    try:
+                        visita, checkList
+                    except:
+                        raise Http404
+
                     for i in visita:
                         fechaVisita = i[1]
-                    
+
                     cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino),RazonSocial FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) WHERE ContratoID = {}'.format(cid))
                     contrato = cursor.fetchall()
 
-                    cursor.execute('EXEC SP_DETALLE_INFORME_VISITA {}'.format(pk))
+                    cursor.execute(
+                        'EXEC SP_DETALLE_INFORME_VISITA {}'.format(pk))
                     detalle = cursor.fetchall()
 
                     cursor.execute('EXEC SP_DETALLE_PLAN_MEJORA {}'.format(pk))
                     plan = cursor.fetchall()
+
+                    try:
+                        contrato, detalle, plan
+                    except:
+                        raise Http404
 
                     for i in contrato:
                         rut = i[0]
@@ -1977,17 +2315,162 @@ def ReporteVisita(request, pk):
                     }
 
                     if 'email' in request.POST:
-                        asunto='Invitacion a contestar Encuesta'
-                        metodo= request.POST.get("sendEmail")
+                        asunto = 'Invitacion a contestar Encuesta'
+                        metodo = request.POST.get("sendEmail")
                         messege = """
                             Ingrese a este link
                             """
-                        mail= EmailMessage(asunto,messege,metodo,to=['rsebadb@gmail.com'])
+                        mail = EmailMessage(
+                            asunto, messege, metodo, to=[datos.email])
                         mail.send()
 
                         return render(request, 'informes/visita.html', data)
 
                     return render(request, 'informes/visita.html', data)
+                else:
+                    return render(request, 'error/auth.html')
+
+
+@login_required
+def ReporteVisitasGenerales(request, pk):
+    datos = request.user
+
+    if datos.is_profesional == 1 and datos.is_staff == 1 and datos.is_superuser == 1:
+        return render(request, 'error/auth.html')
+    else:
+        activo = Contrato.objects.filter(
+            rutcliente=datos.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
+        else:
+            cursor = connection.cursor()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+
+            try:
+                pagoActual
+            except:                
+                raise Http404
+
+            for i in pagoActual:
+                estadoPago = i[0]
+
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+            
+            try:
+                pago
+            except:                
+                raise Http404
+
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
+
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == 0:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                cursor.execute('SELECT RutCliente FROM Contrato WHERE ContratoID = {} '.format(pk))
+                rutcli = cursor.fetchall()
+
+                try:
+                    rutcli
+                except:                
+                    raise Http404
+
+                for i in rutcli:
+                    cliente = i[0]
+
+                if datos.username == cliente:
+                    cursor.execute('SELECT CONVERT(NVARCHAR, FechaVisita, 23) FROM Visita WHERE ContratoID = {}'.format(pk))
+                    fechas = cursor.fetchall()
+                    valoresFecha = []
+                    x = np.array([])
+                    for i in fechas:
+                        valoresFecha.append(i)
+
+                    for i in valoresFecha:
+                        new_x = np.append(x, ['2022-12-2'])
+
+                    y = [1, 2]
+
+                    chart = get_barplot(new_x, y, 'Cantidad de Accidentes Sufridos por la Empresa ', 'Meses del año de contrato', 'Cantidad de Accidentes')
+
+                    aprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=1,semiaprobado=0,reprobado=0).aggregate(r=Coalesce(Count('aprobado'), 0)).get('r')
+                    reprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=0,semiaprobado=0,reprobado=1).aggregate(r=Coalesce(Count('reprobado'), 0)).get('r')
+                    semiaprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=0,semiaprobado=1,reprobado=0).aggregate(r=Coalesce(Count('semiaprobado'), 0)).get('r')
+
+                    cursor.execute('SELECT COUNT(Aprobado), FechaVisita FROM ItemsChecklist JOIN Visita ON (Visita.VisitaID =ItemsChecklist.VisitaID) WHERE ContratoID = {} AND Aprobado = 1 GROUP BY FechaVisita'.format(pk))
+
+                    cursor.execute('SELECT COUNT(SemiAprobado), FechaVisita FROM ItemsChecklist JOIN Visita ON (Visita.VisitaID =ItemsChecklist.VisitaID) WHERE ContratoID = {} AND SemiAprobado = 1 GROUP BY FechaVisita'.format(pk))
+
+                    cursor.execute('SELECT COUNT(Reprobado), FechaVisita FROM ItemsChecklist JOIN Visita ON (Visita.VisitaID =ItemsChecklist.VisitaID) WHERE ContratoID = {} AND Reprobado = 1 GROUP BY FechaVisita'.format(pk))
+
+                    total = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).aggregate(r=Coalesce(Count('itemcheclistid'), 0)).get('r')
+
+                    aprob = aprobado*100/total
+                    semi = semiaprobado*100/total
+                    repro = reprobado*100/total
+                    
+                    cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino),RazonSocial FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) WHERE ContratoID = {}'.format(pk))
+                    contrato = cursor.fetchall()
+
+                    try:
+                        contrato
+                    except:                
+                        raise Http404
+
+                    for i in contrato:
+                        rut = i[0]
+                        yearInicio = i[1]
+                        contratoid = i[2]
+                        monthInicio = i[3]
+                        yearFinal = i[4]
+                        monthFinal = i[5]
+                        razonSocial = i[6]
+
+                    data = {
+                        'id': pk,
+                        'cid': contratoid,
+                        'rut': rut,
+                        'formatRut': formatRut(rut),
+                        'annio': yearInicio,
+                        # 'itemAprob': aprobado,
+                        # 'itemSemi': semiaprobado,
+                        # 'itemRepro': reprobado,
+                        'empresa': razonSocial,
+                        'total': total,
+                        'valoresFecha': valoresFecha,
+                        'aprobado': aprobado,
+                        'semi': semiaprobado,
+                        'reprobado': reprobado,
+                        'aprob': aprob,
+                        'semiapro': semi,
+                        'repro': repro,
+                        'inicio': str(monthInicio) + '/' + str(yearInicio),
+                        'final': str(monthFinal) + '/' + str(yearFinal),
+                        'chart': chart,
+                    }
+
+                    if 'email' in request.POST:
+                        asunto='Invitacion a contestar Encuesta'
+                        metodo= request.POST.get("sendEmail")
+                        messege = """
+                            Ingrese a este link
+                            """
+                        mail= EmailMessage(asunto,messege,metodo,to=[datos.email])
+                        mail.send()
+
+                        return render(request, 'informes/visitas_generales.html', data)
+
+                    return render(request, 'informes/visitas_generales.html', data)
                 else:
                     return render(request, 'error/auth.html')
 
@@ -2005,6 +2488,11 @@ class AccidentesPdf(View):
 
         cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino),RazonSocial FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) WHERE ContratoID = {}'.format(pk))
         contrato = cursor.fetchall()
+
+        try:
+            contrato
+        except:                
+            raise Http404
 
         for i in contrato:
             rut = i[0]

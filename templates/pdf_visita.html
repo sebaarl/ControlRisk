@@ -243,10 +243,8 @@
                 <div class="reporte-content">
                     {% for i in detalle %}
                     <p style="font-size: 13px; padding: 10px;">
-                        De acuerdo a las graficas visualziadas anteriormente, se observa que la empresa {{ i.3 | upper
-                        }} rut {{ i.4}} ha obtenido un total de {{ reprobado }} ITEMS REPROBADOS ({{repro}}%), {{ semi
-                        }} ITEMS SEMI APROBADOS ({{semiapro}}%) y {{ aprobado }} ITEMS APROBADOS ({{aprob}}%), de
-                        acuerdo a la lista de chequeo realziada por el profesional {{ i.0 | upper }}
+                        De acuerdo a las graficas visualziadas anteriormente, se observa que la empresa {{i.3|upper}} rut {{ i.4}} ha obtenido un total de {{ reprobado }} ITEMS REPROBADOS ({{repro}}%), {{semi}} ITEMS SEMI APROBADOS ({{semiapro}}%) y {{aprobado}} ITEMS APROBADOS ({{aprob}}%), de
+                        acuerdo a la lista de chequeo realziada por el profesional {{i.0|upper}}
                     </p>
                     {% endfor %}
                 </div>

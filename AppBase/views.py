@@ -1,4 +1,4 @@
-from .utils import get_graph, get_barplot, get_pieplot
+from .utils import get_graph, get_barplot, get_pieplot, get_groupedbar
 from multiprocessing import connection, context
 from re import I
 
@@ -2138,7 +2138,7 @@ def ReporteAccidentabilidad(request, pk):
                             r=Coalesce(Count('accidenteid'), 0)).get('r')
                         valores.append(acc)
 
-                    cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino),RazonSocial FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) WHERE ContratoID = {}'.format(pk))
+                    cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino), RazonSocial, Nombre FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) JOIN RubroEmpresa ON (Cliente.RubroID = RubroEmpresa.RubroID) WHERE ContratoID = {}'.format(pk))
                     contrato = cursor.fetchall()
 
                     for i in contrato:
@@ -2149,6 +2149,7 @@ def ReporteAccidentabilidad(request, pk):
                         yearFinal = i[4]
                         monthFinal = i[5]
                         razonSocial = i[6]
+                        rubro = i[7]
 
                     try:
                         contrato
@@ -2160,10 +2161,12 @@ def ReporteAccidentabilidad(request, pk):
                         'id': contratoid,
                         'year': yearInicio,
                         'rut': rut,
+                        'formatRut': formatRut(rut),
                         'inicio': str(monthInicio) + '/' + str(yearInicio),
                         'final': str(monthFinal) + '/' + str(yearFinal),
                         'empresa': razonSocial,
                         'graph_accident_month': valores,
+                        'rubro': rubro
                     }
 
                     return render(request, 'informes/accidentes.html', data)
@@ -2301,6 +2304,7 @@ def ReporteVisita(request, pk):
                         'itemSemi': semiaprobado,
                         'itemRepro': reprobado,
                         'checkList': checkList,
+                        'rut': formatRut(rut),
                         'empresa': razonSocial,
                         'total': total,
                         'id': pk,
@@ -2309,9 +2313,9 @@ def ReporteVisita(request, pk):
                         'aprobado': aprobado,
                         'semi': semiaprobado,
                         'reprobado': reprobado,
-                        'aprob': aprob,
-                        'semiapro': semi,
-                        'repro': repro
+                        'aprob': round(aprob, 1),
+                        'semiapro': round(semi,1),
+                        'repro': round(repro,1)
                     }
 
                     if 'email' in request.POST:
@@ -2389,35 +2393,25 @@ def ReporteVisitasGenerales(request, pk):
                     cliente = i[0]
 
                 if datos.username == cliente:
-                    cursor.execute('SELECT CONVERT(NVARCHAR, FechaVisita, 23) FROM Visita WHERE ContratoID = {}'.format(pk))
-                    fechas = cursor.fetchall()
+                    fechas = Visita.objects.filter(contratoid=pk).values_list('fechavisita')
                     valoresFecha = []
-                    x = np.array([])
-                    for i in fechas:
-                        valoresFecha.append(i)
+                    a = np.array([])
+                    new_a = np.append(a, fechas)
+                    vector = np.vectorize(np.str_)
+                    x = vector(new_a)
+                    repro = []
+                    semi = []
+                    aprob = []
 
-                    for i in valoresFecha:
-                        new_x = np.append(x, ['2022-12-2'])
-
-                    y = [1, 2]
-
-                    chart = get_barplot(new_x, y, 'Cantidad de Accidentes Sufridos por la Empresa ', 'Meses del año de contrato', 'Cantidad de Accidentes')
-
-                    aprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=1,semiaprobado=0,reprobado=0).aggregate(r=Coalesce(Count('aprobado'), 0)).get('r')
-                    reprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=0,semiaprobado=0,reprobado=1).aggregate(r=Coalesce(Count('reprobado'), 0)).get('r')
-                    semiaprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=0,semiaprobado=1,reprobado=0).aggregate(r=Coalesce(Count('semiaprobado'), 0)).get('r')
-
-                    cursor.execute('SELECT COUNT(Aprobado), FechaVisita FROM ItemsChecklist JOIN Visita ON (Visita.VisitaID =ItemsChecklist.VisitaID) WHERE ContratoID = {} AND Aprobado = 1 GROUP BY FechaVisita'.format(pk))
-
-                    cursor.execute('SELECT COUNT(SemiAprobado), FechaVisita FROM ItemsChecklist JOIN Visita ON (Visita.VisitaID =ItemsChecklist.VisitaID) WHERE ContratoID = {} AND SemiAprobado = 1 GROUP BY FechaVisita'.format(pk))
-
-                    cursor.execute('SELECT COUNT(Reprobado), FechaVisita FROM ItemsChecklist JOIN Visita ON (Visita.VisitaID =ItemsChecklist.VisitaID) WHERE ContratoID = {} AND Reprobado = 1 GROUP BY FechaVisita'.format(pk))
+                    for i in x:
+                        reprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk, checklistid__visitaid__fechavisita=i).filter(aprobado=0,semiaprobado=0,reprobado=1).aggregate(r=Coalesce(Count('reprobado'), 0)).get('r')
+                        repro.append(reprobado)
+                        semiaprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk, checklistid__visitaid__fechavisita=i).filter(aprobado=0,semiaprobado=1,reprobado=0).aggregate(r=Coalesce(Count('semiaprobado'), 0)).get('r')
+                        semi.append(semiaprobado)
+                        aprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk, checklistid__visitaid__fechavisita=i).filter(aprobado=1,semiaprobado=0,reprobado=0).aggregate(r=Coalesce(Count('aprobado'), 0)).get('r')
+                        aprob.append(aprobado)
 
                     total = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).aggregate(r=Coalesce(Count('itemcheclistid'), 0)).get('r')
-
-                    aprob = aprobado*100/total
-                    semi = semiaprobado*100/total
-                    repro = reprobado*100/total
                     
                     cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino),RazonSocial FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) WHERE ContratoID = {}'.format(pk))
                     contrato = cursor.fetchall()
@@ -2436,27 +2430,38 @@ def ReporteVisitasGenerales(request, pk):
                         monthFinal = i[5]
                         razonSocial = i[6]
 
+                    re = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=0,semiaprobado=0,reprobado=1).aggregate(r=Coalesce(Count('reprobado'), 0)).get('r')
+                    ap = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=1,semiaprobado=0,reprobado=0).aggregate(r=Coalesce(Count('aprobado'), 0)).get('r')
+                    sa = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=0,semiaprobado=1,reprobado=0).aggregate(r=Coalesce(Count('semiaprobado'), 0)).get('r')
+
+                    porc_aprobado = ap*100/total
+                    porc_semi = sa*100/total
+                    porc_reprobado = re*100/total
+
+                    chart = get_groupedbar(repro, semi, aprob, x, str(monthInicio) + '/' + str(yearInicio) + ' - ' + str(monthFinal) + '/' + str(yearFinal),)
+
                     data = {
+                        'x': new_a,
                         'id': pk,
                         'cid': contratoid,
                         'rut': rut,
                         'formatRut': formatRut(rut),
                         'annio': yearInicio,
-                        # 'itemAprob': aprobado,
-                        # 'itemSemi': semiaprobado,
-                        # 'itemRepro': reprobado,
                         'empresa': razonSocial,
                         'total': total,
                         'valoresFecha': valoresFecha,
-                        'aprobado': aprobado,
-                        'semi': semiaprobado,
-                        'reprobado': reprobado,
-                        'aprob': aprob,
-                        'semiapro': semi,
-                        'repro': repro,
+                        'aprobado': aprob,
+                        'semi': semi,
+                        'reprobado': repro,
                         'inicio': str(monthInicio) + '/' + str(yearInicio),
                         'final': str(monthFinal) + '/' + str(yearFinal),
                         'chart': chart,
+                        'porc_aprobado': round(porc_aprobado,1),
+                        'porc_semi': round(porc_semi,1),
+                        'porc_reprobado': round(porc_reprobado,1),
+                        're': re,
+                        'sa': sa,
+                        'ap': ap
                     }
 
                     if 'email' in request.POST:
@@ -2486,7 +2491,7 @@ class AccidentesPdf(View):
             acc = Accidente.objects.filter(contratoid=pk, fecha__month=m).aggregate(r=Coalesce(Count('accidenteid'), 0)).get('r')
             valores.append(acc)
 
-        cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino),RazonSocial FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) WHERE ContratoID = {}'.format(pk))
+        cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino), RazonSocial, Nombre FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) JOIN RubroEmpresa ON (Cliente.RubroID = RubroEmpresa.RubroID) WHERE ContratoID = {}'.format(pk))
         contrato = cursor.fetchall()
 
         try:
@@ -2502,6 +2507,7 @@ class AccidentesPdf(View):
             yearFinal = i[4]
             monthFinal = i[5]
             empresa = i[6]
+            rubro = i[7]
 
         x = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio','Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
         y = valores
@@ -2513,14 +2519,18 @@ class AccidentesPdf(View):
         # response['Content-Disposition'] = 'attachment; filename="infome_accidentes.pdf"'
         context = {
             'comp': {'name': 'ControlRisk', 'rut': '99.999.999-k', 'direccion': 'Avenida Siempreviva 742'},
+            'empresa': empresa,
+            'graph_accident_month': valores,
+            'chart': chart,
+            'c': pk,
             'id': contratoid,
             'year': yearInicio,
             'rut': rut,
+            'formatRut': formatRut(rut),
             'inicio': str(monthInicio) + '/' + str(yearInicio),
             'final': str(monthFinal) + '/' + str(yearFinal),
             'empresa': empresa,
-            'graph_accident_month': valores,
-            'chart': chart
+            'rubro': rubro
         }
         html = template.render(context)
         pisa_status = pisa.CreatePDF(html, dest=response)
@@ -2615,6 +2625,89 @@ class VisitaPDF(View):
             'aprob': aprob,
             'semiapro': semi,
             'repro': repro
+        }
+        html = template.render(context)
+        pisa_status = pisa.CreatePDF(html, dest=response)
+
+        return response
+
+
+# PDF Reporte Visitas Generales
+class VisitaGeneralPDF(View):
+    def get(self, request, *args, **kwargs):
+        pk = self.kwargs['pk']
+        cursor = connection.cursor()
+
+        fechas = Visita.objects.filter(contratoid=pk).values_list('fechavisita')
+        valoresFecha = []
+        a = np.array([])
+        new_a = np.append(a, fechas)
+        vector = np.vectorize(np.str_)
+        x = vector(new_a)
+        repro = []
+        semi = []
+        aprob = []
+
+        for i in x:
+            reprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk,checklistid__visitaid__fechavisita=i).filter(aprobado=0,semiaprobado=0,reprobado=1).aggregate(r=Coalesce(Count('reprobado'), 0)).get('r')
+            repro.append(reprobado)
+            semiaprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk,checklistid__visitaid__fechavisita=i).filter(aprobado=0,semiaprobado=1,reprobado=0).aggregate(r=Coalesce(Count('semiaprobado'), 0)).get('r')
+            semi.append(semiaprobado)
+            aprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk,checklistid__visitaid__fechavisita=i).filter(aprobado=1,semiaprobado=0,reprobado=0).aggregate(r=Coalesce(Count('aprobado'), 0)).get('r')
+            aprob.append(aprobado)
+
+        total = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).aggregate(r=Coalesce(Count('itemcheclistid'), 0)).get('r')
+                    
+        cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino),RazonSocial FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) WHERE ContratoID = {}'.format(pk))
+        contrato = cursor.fetchall()
+
+        for i in contrato:
+            rut = i[0]
+            yearInicio = i[1]
+            contratoid = i[2]
+            monthInicio = i[3]
+            yearFinal = i[4]
+            monthFinal = i[5]
+            razonSocial = i[6]
+
+        re = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=0,semiaprobado=0,reprobado=1).aggregate(r=Coalesce(Count('reprobado'), 0)).get('r')
+        ap = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=1,semiaprobado=0,reprobado=0).aggregate(r=Coalesce(Count('aprobado'), 0)).get('r')
+        sa = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=0,semiaprobado=1,reprobado=0).aggregate(r=Coalesce(Count('semiaprobado'), 0)).get('r')
+
+        porc_aprobado = ap*100/total
+        porc_semi = sa*100/total
+        porc_reprobado = re*100/total
+
+        chart = get_groupedbar(repro, semi, aprob, x, str(monthInicio) + '/' + str(yearInicio) + ' - ' + str(monthFinal) + '/' + str(yearFinal),)
+        pie_chart = get_pieplot(round(porc_aprobado,1), round(porc_semi,1), round(porc_reprobado,1), 'Resultado general de Check List en porcentajes ' + razonSocial ,'Aprobados', 'Semi Aprobados', 'Reprobados')
+
+        template = get_template('pdf_visitas_generales.html')
+        response = HttpResponse(content_type='application/pdf')
+        # response['Content-Disposition'] = 'attachment; filename="infome_accidentes.pdf"'
+        context = {
+            'comp': {'name': 'ControlRisk', 'rut': '99.999.999-k', 'direccion': 'Avenida Siempreviva 742'},
+            'x': new_a,
+            'id': pk,
+            'cid': contratoid,
+            'rut': rut,
+            'formatRut': formatRut(rut),
+            'annio': yearInicio,
+            'empresa': razonSocial,
+            'total': total,
+            'valoresFecha': valoresFecha,
+            'aprobado': aprob,
+            'semi': semi,
+            'reprobado': repro,
+            'inicio': str(monthInicio) + '/' + str(yearInicio),
+            'final': str(monthFinal) + '/' + str(yearFinal),
+            'chart': chart,
+            'pie_chart': pie_chart,
+            'porc_aprobado': round(porc_aprobado,1),
+            'porc_semi': round(porc_semi,1),
+            'porc_reprobado': round(porc_reprobado,1),
+            're': re,
+            'sa': sa,
+            'ap': ap
         }
         html = template.render(context)
         pisa_status = pisa.CreatePDF(html, dest=response)

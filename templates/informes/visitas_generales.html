@@ -86,6 +86,7 @@
     }
 
     .div4 {
+        width: 100%;
         grid-area: 4 / 1 / 7 / 3;
     }
 
@@ -95,6 +96,12 @@
 
     .div6 {
         grid-area: 4 / 3 / 7 / 4;
+    }
+
+    #container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
     }
 
     .check {
@@ -124,15 +131,14 @@
                     de la EMPRESA {{empresa|upper}} RUT {{formatRut}} CONTRATO {{rut}}-{{annio}}-{{cid}} realizadas
                     entre {{inicio}} - {{final}}.
                 </p>
-                <br><br>
             </div>
         </div>
     </div>
     <div class="div4">
-        <figure class="highcharts-figure" style="margin-top: 40px">
+        <figure class="highcharts-figure">
             <div id="container" style="margin-top: 40px">
                 {% if chart %}
-                <img src="data:image/png;base64, {{ chart | safe }}" alt="" class="chart" style="width: 80%">
+                <img src="data:image/png;base64, {{ chart | safe }}" alt="" class="chart">
                 {% endif %}
             </div>
         </figure>
@@ -149,35 +155,29 @@
         <div>
             <h3 style="font-size: 20px">Información Obtenida de las Graficas</h3>
             <div class="reporte-content">
-                {% for i in detalle %}
                 <p style="font-size: 13px; padding: 10px;">
-                    De acuerdo a las graficas visualziadas anteriormente, se observa que la empresa {{ i.3 | upper }}
-                    rut {{ i.4}} ha obtenido un total de {{ reprobado }} ITEMS REPROBADOS ({{repro}}%), {{ semi }} ITEMS
-                    SEMI APROBADOS ({{semiapro}}%) y {{ aprobado }} ITEMS APROBADOS ({{aprob}}%), de acuerdo a la lista
-                    de chequeo realziada por el profesional {{ i.0 | upper }}
+                    De acuerdo a las graficas visualziadas anteriormente, se observa que la empresa {{ empresa | upper }}
+                    rut {{formatRut}} de un total de {{total}} ITEMS (Contanto todos los items de cada visita realizada), obtuvo {{ap}} ITEMS APROBADOS (Que corresponde a un {{ porc_aprobado}}%), {{sa}} ITEMS SEMI APROBADOS (Que corresponde a un {{ porc_semi}}%) y {{re}} ITEMS REPROBADOS (Que corresponde a un {{ porc_reprobado}}%).
                 </p>
-                {% endfor %}
             </div>
         </div>
     </div>
     <div class="boton" style="display:flex; justify-content: space-around;">
         <div class="button-c pdf">
-            <a class="btn" href="" target="_blank">Generar pdf de informe</a>
+            <a class="btn" href="{% url 'base:visita-general-pdf' id %}" target="_blank">Generar pdf de informe</a>
         </div>
-        <div class="button-c pdf">
+        <!-- <div class="button-c pdf">
             <form action="" method="post">
                 {% csrf_token %}
                 <button class="btn" name="email" href="" target="_blank">Enviar informe
                     via email</button>
             </form>
-        </div>
+        </div> -->
     </div>
     <div class="boton">
     </div>
 
     <script type=text/javascript>
-
-
         Highcharts.chart('container-pie', {
             chart: {
                 plotBackgroundColor: null,
@@ -186,7 +186,7 @@
                 type: 'pie'
             },
             title: {
-                text: 'Porcentaje de checklist de la visita {{ fechaVisita }}'
+                text: 'Porcentaje resultado de Lista de Cheoqueo {{ empresa | upper }}'
             },
             tooltip: {
                 pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -211,15 +211,15 @@
                 colorByPoint: true,
                 data: [{
                     name: 'Reprobado',
-                    y: {{ repro }},
+                    y: {{ porc_reprobado }},
                 sliced: true,
                 selected: true
                 }, {
             name: 'Semi Aprobado',
-            y: {{ semiapro }}
+            y: {{ porc_semi }}
                 }, {
                 name: 'Aprobado',
-                y: {{ aprob }},
+                y: {{ porc_aprobado }},
                 }]
             }]
         });

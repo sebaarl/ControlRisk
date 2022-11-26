@@ -66,7 +66,7 @@
         align-items: center;
     }
 
-    img {
+    .img-invoice {
         width: 100px;
     }
 
@@ -100,10 +100,10 @@
         grid-area: 4 / 3 / 7 / 4;
     }
 
-    .chart {
-        width: 100%;
-        height: 1000px;
+    .chart-bar {
+        width: 70%;
     }
+
     .container-firmas {
         display: flex;
         justify-content: center;
@@ -111,9 +111,46 @@
         text-align: center;
         margin-top: 200px;
     }
+
     .firma-container {
         display: flex;
         justify-content: center;
+    }
+
+    .ap {
+        background-color: rgb(40, 181, 52);
+        width: 130px;
+        padding: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50px;
+        color: white;
+        font-weight: bold;
+    }
+
+    .sa {
+        background-color: rgb(203, 156, 45);
+        width: 130px;
+        padding: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50px;
+        color: white;
+        font-weight: bold;
+    }
+
+    .re {
+        background-color: rgb(186, 9, 9);
+        width: 130px;
+        padding: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50px;
+        color: white;
+        font-weight: bold;
     }
 </style>
 
@@ -121,55 +158,74 @@
     <div class="parent">
         <div class="div1">
             <img src="../static/images/ControlRisk_Logo.png" class="img-invoice">
-            <h3 style="font-size: 2rem; ">Reporte de Accidentes : {{ inicio }} - {{ final }}</h3>
+        </div>
+        <div class="div2">
+            <h3 style="font-size: 2rem; ">Reporte General de Visitas Realizadas en el Periodo del Contrato</h3>
         </div>
         <div class="div3" style="margin-bottom: 20px;">
             <div>
-                <h3 style="font-size: 20px">Datos Reporte</h3>
+                <h3 style="font-size: 20px">Información General de la Visita</h3>
                 <div class="reporte-content">
-                    <p style="font-size: 13px; padding: 10px;">
-                        En el presente informe se da a conocer la cantidad de accidentes sufridos por la EMPRESA {{empresa|upper}} RUT {{formatRut}}, perteneciente al rubro {{rubro|upper}}, NRO CONTRATO {{rut}}-{{year}}-{{c}} correspondiente al periodo {{inicio}} - {{final}}.
+                    <p style="font-size: 13px; padding: 5px;">
+                        En el presente informe se da a conocer el resultados de las LISTAS DE CHEQUEO de todas las
+                        visitas
+                        de la EMPRESA {{empresa|upper}} RUT {{formatRut}} CONTRATO {{rut}}-{{annio}}-{{cid}} realizadas
+                        entre {{inicio}} - {{final}}.
                     </p>
                 </div>
             </div>
         </div>
         <div class="div4">
             <figure class="highcharts-figure">
-                <div id="container">
+                <div id="container" style="margin-top: 40px">
                     {% if chart %}
-                    <img src="data:image/png;base64, {{ chart | safe }}" alt="" class="chart">
+                    <h3 style="font-size: 20px;">Resultado de Lista de Chequeo de Visitas Periodo " {{inicio}} - {{final}}</h3>
+                    <img src="data:image/png;base64, {{ chart | safe }}" alt="" class="chart-bar" style="width: 50%;">
                     {% endif %}
                 </div>
             </figure>
-        </div>
-        <div class="div5"> </div>
-        <div class="div6" style="margin-bottom: 20px;">
+            <br>
+            <br>
+            <br>
+            <figure class="highcharts-figure-pie">
+                <div id="container-pie">
+                    {% if pie_chart %}
+                    <img src="data:image/png;base64, {{ pie_chart | safe }}" alt="" class="chart">
+                    {% endif %}
+                </div>
+            </figure>
+            <br>
+            <br>
+            <br>
             <div>
+                <h3 style="font-size: 20px">Información Obtenida de las Graficas</h3>
                 <div class="reporte-content">
-                    <br>
                     <p style="font-size: 13px; padding: 10px;">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Laborum sapiente placeat beatae illo iusto
-                        quidem nulla, facere labore eveniet necessitatibus quam, debitis perferendis ad nostrum
-                        veritatis
-                        aspernatur delectus. Tempore, quos! Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Veniam
-                        fugit cumque nobis tempora ipsam omnis libero, incidunt vitae nam sed molestias, unde dolore
-                        recusandae doloremque, modi sit vero obcaecati? A.
-                        <br> <br>
-                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. A nihil ad repellendus exercitationem
-                        laudantium praesentium quod beatae, mollitia, eum fugit veritatis repudiandae omnis eos iusto
-                        quo deleniti ex maxime nulla. Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis
-                        et hic qui nostrum adipisci! Qui vel quibusdam provident eligendi aspernatur, accusamus
-                        recusandae similique facere doloribus eos, cumque architecto, molestiae dolor! Lorem ipsum dolor
-                        sit amet consectetur, adipisicing elit. Distinctio earum recusandae veritatis, quas ipsa
-                        dolores, delectus ut quasi magnam sequi rem! Repellendus, consequuntur quis. Quisquam doloremque
-                        vitae nostrum placeat et?
+                        De acuerdo a las graficas visualziadas anteriormente, se observa que la empresa {{empresa|upper}} rut {{formatRut}} de un total de {{total}} ITEMS (Contanto todos los items de cada visita
+                        realizada), obtuvo {{ap}} ITEMS APROBADOS (Que corresponde a un {{ porc_aprobado}}%), {{sa}}
+                        ITEMS SEMI APROBADOS (Que corresponde a un {{ porc_semi}}%) y {{re}} ITEMS REPROBADOS (Que
+                        corresponde a un {{ porc_reprobado}}%).
                     </p>
                 </div>
             </div>
         </div>
     </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
     <div class="container-firmas">
         <div class="firmas">
             <div class="firma-container">

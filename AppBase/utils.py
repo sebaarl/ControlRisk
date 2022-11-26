@@ -49,7 +49,7 @@ def get_pieplot(x, y, z,title, labelTitle1, labelTitle2, labelTitle3):
 
     plt.switch_backend('AGG')
     plt.figure(figsize=(20,10))
-    plt.title(title, fontsize=30)
+    plt.title(title)
     plt.pie(clases, labels=labels)
     plt.axis("equal")
     plt.tight_layout()
@@ -57,4 +57,24 @@ def get_pieplot(x, y, z,title, labelTitle1, labelTitle2, labelTitle3):
     graph = get_graph()
 
     return graph
-    
+
+def get_groupedbar(x_values, y_values, z_values, index_values, periodo):
+    x = x_values
+    y = y_values
+    z = z_values
+    index = index_values
+    df = pd.DataFrame({'Reprobados': x,
+                        'Semi Aprobados': y,
+                        'Aprobados': z }, index=index)
+
+    plt.switch_backend('AGG')
+    plt.xticks(rotation=45)
+    plt.figure(figsize=(5,10))
+    ax = df.plot.bar(rot=0, color={"Reprobados": "red", "Semi Aprobados": "yellow", "Aprobados": "green"})
+    plt.title('')
+    plt.axis("equal")
+    plt.tight_layout()
+
+    graph = get_graph()
+
+    return graph

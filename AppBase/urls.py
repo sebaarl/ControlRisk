@@ -2,7 +2,7 @@ from django.urls import path
 from django.conf.urls import handler404, handler500
 
 
-from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView,ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView,ContratoEmpleadoView, PagosDetailView, AsesoriaClienteView, AsesoriaEspecialClienteView, AsesoriaClienteView, AsesoriasEmpleadoView, CapacitacioesEmpleadoView, VisitasEmpleadoView, DetalleAsesoriaView, VisitasClienteView, DetalleVisitaView, DetalleAsesoriaClienteView, DetalleVisitaEmpleadoView, ChecklistView, ClientesEmpleadoView, ClienteDetalle, PerfilUsuario, DetalleChecklist, TasaAccidentabildiadView, InformeVisitaEmp, InformeVisitaCliente, DetallePlanMejora, DetalleCapacitacionEmp, CrearCapacitacion, CapacitacionesView, DetalleCapacitacionView, Error404View, Error500View, ReporteAccidentabilidad, InformesClienteView, AccidentesPdf, ReporteVisita, VisitaPDF, ReporteVisitasGenerales,VisitaGeneralPDF
+from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView,ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView,ContratoEmpleadoView, PagosDetailView, AsesoriaClienteView, AsesoriaEspecialClienteView, AsesoriaClienteView, AsesoriasEmpleadoView, CapacitacioesEmpleadoView, VisitasEmpleadoView, DetalleAsesoriaView, VisitasClienteView, DetalleVisitaView, DetalleAsesoriaClienteView, DetalleVisitaEmpleadoView, ChecklistView, ClientesEmpleadoView, ClienteDetalle, PerfilUsuario, DetalleChecklist, TasaAccidentabildiadView, InformeVisitaEmp, InformeVisitaCliente, DetallePlanMejora, DetalleCapacitacionEmp, CrearCapacitacion, CapacitacionesView, DetalleCapacitacionView, Error404View, Error500View, ReporteAccidentabilidad, InformesClienteView, AccidentesPdf, ReporteVisita, VisitaPDF, ReporteVisitasGenerales,VisitaGeneralPDF, ModificarFechaVisitaView
 
 app_name = 'base'
 
@@ -40,6 +40,7 @@ urlpatterns = [
 
     path('clientes/visitas/', VisitasClienteView, name='visita-client'),
     path('clientes/visitas/detalle/<pk>/', DetalleVisitaView, name='visita-detalle'),
+    path('clientes/visitas/detalle/<pk>/asignar/fecha-hora/', ModificarFechaVisitaView, name='visita-update'),
     path('clientes/visitas/detalle/<pk>/checklist/', DetalleChecklist, name='visitadetalle-checklist'),
     path('clientes/visitas/detalle/<pk>/informe/', InformeVisitaCliente, name='visita-informe-cliente'),
     path('clientes/visitas/detalle/<pk>/plandemejora/', DetallePlanMejora, name='visita-mejora'),

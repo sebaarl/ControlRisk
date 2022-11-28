@@ -87,14 +87,13 @@ def HomeView(request):
             return render(request, 'contrato/contrato_inactivo.html')
         else:
             cursor = connection.cursor()
-            pagoActual = cursor.execute(
-                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(user.username))
+            pagoActual = cursor.execute('SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(str(user.username)[:-1]))
 
             for i in pagoActual:
                 estadoPago = i[0]
 
             pago = cursor.execute(
-                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(user.username))
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(str(user.username)[:-1]))
 
             for a in pago:
                 fechaPago = a[0]
@@ -296,13 +295,13 @@ def CreateAccidentView(request):
         else:
             cursor = connection.cursor()
             pagoActual = cursor.execute(
-                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username[:-1]))
 
             for i in pagoActual:
                 estadoPago = i[0]
 
             pago = cursor.execute(
-                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username[:-1]))
 
             for a in pago:
                 fechaPago = a[0]
@@ -464,7 +463,7 @@ def ContratoClientView(request):
         else:
             cursor = connection.cursor()
             pagoActual = cursor.execute(
-                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username[:-1]))
 
             try:
                 pagoActual
@@ -475,7 +474,7 @@ def ContratoClientView(request):
                 estadoPago = i[0]
 
             pago = cursor.execute(
-                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username[:-1]))
 
             try:
                 pago
@@ -525,7 +524,7 @@ def ContratoEmpleadoView(request):
         cantidad = Contrato.objects.filter(rutempleado=datos.username).count()
         cursor = connection.cursor()
         cursor.execute('EXEC [dbo].[SP_LISTAR_CONTRATOS_PROFESIONAL] [{}]'.format(
-            str(datos.username)))
+            str(datos.username)[:-1]))
         results = cursor.fetchall()
 
         try:
@@ -554,11 +553,11 @@ def ListPagosView(request):
         cursor = connection.cursor()
 
         cursor.execute(
-            'EXEC [dbo].[SP_CONTRATO_ACTIVO] [{}]'.format(str(datos.username)))
+            'EXEC [dbo].[SP_CONTRATO_ACTIVO] [{}]'.format(str(datos.username)[:-1]))
         results = cursor.fetchall()
 
         cursor.execute(
-            'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)))
+            'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(str(datos.username)[:-1]))
         contratos = cursor.fetchall()
 
         try:
@@ -729,7 +728,7 @@ def AsesoriaEspecialClienteView(request):
         else:
             cursor = connection.cursor()
             pagoActual = cursor.execute(
-                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username))
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username[:-1]))
 
             try:
                 pagoActual
@@ -740,7 +739,7 @@ def AsesoriaEspecialClienteView(request):
                 estadoPago = i[0]
 
             pago = cursor.execute(
-                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username))
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username[:-1]))
 
             try:
                 pago
@@ -794,7 +793,7 @@ def AsesoriaClienteView(request):
     if usuario.is_staff == 0 and usuario.is_profesional == 0:
         activo = Contrato.objects.filter(
             rutcliente=usuario.username).filter(estado=1).count()
-        cursor.execute('SELECT dbo.FN_GET_ID({})'.format(usuario.username))
+        cursor.execute('SELECT dbo.FN_GET_ID({})'.format(usuario.username[:-1]))
         contrato = cursor.fetchall()
 
         try:
@@ -823,7 +822,7 @@ def AsesoriaClienteView(request):
             else:
                 cursor = connection.cursor()
                 pagoActual = cursor.execute(
-                    'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username))
+                    'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username[:-1]))
 
                 try:
                     pagoActual
@@ -834,7 +833,7 @@ def AsesoriaClienteView(request):
                     estadoPago = i[0]
 
                 pago = cursor.execute(
-                    'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username))
+                    'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username[:-1]))
 
                 try:
                     pago
@@ -859,11 +858,11 @@ def AsesoriaClienteView(request):
                         rutcliente=usuario.username).filter(estado=1).count()
                     cursor = connection.cursor()
                     mesActual = cursor.execute(
-                        'EXEC [dbo].[SP_ASESORIAS_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
+                        'EXEC [dbo].[SP_ASESORIAS_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)[:-1]))
                     asesoriasMesuales = mesActual.fetchall()
 
                     cursor.execute('EXEC [dbo].[SP_ASESORIAS_CLIENTE] [{}]'.format(
-                        str(usuario.username)))
+                        str(usuario.username)[:-1]))
                     result = cursor.fetchall()
 
                     try:
@@ -910,7 +909,7 @@ def DetalleAsesoriaClienteView(request, pk):
                 return render(request, 'contrato/contrato_inactivo.html')
             else:
                 pagoActual = cursor.execute(
-                    'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+                    'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username[:-1]))
 
                 try:
                     pagoActual
@@ -921,7 +920,7 @@ def DetalleAsesoriaClienteView(request, pk):
                     estadoPago = i[0]
 
                 pago = cursor.execute(
-                    'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+                    'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username[:-1]))
 
                 try:
                     pago
@@ -978,7 +977,7 @@ def CapacitacionesView(request):
         else:
             cursor = connection.cursor()
             pagoActual = cursor.execute(
-                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username))
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username[:-1]))
 
             try:
                 pagoActual
@@ -989,7 +988,7 @@ def CapacitacionesView(request):
                 estadoPago = i[0]
 
             pago = cursor.execute(
-                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username))
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username[:-1]))
 
             try:
                 pago
@@ -1015,11 +1014,11 @@ def CapacitacionesView(request):
 
                 cursor = connection.cursor()
                 mesActual = cursor.execute(
-                    'EXEC [dbo].[SP_CAPACITACIONES_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
+                    'EXEC [dbo].[SP_CAPACITACIONES_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)[:-1]))
                 capacitacionesMensuales = mesActual.fetchall()
 
                 cursor.execute('EXEC [dbo].[SP_CAPACITACIONES_CLIENTE] [{}]'.format(
-                    str(usuario.username)))
+                    str(usuario.username)[:-1]))
                 result = cursor.fetchall()
 
                 try:
@@ -1066,7 +1065,7 @@ def DetalleCapacitacionView(request, pk):
                 return render(request, 'contrato/contrato_inactivo.html')
             else:
                 pagoActual = cursor.execute(
-                    'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+                    'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username[:-1]))
 
                 try:
                     pagoActual
@@ -1077,7 +1076,7 @@ def DetalleCapacitacionView(request, pk):
                     estadoPago = i[0]
 
                 pago = cursor.execute(
-                    'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+                    'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username[:-1]))
 
                 try:
                     pago
@@ -1134,7 +1133,7 @@ def VisitasClienteView(request):
         else:
             cursor = connection.cursor()
             pagoActual = cursor.execute(
-                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username))
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(usuario.username[:-1]))
 
             try:
                 pagoActual
@@ -1145,7 +1144,7 @@ def VisitasClienteView(request):
                 estadoPago = i[0]
 
             pago = cursor.execute(
-                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username))
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(usuario.username[:-1]))
 
             try:
                 pago
@@ -1171,12 +1170,12 @@ def VisitasClienteView(request):
 
                 cursor = connection.cursor()
                 mesActual = cursor.execute(
-                    'EXEC [dbo].[SP_VISITAS_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)))
+                    'EXEC [dbo].[SP_VISITAS_CLIENTE_MES_ACTUAL] [{}]'.format(str(usuario.username)[:-1]))
                 visitasMesuales = mesActual.fetchall()
 
                 cursor = connection.cursor()
                 cursor.execute('EXEC [dbo].[SP_VISITAS_CLIENTE] [{}]'.format(
-                    str(usuario.username)))
+                    str(usuario.username)[:-1]))
                 result = cursor.fetchall()
 
                 try:
@@ -1222,7 +1221,7 @@ def DetalleVisitaView(request, pk):
                 return render(request, 'contrato/contrato_inactivo.html')
             else:
                 pagoActual = cursor.execute(
-                    'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+                    'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username[:-1]))
 
                 try:
                     pagoActual
@@ -1233,7 +1232,7 @@ def DetalleVisitaView(request, pk):
                     estadoPago = i[0]
 
                 pago = cursor.execute(
-                    'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+                    'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username[:-1]))
 
                 for a in pago:
                     fechaPago = a[0]
@@ -1277,6 +1276,110 @@ def DetalleVisitaView(request, pk):
         return render(request, 'error/auth.html')
 
 
+
+@login_required
+def ModificarFechaVisitaView(request, pk):
+    datos = request.user
+    cursor = connection.cursor()
+
+    if datos.is_profesional == 0 and datos.is_staff == 0:
+        cursor.execute(
+            'SELECT RutCliente FROM Contrato JOIN Visita ON (Contrato.ContratoID = Visita.ContratoID) WHERE VisitaID = {}'.format(pk))
+        rutcli = cursor.fetchall()
+
+        try:
+            rutcli
+        except:
+            raise Http404
+
+        for i in rutcli:
+            cliente = i[0]
+
+        if datos.username == cliente:
+            activo = Contrato.objects.filter(
+                rutcliente=datos.username).filter(estado=1).count()
+            if activo == 0:
+                return render(request, 'contrato/contrato_inactivo.html')
+            else:
+                pagoActual = cursor.execute(
+                    'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username[:-1]))
+
+                try:
+                    pagoActual
+                except:
+                    raise Http404
+
+                for i in pagoActual:
+                    estadoPago = i[0]
+
+                pago = cursor.execute(
+                    'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username[:-1]))
+
+                for a in pago:
+                    fechaPago = a[0]
+                    fechaVenc = a[1]
+                    mesPago = a[2]
+                    pagoId = a[3]
+
+                try:
+                    pago
+                except:
+                    raise Http404
+
+                data = {
+                    'pago': estadoPago,
+                    'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                    'mes': mesPago, 'id': pagoId}
+
+                if estadoPago == 0:
+                    return render(request, 'pagos/pago_venc.html', data)
+                else:
+                    cursor = connection.cursor()
+                    cursor.execute(
+                        'EXEC [dbo].[SP_DETALLE_VISITA] {}'.format(pk))
+                    results = cursor.fetchall()
+
+                    try:
+                        results
+                    except:
+                        raise Http404
+
+                    for i in results:
+                        empleado = i[11]
+
+                    if request.method == 'POST':
+                        fecha = request.POST.get('fecha')
+                        hora = request.POST.get('hora')
+
+                        fechaOcupada = Visita.objects.filter(contratoid__rutempleado=rut(empleado), fechavisita=fecha).exists()
+
+                        data = {
+                            'entity': results,
+                            'id': pk,
+                            'rut': formatRut(datos.username)
+                        }
+
+                        if fechaOcupada:
+                            messages.warning(request, 'El profesional ' + empleado + ' posee una visita agendada en la fecha ingresada. Por favor ingrese una nueva')
+                            return render(request, 'visitas/modificar_visita.html', data)
+                        else:
+                            Visita.objects.filter(visitaid=int(pk)).update(fechavisita=fecha, hora=hora)
+                            messages.success(request, 'Fecha y Hora asignadas correctamente')
+                            return render(request, 'visitas/modificar_visita.html', data)
+
+                    data = {
+                        'entity': results,
+                        'id': pk,
+                        'rut': formatRut(datos.username)
+                    }
+                    
+                    return render(request, 'visitas/modificar_visita.html', data)
+        else:
+            return render(request, 'error/auth.html')
+    else:
+        return render(request, 'error/auth.html')
+
+
 # Actividades empleado
 @login_required
 def AsesoriasEmpleadoView(request):
@@ -1285,7 +1388,7 @@ def AsesoriasEmpleadoView(request):
     if datos.is_profesional == 1:
         cursor = connection.cursor()
         cursor.execute(
-            'EXEC [dbo].[SP_ACTIVIDAD_EMPLEADO] [{}]'.format(str(datos.username)))
+            'EXEC [dbo].[SP_ACTIVIDAD_EMPLEADO] [{}]'.format(str(datos.username)[:-1]))
         results = cursor.fetchall()
 
         try:
@@ -1351,7 +1454,7 @@ def CapacitacioesEmpleadoView(request):
     if datos.is_profesional == 1:
         cursor = connection.cursor()
         cursor.execute('EXEC [dbo].[SP_ACTIVIDAD_EMPLEADO_CAPACITACION] [{}]'.format(
-            str(datos.username)))
+            str(datos.username)[:-1]))
         results = cursor.fetchall()
 
         try:
@@ -1378,7 +1481,7 @@ def VisitasEmpleadoView(request):
     if datos.is_profesional == 1:
         cursor = connection.cursor()
         cursor.execute(
-            'EXEC [dbo].[SP_ACTIVIDAD_EMPLEADO_VISITA] [{}]'.format(str(datos.username)))
+            'EXEC [dbo].[SP_ACTIVIDAD_EMPLEADO_VISITA] [{}]'.format(str(datos.username)[:-1]))
         results = cursor.fetchall()
 
         try:
@@ -1508,7 +1611,7 @@ def ClientesEmpleadoView(request):
     if datos.is_profesional == 1:
         cursor = connection.cursor()
         cursor.execute(
-            'EXEC [dbo].[SP_LISTAR_CLIENTES_EMP] {}'.format(str(datos.username)))
+            'EXEC [dbo].[SP_LISTAR_CLIENTES_EMP] {}'.format(str(datos.username)[:-1]))
         result = cursor.fetchall()
 
         try:
@@ -1564,7 +1667,7 @@ def PerfilUsuario(request, pk):
     if datos.is_profesional == 1:
         cursor = connection.cursor()
         cursor.execute(
-            'EXEC [dbo].[SP_DETALLE_CUENTA_EMPLEADO] {0}'.format(datos.username))
+            'EXEC [dbo].[SP_DETALLE_CUENTA_EMPLEADO] {0}'.format(datos.username[:-1]))
         result = cursor.fetchall()
 
         try:
@@ -1585,7 +1688,7 @@ def PerfilUsuario(request, pk):
         else:
             cursor = connection.cursor()
             pagoActual = cursor.execute(
-                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username[:-1]))
 
             try:
                 pagoActual
@@ -1596,7 +1699,7 @@ def PerfilUsuario(request, pk):
                 estadoPago = i[0]
 
             pago = cursor.execute(
-                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username[:-1]))
 
             try:
                 pago
@@ -1619,7 +1722,7 @@ def PerfilUsuario(request, pk):
             else:
                 cursor = connection.cursor()
                 cursor.execute(
-                    'EXEC [dbo].[SP_DETALLE_CUENTA_CLIENTE] {0}'.format(datos.username))
+                    'EXEC [dbo].[SP_DETALLE_CUENTA_CLIENTE] {0}'.format(datos.username[:-1]))
                 result = cursor.fetchall()
 
                 try:
@@ -1660,7 +1763,7 @@ def DetalleChecklist(request, pk):
                 return render(request, 'contrato/contrato_inactivo.html')
             else:
                 pagoActual = cursor.execute(
-                    'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+                    'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username[:-1]))
 
                 try:
                     pagoActual
@@ -1671,7 +1774,7 @@ def DetalleChecklist(request, pk):
                     estadoPago = i[0]
 
                 pago = cursor.execute(
-                    'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+                    'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username[:-1]))
 
                 try:
                     pago
@@ -1849,7 +1952,7 @@ def InformeVisitaCliente(request, pk):
             else:
                 cursor = connection.cursor()
                 pagoActual = cursor.execute(
-                    'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+                    'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username[:-1]))
 
                 try:
                     pagoActual
@@ -1860,7 +1963,7 @@ def InformeVisitaCliente(request, pk):
                     estadoPago = i[0]
 
                 pago = cursor.execute(
-                    'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+                    'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username[:-1]))
 
                 try:
                     pago
@@ -2037,15 +2140,15 @@ def InformesClienteView(request):
         cantidad = Contrato.objects.all().filter(rutcliente=datos.username).count()
         cursor = connection.cursor()
         cursor.execute(
-            'EXEC [dbo].[SP_CONTRATO_ACTIVO] [{}]'.format(str(datos.username)))
+            'EXEC [dbo].[SP_CONTRATO_ACTIVO] [{}]'.format(str(datos.username)[:-1]))
         results = cursor.fetchall()
 
         cursor.execute(
-            'EXEC SP_VISITAS_CLIENTE_REPORT [{}]'.format(datos.username))
+            'EXEC SP_VISITAS_CLIENTE_REPORT [{}]'.format(datos.username[:-1]))
         visitas = cursor.fetchall()
 
         cursor.execute(
-            'EXEC SP_LISTAR_CONTRATOS_CLIENTE_INACTIVO [{}]'.format(datos.username))
+            'EXEC SP_LISTAR_CONTRATOS_CLIENTE_INACTIVO [{}]'.format(datos.username[:-1]))
         inactivo = cursor.fetchall()
 
         try:
@@ -2078,7 +2181,7 @@ def ReporteAccidentabilidad(request, pk):
         else:
             cursor = connection.cursor()
             pagoActual = cursor.execute(
-                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username[:-1]))
 
             try:
                 pagoActual
@@ -2089,7 +2192,7 @@ def ReporteAccidentabilidad(request, pk):
                 estadoPago = i[0]
 
             pago = cursor.execute(
-                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username[:-1]))
 
             try:
                 pago
@@ -2112,7 +2215,7 @@ def ReporteAccidentabilidad(request, pk):
             else:
                 cursor = connection.cursor()
                 cursor.execute(
-                    'SELECT dbo.FN_GET_ID({})'.format(datos.username))
+                    'SELECT dbo.FN_GET_ID({})'.format(datos.username[:-1]))
                 contrato = cursor.fetchall()
 
                 for i in contrato:
@@ -2188,7 +2291,7 @@ def ReporteVisita(request, pk):
         else:
             cursor = connection.cursor()
             pagoActual = cursor.execute(
-                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username[:-1]))
 
             try:
                 pagoActual
@@ -2199,7 +2302,7 @@ def ReporteVisita(request, pk):
                 estadoPago = i[0]
 
             pago = cursor.execute(
-                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username[:-1]))
 
             try:
                 pago
@@ -2221,7 +2324,7 @@ def ReporteVisita(request, pk):
                 return render(request, 'pagos/pago_venc.html', data)
             else:
                 cursor.execute(
-                    'SELECT dbo.FN_GET_ID({})'.format(datos.username))
+                    'SELECT dbo.FN_GET_ID({})'.format(datos.username[:-1]))
                 contrato = cursor.fetchall()
 
                 try:
@@ -2349,7 +2452,7 @@ def ReporteVisitasGenerales(request, pk):
         else:
             cursor = connection.cursor()
             pagoActual = cursor.execute(
-                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username))
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username[:-1]))
 
             try:
                 pagoActual
@@ -2360,7 +2463,7 @@ def ReporteVisitasGenerales(request, pk):
                 estadoPago = i[0]
 
             pago = cursor.execute(
-                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username))
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username[:-1]))
             
             try:
                 pago

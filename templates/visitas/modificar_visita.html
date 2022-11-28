@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block name %}
+<title>Visitas Nro {{ id }} - ControlRisk</title>
+{% endblock %}
+
+{% block contenido %}
+<div class="title">
+    <i class="uil uil-car-sideview"></i>
+    <span class="text">Asignar Fecha para Visita : {{ id }}</span>
+</div>
+
+<div class="dash-content">
+    {% for i in entity %}
+    <form action="#" method="POST" id="form-asesoria">
+        {% csrf_token %}
+        <div class="form first">
+            <div class="details personal">
+                <div class="fields">
+                    <div class="input-field repre" id="">
+                        <label>Rut Empleado Encargado</label>
+                        <input type="text" name="rut" id="" value="{{ i.11 }}" disabled>
+                        <p class="alert-input" id="alert-input">
+                            <i class="uil uil-exclamation-circle"></i>
+                        </p>
+                    </div>
+                    <div class="input-field repre" id="">
+                        <label>Nombre Empleado Encargado</label>
+                        <input type="text" name="nombre" id="" value="{{ i.10 }}" disabled>
+                        <p class="alert-input" id="alert-input">
+                            <i class="uil uil-exclamation-circle"></i>
+                            La fecha ingresada no puede ser inferior a
+                        </p>
+                    </div>
+                    <div class="input-field repre" id="input-field-fecha">
+                        <label>Fecha de la Visita </label>
+                        <input type="date" name="fecha" id="">
+                        <p class="alert-input" id="alert-input-fecha">
+                            <i class="uil uil-exclamation-circle"></i>
+                            La fecha ingresada no puede ser inferior a 
+                        </p>
+                    </div>
+                    <div class="input-field repre" id="input-field-hora">
+                        <label>Hora de la Visita </label>
+                        <input type="time" name="hora">
+                        <p class="alert-input" id="alert-input">
+                            <i class="uil uil-exclamation-circle"></i>
+                            La hora ingresada debe ser entre las 10:00 am y las 16:00 pm
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details ID">
+                <button class="nextBtn" type="submit" id="btn">
+                    <span class="btnText">Guardar</span>
+                    <i class="uil uil-navigator"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+    {% endfor %}
+
+    <script type=text/javascript>
+        const formularioAsesoria = document.getElementById("form-asesoria");
+        const inputsAsesoria = document.querySelectorAll("#form-asesoria input");
+
+        function sumarDias(fecha, dias) {
+            fecha.setDate(fecha.getDate() + dias);
+            return fecha;
+        }
+
+        const validarFormulario = (e) => {
+            switch (e.target.name) {
+                case "fecha":
+                    var fecha = new Date(e.target.value);
+                    var f1 = new Date(sumarDias(fecha, 1)).toDateString();
+                    var f2 = Date.now();
+                    var f3 = new Date(f2).toDateString();
+
+                    var f4 = new Date(f1);
+                    var f5 = new Date(f3);
+                    var f6 = new Date(sumarDias(f5, 2))
+
+                    if (f4 <= f6) {
+                        document
+                            .querySelector("#input-field-fecha .alert-input")
+                            .classList.add("alert-input-active");
+                        document.getElementById("alert-input-fecha").innerHTML = "La fecha ingresada debe ser mayor a la fecha actual y debe ser con minimo 3 días de anticipación";
+                        const btn = document.getElementById("btn");
+                        btn.disabled = true;
+                    } else {
+                        document
+                            .querySelector("#input-field-fecha .alert-input")
+                            .classList.remove("alert-input-active");
+
+                        const btn = document.getElementById("btn");
+                        btn.disabled = false;
+                    }
+                    break;
+            };
+            switch (e.target.name) {
+                case "hora":
+                    if (new Date(e.target.value).toDateString() >= new Date(new Date().toDateString() + ' ' + '10:00') && new Date(e.target.value).toDateString() <= new new Date(new Date().toDateString() + ' ' + '18:00')) {
+                        document
+                            .querySelector("#input-field-hora .alert-input")
+                            .classList.add("alert-input-active");
+                        btn.disabled = true;
+                    } else {
+                        document
+                            .querySelector("#input-field-hora .alert-input")
+                            .classList.remove("alert-input-active");
+
+                        const btn = document.getElementById("btn");
+                        btn.disabled = false;
+                    }
+                    break;
+            };
+        }
+
+        inputsAsesoria.forEach((input) => {
+            input.addEventListener("keyup", validarFormulario);
+            input.addEventListener("blur", validarFormulario);
+        });
+    </script>
+
+    {% if messages %}
+    {% for m in messages %}
+    {% if m.tags == 'success' %}
+    <script>
+        Swal.fire({
+            'tittle': 'Exito',
+            'icon': 'success',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    {% if messages %}
+    {% for m in messages %}
+    {% if m.tags == 'error' %}
+    <script>
+        Swal.fire({
+            'tittle': 'Error',
+            'icon': 'error',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    {% if messages %}
+    {% for m in messages %}
+    {% if m.tags == 'warning' %}
+    <script>
+        Swal.fire({
+            'tittle': 'Atención',
+            'icon': 'warning',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

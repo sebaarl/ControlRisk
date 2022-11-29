@@ -8,49 +8,6 @@
 <script src="../static/lib/highcharts/modules/accessibility.js"></script>
 <script src="../static/lib/jquery/dist/jquery.min.js"></script>
 <style>
-    .highcharts-figure,
-    .highcharts-data-table table {
-        min-width: 360px;
-        max-width: 800px;
-        margin: 1em auto;
-    }
-
-    .highcharts-data-table table {
-        font-family: Verdana, sans-serif;
-        border-collapse: collapse;
-        border: 1px solid #ebebeb;
-        margin: 10px auto;
-        text-align: center;
-        width: 100%;
-        max-width: 500px;
-    }
-
-    .highcharts-data-table caption {
-        padding: 1em 0;
-        font-size: 1.2em;
-        color: #555;
-    }
-
-    .highcharts-data-table th {
-        font-weight: 600;
-        padding: 0.5em;
-    }
-
-    .highcharts-data-table td,
-    .highcharts-data-table th,
-    .highcharts-data-table caption {
-        padding: 0.5em;
-    }
-
-    .highcharts-data-table thead tr,
-    .highcharts-data-table tr:nth-child(even) {
-        background: #f8f8f8;
-    }
-
-    .highcharts-data-table tr:hover {
-        background: #f1f7ff;
-    }
-
     .parent {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -59,10 +16,51 @@
         grid-row-gap: 14px;
     }
 
+    #pspdfkit-header {
+        font-size: 0.625rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 400;
+        color: #717885;
+        margin-top: 2.5rem;
+        margin-bottom: 2.5rem;
+        width: 100%;
+    }
+
+    .header-columns {
+        display: flex;
+        justify-content: space-between;
+        padding-left: 2.5rem;
+        padding-right: 2.5rem;
+    }
+
+    .logo {
+        margin-right: 1rem;
+    }
+
+    .logotype {
+        display: flex;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    h2 {
+        font-family: "Space Mono", monospace;
+        font-size: 1.25rem;
+        font-weight: 400;
+    }
+
+    h4 {
+        font-family: "Space Mono", monospace;
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
     .div1 {
         grid-area: 1 / 1 / 2 / 2;
-        display: flex;
-        justify-content: center;
+        display: flex !important;
+        justify-content: space-between;
+        flex-direction: row;
         align-items: center;
     }
 
@@ -104,6 +102,7 @@
         width: 100%;
         height: 1000px;
     }
+
     .container-firmas {
         display: flex;
         justify-content: center;
@@ -111,6 +110,7 @@
         text-align: center;
         margin-top: 200px;
     }
+
     .firma-container {
         display: flex;
         justify-content: center;
@@ -120,15 +120,27 @@
 <body>
     <div class="parent">
         <div class="div1">
-            <img src="../static/images/ControlRisk_Logo.png" class="img-invoice">
-            <h3 style="font-size: 2rem; ">Reporte de Accidentes : {{ inicio }} - {{ final }}</h3>
+            <div id="pspdfkit-header">
+                <div class="header-columns">
+                    <div class="logotype">
+                        <div>
+                            <p style="font-size: 10px;">FECHA INFORME: {{fechaActual}}</p>
+                        </div>
+                        <img class="logo" src="../static/images/ControlRisk_Logo.png" style="width: 80px;" />
+                    </div>
+
+                </div>
+            </div>
         </div>
+        <h3 style="font-size: 2rem; ">Reporte de Accidentes : {{ inicio }} - {{ final }}</h3>
         <div class="div3" style="margin-bottom: 20px;">
             <div>
                 <h3 style="font-size: 20px">Datos Reporte</h3>
                 <div class="reporte-content">
                     <p style="font-size: 13px; padding: 10px;">
-                        En el presente informe se da a conocer la cantidad de accidentes sufridos por la EMPRESA {{empresa|upper}} RUT {{formatRut}}, perteneciente al rubro {{rubro|upper}}, NRO CONTRATO {{rut}}-{{year}}-{{c}} correspondiente al periodo {{inicio}} - {{final}}.
+                        En el presente informe se da a conocer la cantidad de accidentes sufridos por la EMPRESA
+                        {{empresa|upper}} RUT {{formatRut}}, perteneciente al rubro {{rubro|upper}}, NRO CONTRATO
+                        {{rut}}-{{year}}-{{c}} correspondiente al periodo {{inicio}} - {{final}}.
                     </p>
                 </div>
             </div>
@@ -170,6 +182,15 @@
             </div>
         </div>
     </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
     <div class="container-firmas">
         <div class="firmas">
             <div class="firma-container">

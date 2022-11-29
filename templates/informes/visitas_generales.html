@@ -117,7 +117,77 @@
 </div>
 
 <div class="parent">
-    <div class="div1"></div>
+    <div class="div1">
+        <form action="POST">
+            <div class="periodo">
+                <div class="form first">
+                    <div class="details personal">
+                        <div class="fields acci">
+                            <div class="input-field" id="input-field">
+                                <label>Periodo Inicio</label>
+                            </div>
+                        </div>
+                    </div>
+                    <select name="mes_inicio" id="mes-inicio">
+                        <option value="01">Enero</option>
+                        <option value="02">Febrero</option>
+                        <option value="03">Marzo</option>
+                        <option value="04">Abril</option>
+                        <option value="05">Mayo</option>
+                        <option value="06">Junio</option>
+                        <option value="07">Julio</option>
+                        <option value="08">Agosto</option>
+                        <option value="09">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                    <select name="annio_inicio" id="annio-inicio">
+                        {% for i in annios %}
+                        <option value="{{i}}">{{i.0}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form first" style="margin-left: 100px">
+                    <div class="details personal">
+                        <div class="fields acci">
+                            <div class="input-field" id="input-field">
+                                <label style="width:100%;">Periodo Final</label>
+                            </div>
+                        </div>
+                        <select name="mes_final" id="mes-final">
+                            <option value="01">Enero</option>
+                            <option value="02">Febrero</option>
+                            <option value="03">Marzo</option>
+                            <option value="04">Abril</option>
+                            <option value="05">Mayo</option>
+                            <option value="06">Junio</option>
+                            <option value="07">Julio</option>
+                            <option value="08">Agosto</option>
+                            <option value="09">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                        <select name="annio_final" id="annio-final">
+                            {% for i in annios %}
+                            <option value="{{i.0}}">{{i.0}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="details ID">
+                    <button class="nextBtn" id="btn-periodo">
+                        <span class="btnText">Guardar</span>
+                        <i class="uil uil-navigator"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <br>
     <div class="div2" style="margin-bottom: 20px">
         <h3 style="font-size: 2rem; ">Reporte General de Visitas Realizadas en el Periodo del Contrato</h3>
     </div>
@@ -156,8 +226,12 @@
             <h3 style="font-size: 20px">Información Obtenida de las Graficas</h3>
             <div class="reporte-content">
                 <p style="font-size: 13px; padding: 10px;">
-                    De acuerdo a las graficas visualziadas anteriormente, se observa que la empresa {{ empresa | upper }}
-                    rut {{formatRut}} de un total de {{total}} ITEMS (Contanto todos los items de cada visita realizada), obtuvo {{ap}} ITEMS APROBADOS (Que corresponde a un {{ porc_aprobado}}%), {{sa}} ITEMS SEMI APROBADOS (Que corresponde a un {{ porc_semi}}%) y {{re}} ITEMS REPROBADOS (Que corresponde a un {{ porc_reprobado}}%).
+                    De acuerdo a las graficas visualziadas anteriormente, se observa que la empresa {{ empresa | upper
+                    }}
+                    rut {{formatRut}} de un total de {{total}} ITEMS (Contanto todos los items de cada visita
+                    realizada), obtuvo {{ap}} ITEMS APROBADOS (Que corresponde a un {{ porc_aprobado}}%), {{sa}} ITEMS
+                    SEMI APROBADOS (Que corresponde a un {{ porc_semi}}%) y {{re}} ITEMS REPROBADOS (Que corresponde a
+                    un {{ porc_reprobado}}%).
                 </p>
             </div>
         </div>

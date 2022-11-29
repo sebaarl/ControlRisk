@@ -25,9 +25,7 @@ from AppBase.forms import CreateAsesoriaEspecial, CreateClienteForm, CreateEmple
 from AppBase.models import Asesoria, Capacitacion, Cliente, Empleado, Contrato, Accidente, Historialactividad, Itemschecklist, Mejora, Valorextra, Pagos, Visita
 from AppUser.models import User
 
-from datetime import date
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta, date
 from dateutil.relativedelta import *
 from dateutil.easter import *
 from dateutil.rrule import *
@@ -38,6 +36,7 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from rut_chile import rut_chile
+from collections import OrderedDict
 
 import base64
 from io import BytesIO
@@ -2234,14 +2233,7 @@ def ReporteAccidentabilidad(request, pk):
                     cliente = i[0]
 
                 if datos.username == cliente:
-                    valores = []
-
-                    for m in range(1, 13):
-                        acc = Accidente.objects.filter(contratoid=pk, fecha__month=m).aggregate(
-                            r=Coalesce(Count('accidenteid'), 0)).get('r')
-                        valores.append(acc)
-
-                    cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino), RazonSocial, Nombre FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) JOIN RubroEmpresa ON (Cliente.RubroID = RubroEmpresa.RubroID) WHERE ContratoID = {}'.format(pk))
+                    cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino), RazonSocial, Nombre, DATEADD(MONTH, -1, FechaCreacion), FechaTermino FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) JOIN RubroEmpresa ON (Cliente.RubroID = RubroEmpresa.RubroID) WHERE ContratoID = {}'.format(pk))
                     contrato = cursor.fetchall()
 
                     for i in contrato:
@@ -2253,11 +2245,37 @@ def ReporteAccidentabilidad(request, pk):
                         monthFinal = i[5]
                         razonSocial = i[6]
                         rubro = i[7]
+                        inicio = i[8]
+                        final = i[9]
 
                     try:
                         contrato
                     except:
                         raise Http404
+
+                    date1 = inicio
+                    date2 = final
+                    month_list = np.array([i.strftime("%b-%y") for i in pd.date_range(start=date1, end=date2, freq='MS')])
+
+                    valores = []
+
+                    for month in np.array([i.strftime("%m-%y") for i in pd.date_range(start=date1, end=date2, freq='MS')]):
+                        cursor.execute("SELECT COUNT(AccidenteID) FROM Accidente WHERE FORMAT(Fecha, '%M-%y') = '{0}' AND ContratoID = {1}".format(month, pk))
+                        cantidad = cursor.fetchall()
+                        for i in cantidad:
+                            valores.append(i)
+
+                    cantidadAccidentes = Accidente.objects.filter(contratoid=pk).count()
+
+                    x = month_list
+                    a = np.array([])
+                    new_a = np.append(a, valores)
+                    vector = np.vectorize(np.int_)
+                    y = np.array(new_a)
+                    new_y = vector(y)
+
+                    periodo = str(monthInicio) + '/' + str(yearInicio) + ' - ' + str(monthFinal) + '/' + str(yearFinal)
+                    chart = get_barplot(x, new_y, 'Cantidad de Accidentes Sufridos por la Empresa ' + razonSocial + ' en el periodo ' + periodo, 'Meses del año de contrato', 'Cantidad de Accidentes')
 
                     data = {
                         'c': cid,
@@ -2269,7 +2287,10 @@ def ReporteAccidentabilidad(request, pk):
                         'final': str(monthFinal) + '/' + str(yearFinal),
                         'empresa': razonSocial,
                         'graph_accident_month': valores,
-                        'rubro': rubro
+                        'rubro': rubro,
+                        'chart': chart,
+                        'fecha': new_y,
+                        'cantidadAccidentes': cantidadAccidentes
                     }
 
                     return render(request, 'informes/accidentes.html', data)
@@ -2543,6 +2564,9 @@ def ReporteVisitasGenerales(request, pk):
 
                     chart = get_groupedbar(repro, semi, aprob, x, str(monthInicio) + '/' + str(yearInicio) + ' - ' + str(monthFinal) + '/' + str(yearFinal),)
 
+                    cursor.execute('SELECT YEAR(FechaCreacion) FROM Contrato GROUP BY YEAR(FechaCreacion)')
+                    annios = cursor.fetchall()
+
                     data = {
                         'x': new_a,
                         'id': pk,
@@ -2564,7 +2588,8 @@ def ReporteVisitasGenerales(request, pk):
                         'porc_reprobado': round(porc_reprobado,1),
                         're': re,
                         'sa': sa,
-                        'ap': ap
+                        'ap': ap,
+                        'annios': annios
                     }
 
                     if 'email' in request.POST:
@@ -2588,19 +2613,9 @@ class AccidentesPdf(View):
     def get(self, request, *args, **kwargs):
         pk = self.kwargs['pk']
         cursor = connection.cursor()
-        valores = []
 
-        for m in range(1, 13):
-            acc = Accidente.objects.filter(contratoid=pk, fecha__month=m).aggregate(r=Coalesce(Count('accidenteid'), 0)).get('r')
-            valores.append(acc)
-
-        cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino), RazonSocial, Nombre FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) JOIN RubroEmpresa ON (Cliente.RubroID = RubroEmpresa.RubroID) WHERE ContratoID = {}'.format(pk))
+        cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino), RazonSocial, Nombre, DATEADD(MONTH, -1, FechaCreacion), FechaTermino FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) JOIN RubroEmpresa ON (Cliente.RubroID = RubroEmpresa.RubroID) WHERE ContratoID = {}'.format(pk))
         contrato = cursor.fetchall()
-
-        try:
-            contrato
-        except:                
-            raise Http404
 
         for i in contrato:
             rut = i[0]
@@ -2609,20 +2624,45 @@ class AccidentesPdf(View):
             monthInicio = i[3]
             yearFinal = i[4]
             monthFinal = i[5]
-            empresa = i[6]
+            razonSocial = i[6]
             rubro = i[7]
+            inicio = i[8]
+            final = i[9]
 
-        x = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio','Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
-        y = valores
+        try:
+            contrato
+        except:
+            raise Http404
+
+        
+        date1 = inicio
+        date2 = final
+        month_list = np.array([i.strftime("%b-%y") for i in pd.date_range(start=date1, end=date2, freq='MS')])
+
+        valores = []
+
+        for month in np.array([i.strftime("%m-%y") for i in pd.date_range(start=date1, end=date2, freq='MS')]):
+            cursor.execute("SELECT COUNT(AccidenteID) FROM Accidente WHERE FORMAT(Fecha, '%M-%y') = '{0}' AND ContratoID = {1}".format(month, pk))
+            cantidad = cursor.fetchall()
+            for i in cantidad:
+                valores.append(i)
+
+        x = month_list
+        a = np.array([])
+        new_a = np.append(a, valores)
+        vector = np.vectorize(np.int_)
+        y = np.array(new_a)
+        new_y = vector(y)
+
         periodo = str(monthInicio) + '/' + str(yearInicio) + ' - ' + str(monthFinal) + '/' + str(yearFinal)
-        chart = get_barplot(x, y, 'Cantidad de Accidentes Sufridos por la Empresa ' + empresa + ' en el periodo ' + periodo, 'Meses del año de contrato', 'Cantidad de Accidentes')
+        chart = get_barplot(x, new_y, 'Cantidad de Accidentes Sufridos por la Empresa ' + razonSocial + ' en el periodo ' + periodo, 'Meses del año de contrato', 'Cantidad de Accidentes')
 
         template = get_template('pdf_accidente.html')
         response = HttpResponse(content_type='application/pdf')
         # response['Content-Disposition'] = 'attachment; filename="infome_accidentes.pdf"'
         context = {
             'comp': {'name': 'ControlRisk', 'rut': '99.999.999-k', 'direccion': 'Avenida Siempreviva 742'},
-            'empresa': empresa,
+            'empresa': razonSocial,
             'graph_accident_month': valores,
             'chart': chart,
             'c': pk,
@@ -2632,8 +2672,8 @@ class AccidentesPdf(View):
             'formatRut': formatRut(rut),
             'inicio': str(monthInicio) + '/' + str(yearInicio),
             'final': str(monthFinal) + '/' + str(yearFinal),
-            'empresa': empresa,
-            'rubro': rubro
+            'rubro': rubro,
+            'fechaActual': datetime.today().strftime("%d-%m-%Y"),
         }
         html = template.render(context)
         pisa_status = pisa.CreatePDF(html, dest=response)

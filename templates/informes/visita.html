@@ -129,6 +129,7 @@
                 <br><br>
             </div>
         </div>
+        {% if total > 0 %}
         <div>
             <h3 style="font-size: 20px">Informe Entregado por Profesional y Plan de Mejora</h3>
             <div class="reporte-content">
@@ -151,7 +152,8 @@
                 {% endif %}
                 {% if i.2 == None %}
                 <p style="font-size: 13px; padding: 10px;">
-                    Dado a concoer el Plan de Mejora al cliente, el profesional da a concoer que : NO SE REGISTRÓ PLAN DE MEJORA.
+                    Dado a concoer el Plan de Mejora al cliente, el profesional da a concoer que : NO SE REGISTRÓ PLAN
+                    DE MEJORA.
                 </p>
                 {% else %}
                 <p style="font-size: 13px; padding: 10px;">
@@ -170,7 +172,8 @@
     </div>
     <div class="div4">
         <figure class="highcharts-figure" style="margin-top: 40px">
-            <div id="container" style="margin-top: 40px"></div>
+            <div id="container" style="margin-top: 40px">
+            </div>
 
         </figure>
         <br>
@@ -233,6 +236,15 @@
             </div>
         </div>
     </div>
+    {% else %}
+    <div class="alerta">
+        <img src="{% static 'images/report.png' %}" alt="">
+        <div>
+            <p>La visita aún no se ha realizado</p>
+        </div>
+    </div>
+    {% endif %}
+    {% if total > 0 %}
     <div class="boton" style="display:flex; justify-content: space-around;">
         <div class="button-c pdf">
             <a class="btn" href="{% url 'base:visita-pdf' id %}" target="_blank">Generar pdf de informe</a>
@@ -245,6 +257,20 @@
             </form>
         </div> -->
     </div>
+    {% else %}
+    <div class="boton" style="display:flex; justify-content: space-around;">
+        <div class="button-c pdf">
+            <p class="btn">No se puede generar pdf</p>
+        </div>
+        <!-- <div class="button-c pdf">
+            <form action="" method="post">
+                {% csrf_token %}
+                <button class="btn" name="email" href="{% url 'base:visita-pdf' id %}" target="_blank">Enviar informe
+                    via email</button>
+            </form>
+        </div> -->
+    </div>
+    {% endif %}
     <div class="boton">
     </div>
     <script type=text/javascript>

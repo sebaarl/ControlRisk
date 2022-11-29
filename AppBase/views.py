@@ -2379,10 +2379,6 @@ def ReporteVisita(request, pk):
                     total = Itemschecklist.objects.filter(visitaid=pk).aggregate(
                         r=Coalesce(Count('itemcheclistid'), 0)).get('r')
 
-                    aprob = aprobado*100/total
-                    semi = semiaprobado*100/total
-                    repro = reprobado*100/total
-
                     cursor.execute('EXEC [SP_DETALLE_VISITA] {}'.format(pk))
                     visita = cursor.fetchall()
 
@@ -2421,6 +2417,11 @@ def ReporteVisita(request, pk):
                         monthFinal = i[5]
                         razonSocial = i[6]
 
+                    if total >= 1:
+                        aprob = aprobado*100/total
+                        semi = semiaprobado*100/total
+                        repro = reprobado*100/total
+
                     data = {
                         'c': cid,
                         'fechaVisita': fechaVisita,
@@ -2439,7 +2440,7 @@ def ReporteVisita(request, pk):
                         'reprobado': reprobado,
                         'aprob': round(aprob, 1),
                         'semiapro': round(semi,1),
-                        'repro': round(repro,1)
+                        'repro': round(repro,1),
                     }
 
                     if 'email' in request.POST:
@@ -2517,7 +2518,7 @@ def ReporteVisitasGenerales(request, pk):
                     cliente = i[0]
 
                 if datos.username == cliente:
-                    fechas = Visita.objects.filter(contratoid=pk).values_list('fechavisita')
+                    fechas = Visita.objects.filter(contratoid=pk).values_list('fechavisita').exclude(fechavisita__isnull=True)
                     valoresFecha = []
                     a = np.array([])
                     new_a = np.append(a, fechas)
@@ -2527,16 +2528,39 @@ def ReporteVisitasGenerales(request, pk):
                     semi = []
                     aprob = []
 
-                    for i in x:
-                        reprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk, checklistid__visitaid__fechavisita=i).filter(aprobado=0,semiaprobado=0,reprobado=1).aggregate(r=Coalesce(Count('reprobado'), 0)).get('r')
-                        repro.append(reprobado)
-                        semiaprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk, checklistid__visitaid__fechavisita=i).filter(aprobado=0,semiaprobado=1,reprobado=0).aggregate(r=Coalesce(Count('semiaprobado'), 0)).get('r')
-                        semi.append(semiaprobado)
-                        aprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk, checklistid__visitaid__fechavisita=i).filter(aprobado=1,semiaprobado=0,reprobado=0).aggregate(r=Coalesce(Count('aprobado'), 0)).get('r')
-                        aprob.append(aprobado)
+                    if len(fechas) > 0:
+                        for i in x:
+                            reprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk, checklistid__visitaid__fechavisita=i).filter(aprobado=0,semiaprobado=0,reprobado=1).aggregate(r=Coalesce(Count('reprobado'), 0)).get('r')
+                            repro.append(reprobado)
+                            semiaprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk, checklistid__visitaid__fechavisita=i).filter(aprobado=0,semiaprobado=1,reprobado=0).aggregate(r=Coalesce(Count('semiaprobado'), 0)).get('r')
+                            semi.append(semiaprobado)
+                            aprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk, checklistid__visitaid__fechavisita=i).filter(aprobado=1,semiaprobado=0,reprobado=0).aggregate(r=Coalesce(Count('aprobado'), 0)).get('r')
+                            aprob.append(aprobado)
 
-                    total = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).aggregate(r=Coalesce(Count('itemcheclistid'), 0)).get('r')
-                    
+                            total = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).aggregate(r=Coalesce(Count('itemcheclistid'), 0)).get('r')
+
+                            re = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=0,semiaprobado=0,reprobado=1).aggregate(r=Coalesce(Count('reprobado'), 0)).get('r')
+                            ap = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=1,semiaprobado=0,reprobado=0).aggregate(r=Coalesce(Count('aprobado'), 0)).get('r')
+                            sa = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=0,semiaprobado=1,reprobado=0).aggregate(r=Coalesce(Count('semiaprobado'), 0)).get('r')
+
+                            porc_aprobado = ap*100/total
+                            porc_semi = sa*100/total
+                            porc_reprobado = re*100/total
+
+                            data = {
+                                'total': total,
+                                'valoresFecha': valoresFecha,
+                                'aprobado': aprob,
+                                'semi': semi,
+                                'reprobado': repro,
+                                'porc_aprobado': round(porc_aprobado,1),
+                                'porc_semi': round(porc_semi,1),
+                                'porc_reprobado': round(porc_reprobado,1),
+                                're': re,
+                                'sa': sa,
+                                'ap': ap,
+                            }
+                            
                     cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino),RazonSocial FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) WHERE ContratoID = {}'.format(pk))
                     contrato = cursor.fetchall()
 
@@ -2554,14 +2578,6 @@ def ReporteVisitasGenerales(request, pk):
                         monthFinal = i[5]
                         razonSocial = i[6]
 
-                    re = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=0,semiaprobado=0,reprobado=1).aggregate(r=Coalesce(Count('reprobado'), 0)).get('r')
-                    ap = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=1,semiaprobado=0,reprobado=0).aggregate(r=Coalesce(Count('aprobado'), 0)).get('r')
-                    sa = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).filter(aprobado=0,semiaprobado=1,reprobado=0).aggregate(r=Coalesce(Count('semiaprobado'), 0)).get('r')
-
-                    porc_aprobado = ap*100/total
-                    porc_semi = sa*100/total
-                    porc_reprobado = re*100/total
-
                     chart = get_groupedbar(repro, semi, aprob, x, str(monthInicio) + '/' + str(yearInicio) + ' - ' + str(monthFinal) + '/' + str(yearFinal),)
 
                     cursor.execute('SELECT YEAR(FechaCreacion) FROM Contrato GROUP BY YEAR(FechaCreacion)')
@@ -2575,21 +2591,10 @@ def ReporteVisitasGenerales(request, pk):
                         'formatRut': formatRut(rut),
                         'annio': yearInicio,
                         'empresa': razonSocial,
-                        'total': total,
-                        'valoresFecha': valoresFecha,
-                        'aprobado': aprob,
-                        'semi': semi,
-                        'reprobado': repro,
+                        'annios': annios,
                         'inicio': str(monthInicio) + '/' + str(yearInicio),
                         'final': str(monthFinal) + '/' + str(yearFinal),
                         'chart': chart,
-                        'porc_aprobado': round(porc_aprobado,1),
-                        'porc_semi': round(porc_semi,1),
-                        'porc_reprobado': round(porc_reprobado,1),
-                        're': re,
-                        'sa': sa,
-                        'ap': ap,
-                        'annios': annios
                     }
 
                     if 'email' in request.POST:

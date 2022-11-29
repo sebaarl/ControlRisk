@@ -2,7 +2,7 @@ from django.urls import path
 from django.conf.urls import handler404, handler500
 
 
-from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView,ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView,ContratoEmpleadoView, PagosDetailView, AsesoriaClienteView, AsesoriaEspecialClienteView, AsesoriaClienteView, AsesoriasEmpleadoView, CapacitacioesEmpleadoView, VisitasEmpleadoView, DetalleAsesoriaView, VisitasClienteView, DetalleVisitaView, DetalleAsesoriaClienteView, DetalleVisitaEmpleadoView, ChecklistView, ClientesEmpleadoView, ClienteDetalle, PerfilUsuario, DetalleChecklist, TasaAccidentabildiadView, InformeVisitaEmp, InformeVisitaCliente, DetallePlanMejora, DetalleCapacitacionEmp, CrearCapacitacion, CapacitacionesView, DetalleCapacitacionView, Error404View, Error500View, ReporteAccidentabilidad, InformesClienteView, AccidentesPdf, ReporteVisita, VisitaPDF, ReporteVisitasGenerales,VisitaGeneralPDF, ModificarFechaVisitaView
+from AppBase.views import HomeView, CreateClient, CreateEmpleado, ListClienteView, CreateContractView, CreateAccidentView, ListContractView,ContractDetailView, ContractDetailPdf, ListPagosView, ContratoClientView, PagosContractView,ContratoEmpleadoView, PagosDetailView, AsesoriaClienteView, AsesoriaEspecialClienteView, AsesoriaClienteView, AsesoriasEmpleadoView, CapacitacioesEmpleadoView, VisitasEmpleadoView, DetalleAsesoriaView, VisitasClienteView, DetalleVisitaView, DetalleAsesoriaClienteView, DetalleVisitaEmpleadoView, ChecklistView, ClientesEmpleadoView, ClienteDetalle, PerfilUsuario, DetalleChecklist, TasaAccidentabildiadView, InformeVisitaEmp, InformeVisitaCliente, DetallePlanMejora, DetalleCapacitacionEmp, CrearCapacitacion, CapacitacionesView, DetalleCapacitacionView, Error404View, Error500View, ReporteAccidentabilidad, InformesClienteView, AccidentesPdf, ReporteVisita, VisitaPDF, ReporteVisitasGenerales,VisitaGeneralPDF, ModificarFechaVisitaView, SolicitarCapacitacionView
 
 app_name = 'base'
 
@@ -47,6 +47,7 @@ urlpatterns = [
 
     path('clientes/capacitaciones/', CapacitacionesView, name='capacitacion-client'),
     path('clientes/capacitaciones/detalle/<pk>/', DetalleCapacitacionView, name='capacitacion-detalle'),
+    path('clientes/capacitaciones/solicitud/', SolicitarCapacitacionView, name='capacitacion-crear'),
 
     path('clientes/accidentes/ingresar/', CreateAccidentView, name='create-accident'),
     path('clientes/accidentes/tasa/<pk>', TasaAccidentabildiadView, name='tasa-accident'),

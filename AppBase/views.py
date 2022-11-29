@@ -496,11 +496,13 @@ def ContratoClientView(request):
             else:
                 cursor = connection.cursor()
                 cursor.execute(
-                    'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(datos.username))
+                    'EXEC [dbo].[SP_LISTAR_CONTRATOS_CLIENTE] [{}]'.format(datos.username[:-1]))
                 results = cursor.fetchall()
 
                 cantidad = Contrato.objects.filter(
                     rutcliente=datos.username).count()
+
+                activo = Contrato.objects.filter(rutcliente=datos.username, estado=1).count()
 
                 try:
                     cantidad,
@@ -508,7 +510,7 @@ def ContratoClientView(request):
                 except:
                     raise Http404
 
-                data = {'entity': results, 'cantidad': cantidad}
+                data = {'entity': results, 'cantidad': cantidad, 'activo': activo}
 
                 return render(request, 'contrato/contratos_client.html', data)
     else:
@@ -2106,6 +2108,55 @@ def CrearCapacitacion(request):
 
     else:
         return render(request, 'error/auth.html')
+
+
+def SolicitarCapacitacionView(request):
+    datos = request.user
+
+    if datos.is_profesional == 1 and datos.is_staff == 1 and datos.is_superuser == 1:
+        return render(request, 'error/auth.html')
+    else:
+        activo = Contrato.objects.filter(
+            rutcliente=datos.username).filter(estado=1).count()
+        if activo == 0:
+            return render(request, 'contrato/contrato_inactivo.html')
+        else:
+            cursor = connection.cursor()
+            pagoActual = cursor.execute(
+                'SELECT [dbo].[FN_GET_PAGO_ATRASADO]({})'.format(datos.username[:-1]))
+
+            try:
+                pagoActual
+            except:
+                raise Http404
+
+            for i in pagoActual:
+                estadoPago = i[0]
+
+            pago = cursor.execute(
+                'EXEC [dbo].[SP_FECHA_PAGO] {}'.format(datos.username[:-1]))
+
+            try:
+                pago
+            except:
+                raise Http404
+
+            for a in pago:
+                fechaPago = a[0]
+                fechaVenc = a[1]
+                mesPago = a[2]
+                pagoId = a[3]
+
+            data = {
+                'pago': estadoPago,
+                'fechaPago': fechaPago, 'fechaVenc': fechaVenc,
+                'mes': mesPago, 'id': pagoId}
+
+            if estadoPago == 0:
+                return render(request, 'pagos/pago_venc.html', data)
+            else:
+                return render(request, 'capacitaciones/solicitud_capacitacion.html')
+
 
 
 class Error404View(TemplateView):

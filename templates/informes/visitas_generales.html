@@ -136,6 +136,7 @@
             </div>
         </div>
     </div>
+    {% if total > 0 %}
     <div class="div4">
         <figure class="highcharts-figure">
             <div id="container" style="margin-top: 40px">
@@ -167,20 +168,42 @@
             </div>
         </div>
     </div>
+    {% else %}
+    <div class="alerta">
+        <img src="{% static 'images/report.png' %}" alt="">
+        <div>
+            <p>La visita aún no se ha realizado</p>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if total > 0 %}
     <div class="boton" style="display:flex; justify-content: space-around;">
         <div class="button-c pdf">
-            <a class="btn" href="{% url 'base:visita-general-pdf' id %}" target="_blank">Generar pdf de informe</a>
+            <a class="btn" href="{% url 'base:visita-pdf' id %}" target="_blank">Generar pdf de informe</a>
         </div>
         <!-- <div class="button-c pdf">
             <form action="" method="post">
                 {% csrf_token %}
-                <button class="btn" name="email" href="" target="_blank">Enviar informe
+                <button class="btn" name="email" href="{% url 'base:visita-pdf' id %}" target="_blank">Enviar informe
                     via email</button>
             </form>
         </div> -->
     </div>
-    <div class="boton">
+    {% else %}
+    <div class="boton" style="display:flex; justify-content: space-around;">
+        <div class="button-c pdf">
+            <p class="btn">No se puede generar pdf</p>
+        </div>
+        <!-- <div class="button-c pdf">
+            <form action="" method="post">
+                {% csrf_token %}
+                <button class="btn" name="email" href="{% url 'base:visita-pdf' id %}" target="_blank">Enviar informe
+                    via email</button>
+            </form>
+        </div> -->
     </div>
+    {% endif %}
 
     <script type=text/javascript>
         Highcharts.chart('container-pie', {

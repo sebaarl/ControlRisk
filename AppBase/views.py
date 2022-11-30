@@ -2508,6 +2508,29 @@ def ReporteVisita(request, pk):
                         semi = semiaprobado*100/total
                         repro = reprobado*100/total
 
+                        data = {
+                            'c': cid,
+                            'fechaVisita': fechaVisita,
+                            'itemAprob': aprobado,
+                            'itemSemi': semiaprobado,
+                            'itemRepro': reprobado,
+                            'checkList': checkList,
+                            'rut': formatRut(rut),
+                            'empresa': razonSocial,
+                            'total': total,
+                            'id': pk,
+                            'detalle': detalle,
+                            'plan': plan,
+                            'aprobado': aprobado,
+                            'semi': semiaprobado,
+                            'reprobado': reprobado,
+                            'aprob': round(aprob, 1),
+                            'semiapro': round(semi,1),
+                            'repro': round(repro,1),
+                        }
+
+                        return render(request, 'informes/visita.html', data)
+
                     data = {
                         'c': cid,
                         'fechaVisita': fechaVisita,
@@ -2524,9 +2547,6 @@ def ReporteVisita(request, pk):
                         'aprobado': aprobado,
                         'semi': semiaprobado,
                         'reprobado': reprobado,
-                        'aprob': round(aprob, 1),
-                        'semiapro': round(semi,1),
-                        'repro': round(repro,1),
                     }
 
                     if 'email' in request.POST:
@@ -2609,12 +2629,29 @@ def ReporteVisitasGenerales(request, pk):
                     a = np.array([])
                     new_a = np.append(a, fechas)
                     vector = np.vectorize(np.str_)
-                    x = vector(new_a)
                     repro = []
                     semi = []
                     aprob = []
 
-                    if len(fechas) > 0:
+                    cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino),RazonSocial FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) WHERE ContratoID = {}'.format(pk))
+                    contrato = cursor.fetchall()
+
+                    try:
+                        contrato
+                    except:                
+                        raise Http404
+
+                    for i in contrato:
+                        rut = i[0]
+                        yearInicio = i[1]
+                        contratoid = i[2]
+                        monthInicio = i[3]
+                        yearFinal = i[4]
+                        monthFinal = i[5]
+                        razonSocial = i[6]
+
+                    if new_a.size != 0:
+                        x = vector(new_a)
                         for i in x:
                             reprobado = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk, checklistid__visitaid__fechavisita=i).filter(aprobado=0,semiaprobado=0,reprobado=1).aggregate(r=Coalesce(Count('reprobado'), 0)).get('r')
                             repro.append(reprobado)
@@ -2633,41 +2670,36 @@ def ReporteVisitasGenerales(request, pk):
                             porc_semi = sa*100/total
                             porc_reprobado = re*100/total
 
-                            data = {
-                                'total': total,
-                                'valoresFecha': valoresFecha,
-                                'aprobado': aprob,
-                                'semi': semi,
-                                'reprobado': repro,
-                                'porc_aprobado': round(porc_aprobado,1),
-                                'porc_semi': round(porc_semi,1),
-                                'porc_reprobado': round(porc_reprobado,1),
-                                're': re,
-                                'sa': sa,
-                                'ap': ap,
-                            }
-                            
-                    cursor.execute('SELECT Contrato.RutCliente,YEAR(FechaCreacion),ContratoID,MONTH(FechaCreacion),YEAR(FechaTermino),MONTH(FechaTermino),RazonSocial FROM Contrato JOIN Cliente ON (Contrato.RutCliente = CLiente.RutCliente) WHERE ContratoID = {}'.format(pk))
-                    contrato = cursor.fetchall()
+                        chart = get_groupedbar(repro, semi, aprob, x, str(monthInicio) + '/' + str(yearInicio) + ' - ' + str(monthFinal) + '/' + str(yearFinal))
 
-                    try:
-                        contrato
-                    except:                
-                        raise Http404
+                        data = {
+                            'total': total,
+                            'valoresFecha': valoresFecha,
+                            'aprobado': aprob,
+                            'semi': semi,
+                            'reprobado': repro,
+                            'porc_aprobado': round(porc_aprobado,1),
+                            'porc_semi': round(porc_semi,1),
+                            'porc_reprobado': round(porc_reprobado,1),
+                            're': re,
+                            'sa': sa,
+                            'ap': ap,
+                            'chart': chart,
+                            'x': new_a,
+                            'id': pk,
+                            'cid': contratoid,
+                            'rut': rut,
+                            'formatRut': formatRut(rut),
+                            'annio': yearInicio,
+                            'empresa': razonSocial,
+                            'inicio': str(monthInicio) + '/' + str(yearInicio),
+                            'final': str(monthFinal) + '/' + str(yearFinal),
+                            'total': total,
+                        }
 
-                    for i in contrato:
-                        rut = i[0]
-                        yearInicio = i[1]
-                        contratoid = i[2]
-                        monthInicio = i[3]
-                        yearFinal = i[4]
-                        monthFinal = i[5]
-                        razonSocial = i[6]
+                        return render(request, 'informes/visitas_generales.html', data)
 
-                    chart = get_groupedbar(repro, semi, aprob, x, str(monthInicio) + '/' + str(yearInicio) + ' - ' + str(monthFinal) + '/' + str(yearFinal),)
-
-                    cursor.execute('SELECT YEAR(FechaCreacion) FROM Contrato GROUP BY YEAR(FechaCreacion)')
-                    annios = cursor.fetchall()
+                    total = Itemschecklist.objects.filter(checklistid__visitaid__contratoid=pk).aggregate(r=Coalesce(Count('itemcheclistid'), 0)).get('r')
 
                     data = {
                         'x': new_a,
@@ -2677,10 +2709,9 @@ def ReporteVisitasGenerales(request, pk):
                         'formatRut': formatRut(rut),
                         'annio': yearInicio,
                         'empresa': razonSocial,
-                        'annios': annios,
                         'inicio': str(monthInicio) + '/' + str(yearInicio),
                         'final': str(monthFinal) + '/' + str(yearFinal),
-                        'chart': chart,
+                        'total': total,
                     }
 
                     if 'email' in request.POST:

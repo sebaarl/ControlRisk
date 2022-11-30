@@ -2096,16 +2096,51 @@ def CrearCapacitacion(request):
             materiales = request.POST.get('materiales')
             desc = request.POST.get('desc')
 
-            cursor = connection.cursor()
-            cursor.execute('EXEC [dbo].[SP_CREAR_CAPACITACION] %s, %s, %s, %s, %s, %s', (
-                fecha, hora, asistentes, materiales, desc, rut(rutcliente)))
+            existeCliente = Cliente.objects.filter(rutcliente=rut(rutcliente)).exists()
 
-            messages.success(request, 'Capacitación ingresada correctamente')
+            if existeCliente:
+                cursor = connection.cursor()
+                cursor.execute('EXEC [dbo].[SP_CREAR_CAPACITACION] %s, %s, %s, %s, %s, %s', (
+                    fecha, hora, asistentes, materiales, desc, rut(rutcliente)))
 
-            return render(request, 'actividades/crear_capacitacion.html')
+                messages.success(request, 'Capacitación ingresada correctamente')
+
+                return render(request, 'actividades/crear_capacitacion.html')
+            else:
+                messages.error(request, 'El rut {} ingresado no existe en el sistema'.format(rutcliente))
+
+                return render(request, 'actividades/ingresar_asesoria.html')
 
         return render(request, 'actividades/crear_capacitacion.html')
 
+    else:
+        return render(request, 'error/auth.html')
+
+
+def CrearAsesoriaEmp(request):
+    datos = request.user
+    cursor = connection.cursor()
+
+    if datos.is_profesional == 1:
+        if request.method == 'POST':
+            cliente = request.POST.get('rut')
+            fecha = request.POST.get('fecha')
+            hora = request.POST.get('hora')
+            desc = request.POST.get('descripcion')
+
+            existeCliente = Cliente.objects.filter(rutcliente=rut(cliente)).exists()
+
+            if existeCliente:
+                cursor.execute('EXEC [dbo].[SP_ASESORIA_ESPECIAL] %s, %s, %s, %s',(fecha, desc, hora, rut(cliente)))
+
+                messages.success(request, 'Asesoria ingresada correctamente')
+                return render(request, 'actividades/ingresar_asesoria.html')
+            else:
+                messages.error(request, 'El rut {} ingresado no existe en el sistema'.format(cliente))
+
+                return render(request, 'actividades/ingresar_asesoria.html')
+
+        return render(request, 'actividades/ingresar_asesoria.html')
     else:
         return render(request, 'error/auth.html')
 

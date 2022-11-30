@@ -53,14 +53,33 @@
 
     {% if messages %}
     {% for m in messages %}
+    {% if m.tags == 'success' %}
     <script>
         Swal.fire({
             'tittle': 'Exito',
+            'icon': 'success',
             'text': '{{ m }}',
             'confirmButtonColor': '#ff131d',
             'confirmButtonText': 'Aceptar',
         })
     </script>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    {% if messages %}
+    {% for m in messages %}
+    {% if m.tags == 'error' %}
+    <script>
+        Swal.fire({
+            'tittle': 'Exito',
+            'icon': 'error',
+            'text': '{{ m }}',
+            'confirmButtonColor': '#ff131d',
+            'confirmButtonText': 'Aceptar',
+        })
+    </script>
+    {% endif %}
     {% endfor %}
     {% endif %}
 </div>

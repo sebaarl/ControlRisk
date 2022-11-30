@@ -11,6 +11,11 @@
     <span class="text">Asesorias, Empleado : {{ rut }}</span>
 </div>
 
+
+<div class="especial">
+    <a href="{% url 'base:asesorias-create' %}">Ingresar Asesoria <i class="uil uil-arrow-right"></i></a>
+</div>
+
 <div class="dash-content">
     {% if c > 0 %}
     <h2 style="text-align: center" class="act">ESTAS SON TUS ASESORIAS DE LA SEMANA</h2>
